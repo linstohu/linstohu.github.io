@@ -1,0 +1,9 @@
+baseURL: https://linsto.org/
+title: Linsto's Notes
+languageCode: en-us
+timeZone: Asia/Shanghai
+paginate: 50
+archivePaginate: 50
+enableEmoji: true
+enableRobotsTXT: true
+googleAnalytics: G-RH55QJFKK1

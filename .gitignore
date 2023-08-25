@@ -12,7 +12,7 @@ __*
 *.iml
 
 # Vscode files
-.vscode
+# .vscode
 
 # This is where the result of the go build goes
 /output*/
@@ -30,3 +30,11 @@ __*
 *.un~
 Session.vim
 .netrwhist
+
+node_modules
+
+# Hugo
+.hugo_build.lock
+/resources
+/public
+/dist
