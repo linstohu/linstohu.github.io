@@ -3,7 +3,6 @@
     "esbenp.prettier-vscode",
     "redhat.vscode-yaml",
     "mohsen1.prettify-json",
-    "DavidAnson.vscode-markdownlint",
     "streetsidesoftware.code-spell-checker"
   ]
 }
