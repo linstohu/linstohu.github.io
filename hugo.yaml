@@ -53,26 +53,48 @@ markup:
     endLevel: 3
     ordered: false
     startLevel: 2
+  highlight:
+    guessSyntax: false
+    noClasses: false
+    codeFences: true
+    lineNos: false
 
+# Params of theme
 params:
+  # basic
   since: 2023
   location: Beijing
   description: "linsto's blog"
   keywords:
     - linsto
-
+  # Display of posts
   postMetaInFooter: true
   showArchiveCount: false # show 'xx Posts In Total' in archive page
   dateFormatToUse: "2006-01-02" # The date format to use; for a list of valid formats, see https://gohugo.io/functions/format/
   moreMeta: false # show word count and read time? 是否显示字数统计与阅读时间
   toc: true # Auto enable toc
   autoCollapseToc: false # Auto expand and collapse toc
+  # Social Accounts
+  social:
+    a-email: linstohu@gmail.com
+    b-twitter: https://mastodon.social/@linstohu
+    c-mastodon: https://mastodon.social/@linstohu
+  # Display of images
   fancybox: true # see https://github.com/fancyapps/fancybox
-
-  mathjax: false # see https://www.mathjax.org/ 是否使用mathjax（数学公式）
-  mathjaxEnableSingleDollar: false # 是否使用 $...$ 即可進行inline latex渲染
+  # Display of mathematics
+  mathjax: true # see https://www.mathjax.org/ 是否使用mathjax（数学公式）
+  mathjaxEnableSingleDollar: true # 是否使用 $...$ 即可進行inline latex渲染
   mathjaxEnableAutoNumber: false # 是否使用公式自动编号
-  mathjaxUseLocalFiles: false # You should install mathjax in `your-site/static/lib/mathjax`
-
+  # load these files from public cdn
+  publicCDN:
+    enable: true
+    jquery: <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    slideout: <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+    fancyboxJS: <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+    fancyboxCSS: <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+    timeagoJS: <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js" integrity="sha256-jwCP0NAdCBloaIWTWHmW4i3snUNMHUNO+jr9rYd2iOI=" crossorigin="anonymous"></script>
+    timeagoLocalesJS: <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.locales.min.js" integrity="sha256-ZwofwC1Lf/faQCzN7nZtfijVV6hSwxjQMwXL4gn9qU8=" crossorigin="anonymous"></script>
+    mathjaxJS: <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+  # Link custom CSS and JS assets (relative to /static/css and /static/js respectively)
   customCSS: []
   customJS: []

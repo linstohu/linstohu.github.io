@@ -153,7 +153,7 @@ $post-nav-font-size: 18px !default;
 $post-toc-width: 200px !default;
 
 // Backgroud color of the post toc.
-$post-toc-backgroud: rgba($deputy-color, 0.6) !default;
+$post-toc-backgroud: rgba($deputy-color, 0.4) !default;
 
 // Margin left of the post toc.
 $post-toc-margin-left: $global-body-width - 15px !default;
@@ -258,7 +258,7 @@ $code-type-list: (
 ) !default;
 
 // Color of the code background.
-$code-background: $deputy-color !default;
+$code-background: rgba($deputy-color, 0.6) !default;
 
 
 // ========== Pagination ========== //

@@ -3,13 +3,15 @@
 // ==============================
 
 @font-face {
-  font-family: 'iconfont';
+  font-family: "iconfont";
 
-  src: url('../fonts/iconfont/iconfont.eot');
-  src: url('../fonts/iconfont/iconfont.eot#iefix') format('embedded-opentype'), // not '?#iefix', because webpack will add '?hash=[hash]'
-  url('../fonts/iconfont/iconfont.woff') format('woff'),
-  url('../fonts/iconfont/iconfont.ttf') format('truetype'),
-  url('../fonts/iconfont/iconfont.svg#iconfont') format('svg');
+  src: url("../fonts/iconfont/iconfont.eot");
+  src:
+    url("../fonts/iconfont/iconfont.eot#iefix") format("embedded-opentype"),
+    // not '?#iefix', because webpack will add '?hash=[hash]'
+    url("../fonts/iconfont/iconfont.woff") format("woff"),
+    url("../fonts/iconfont/iconfont.ttf") format("truetype"),
+    url("../fonts/iconfont/iconfont.svg#iconfont") format("svg");
   font-display: swap;
 }
 
@@ -40,86 +42,107 @@
 }
 
 /* Social Icon */
-.icon-bilibili:before {
-  content: "\e900";
-  font-size: .9em;
+.icon-rss:before {
+  content: "\e604";
+  font-size: 0.95em;
   position: relative;
-  top: -4px;
+  top: 0.5px;
 }
-.icon-instagram:before {
-  font-size: .95em;
-  content: "\e611";
-  position: relative;
-  top: 1px;
-}
-.icon-douban:before {
-  content: "\e610";
-  position: relative;
-  top: 2px;
-}
-.icon-tumblr:before {
-  content: "\e69f";
-  font-size: .85em;
-  position: relative;
-  top: -2px;
-}
-.icon-linkedin:before {
-  content: "\e60d";
-  position: relative;
-  top: -2px;
-}
-.icon-twitter:before {
-  content: "\e600";
-}
-.icon-weibo:before {
-  content: "\e602";
-  position: relative;
-  top: 2px;
-}
-.icon-stack-overflow:before {
-  content: "\e902";
-  font-size: .85em;
-  position: relative;
-  top: -4px;
-}
+
 .icon-email:before {
   content: "\e605";
   position: relative;
-  top: -2px;
+  top: -0.78px;
 }
-.icon-facebook:before {
-  content: "\e601";
-  font-size: .95em;
-  position: relative;
-  top: -2px;
-}
-.icon-gitlab:before {
-  content: "\e901";
-  font-size: .9em;
-  position: relative;
-  top: -4px;
-}
+
 .icon-github:before {
   content: "\e606";
   position: relative;
-  top: -1px;
+  top: -1.5px;
 }
-.icon-rss:before {
-  content: "\e604";
+
+.icon-twitter:before {
+  content: "\e900";
+  font-size: 0.78em;
+  position: relative;
+  top: -3.4px;
 }
+
+.icon-mastodon:before {
+  content: "\e901";
+  font-size: 0.87em;
+  position: relative;
+  top: -3.1px;
+}
+
+.icon-instagram:before {
+  content: "\ea92";
+  font-size: 0.95em;
+  position: relative;
+  top: -2px;
+}
+
 .icon-google:before {
-  content: "\e609";
+  content: "\e901";
+  font-size: 0.85em;
   position: relative;
-  top: 2px;
+  top: -4px;
 }
-.icon-zhihu:before {
-  content: "\e607";
-  font-size: .9em;
-}
-.icon-pocket:before {
-  content: "\e856";
+
+.icon-stack-overflow:before {
+  content: "\e902";
+  font-size: 0.85em;
   position: relative;
-  top: 2px;
+  top: -4px;
+}
+
+.icon-google-drive:before {
+  content: "\ea8f";
+  font-size: 0.85em;
+  position: relative;
+  top: -4px;
+}
+
+.icon-spotify:before {
+  content: "\ea94";
+  font-size: 0.87em;
+  position: relative;
+  top: -3.5px;
+}
+
+.icon-telegram:before {
+  content: "\ea95";
+  font-size: 0.88em;
+  position: relative;
+  top: -3.2px;
+}
+
+.icon-linkedin:before {
+  content: "\eaca";
+  font-size: 0.98em;
+  position: relative;
+  top: -4px;
+}
+
+.icon-facebook:before {
+  content: "\ea90";
+  font-size: 0.85em;
+  position: relative;
+  top: -4px;
+}
+
+.icon-paypal:before {
+  content: "\ead8";
+  font-size: 0.88em;
+  position: relative;
+  top: -2.1px;
+}
+
+.icon-facebook:before {
+  content: "\ea90";
+  font-size: 0.83em;
+  position: relative;
+  top: -3.2px;
 }
 
 /* Generic Icon */

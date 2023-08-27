@@ -6,6 +6,4 @@ $(document).ready(function () {
 });
 
 Even.responsiveTable();
-Even.flowchart();
-Even.sequence();
 Even.chroma();

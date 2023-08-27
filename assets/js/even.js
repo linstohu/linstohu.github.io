@@ -200,64 +200,6 @@ Even._linkToc = function () {
   }
 };
 
-Even.flowchart = function () {
-  if (!window.flowchart) return;
-
-  const blocks = document.querySelectorAll(
-    "pre code.language-flowchart, pre code.language-flow",
-  );
-  for (let i = 0; i < blocks.length; i++) {
-    if (!window.hljs && i % 2 === 0) continue;
-
-    const block = blocks[i];
-    const rootElement = window.hljs
-      ? block.parentElement
-      : block.parentElement.parentElement.parentElement.parentElement
-          .parentElement.parentElement.parentElement;
-
-    const container = document.createElement("div");
-    const id = `js-flowchart-diagrams-${i}`;
-    container.id = id;
-    container.className = "align-center";
-    rootElement.parentElement.replaceChild(container, rootElement);
-
-    const diagram = flowchart.parse(block.childNodes[0].nodeValue);
-    diagram.drawSVG(
-      id,
-      window.flowchartDiagramsOptions ? window.flowchartDiagramsOptions : {},
-    );
-  }
-};
-
-Even.sequence = function () {
-  if (!window.Diagram) return;
-
-  const blocks = document.querySelectorAll("pre code.language-sequence");
-  for (let i = 0; i < blocks.length; i++) {
-    if (!window.hljs && i % 2 === 0) continue;
-
-    const block = blocks[i];
-    const rootElement = window.hljs
-      ? block.parentElement
-      : block.parentElement.parentElement.parentElement.parentElement
-          .parentElement.parentElement.parentElement;
-
-    const container = document.createElement("div");
-    const id = `js-sequence-diagrams-${i}`;
-    container.id = id;
-    container.className = "align-center";
-    rootElement.parentElement.replaceChild(container, rootElement);
-
-    const diagram = Diagram.parse(block.childNodes[0].nodeValue);
-    diagram.drawSVG(
-      id,
-      window.sequenceDiagramsOptions
-        ? window.sequenceDiagramsOptions
-        : { theme: "simple" },
-    );
-  }
-};
-
 Even.responsiveTable = function () {
   const tables = document.querySelectorAll(".post-content table:not(.lntable)");
   for (let i = 0; i < tables.length; i++) {
