@@ -77,9 +77,10 @@ params:
   autoCollapseToc: false # Auto expand and collapse toc
   # Social Accounts
   social:
-    a-email: linstohu@gmail.com
+    a-email: mailto:linstohu@gmail.com
     b-twitter: https://twitter.com/linstohu
     c-mastodon: https://mastodon.social/@linstohu
+    d-telegram: https://t.me/linstohu
   # Display of images
   fancybox: true # see https://github.com/fancyapps/fancybox
   # Display of mathematics
