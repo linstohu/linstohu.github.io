@@ -1,10 +1,10 @@
-baseURL: https://linsto.org/
+baseURL: https://www.linsto.org/
 title: Linsto's Notes
 languageCode: en-us
 defaultContentLanguage: en
 timeZone: Asia/Shanghai
 hasCJKLanguage: true
-paginate: 50
+paginate: 10
 enableEmoji: true
 enableRobotsTXT: true
 googleAnalytics: G-RH55QJFKK1
@@ -67,6 +67,7 @@ params:
   description: "linsto's blog"
   keywords:
     - linsto
+    - lifehacker
   # Display of posts
   postMetaInFooter: true
   showArchiveCount: false # show 'xx Posts In Total' in archive page
@@ -77,7 +78,7 @@ params:
   # Social Accounts
   social:
     a-email: linstohu@gmail.com
-    b-twitter: https://mastodon.social/@linstohu
+    b-twitter: https://twitter.com/linstohu
     c-mastodon: https://mastodon.social/@linstohu
   # Display of images
   fancybox: true # see https://github.com/fancyapps/fancybox

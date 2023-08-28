@@ -23,10 +23,10 @@
   <meta name="description" content="{{ .Description | safeHTML }}" />
 {{- else if .IsPage -}}
   <meta name="description" content="{{ .Summary | plainify }}" />
-{{- else if .Site.Params.description -}}
+{{- else -}}
   <meta
     name="description"
-    content="{{ .Site.Params.description | safeHTML }}"
+    content="我其实就是想弄明白这个世界到底是怎么运行的"
   />
 {{- end -}}
 
