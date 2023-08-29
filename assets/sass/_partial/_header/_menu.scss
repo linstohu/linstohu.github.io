@@ -25,10 +25,6 @@
     }
 
     .dropdown {
-      display: inline-flex;
-      position: relative;
-      // vertical-align: top;
-
       .dropdown-menu {
         display: none;
         left: 0;
@@ -49,7 +45,7 @@
         padding-top: 0.5rem;
       }
 
-      .dropdown-item {
+      .dropdown-menu-item {
         color: #4a4a4a;
         display: block;
         font-size: 0.875rem;

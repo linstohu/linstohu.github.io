@@ -20,13 +20,15 @@
           >
 
           <div class="dropdown-menu">
-            <div class="dropdown-content">
+            <ul class="dropdown-content">
               {{ range .Children -}}
-                <a class="dropdown-item" href="{{ .URL | safeURL }}"
-                  >{{ .Name }}</a
-                >
+                <li class="dropdown-menu-item">
+                  <a class="menu-item-link" href="{{ .URL | safeURL }}"
+                    >{{ .Name }}</a
+                  >
+                </li>
               {{ end -}}
-            </div>
+            </ul>
           </div>
         </li>
       {{ else }}

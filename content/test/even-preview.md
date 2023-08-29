@@ -160,48 +160,42 @@ _italic 1_ and _italic 2_
 ## Links
 
 ```
-Web image
-![Web Picture](https://count.getloli.com/get/@even-preview?theme=konachan "Web Picture")
-
 Local image
-![Local Picture](logo-revolunet-carre.jpg "Local Picture")
+![Local Picture](logo.jpg "Local Picture")
 
-contact@revolunet.com
+linstohu@gmail.com
 
-@revolunet
+@linstohu
 
 Issue #1
 
-https://github.com/revolunet/sublimetext-markdown-preview/
+https://github.com/linstohu/linstohu.github.io/
 
-This is a link https://github.com/revolunet/sublimetext-markdown-preview/.
+This is a link https://github.com/linstohu/linstohu.github.io/.
 
-This is a link "https://github.com/revolunet/sublimetext-markdown-preview/".
+This is a link "https://github.com/linstohu/linstohu.github.io/".
 
-With this link (https://github.com/revolunet/sublimetext-markdown-preview/), it still works.
+With this link (https://github.com/linstohu/linstohu.github.io/), it still works.
 ```
-
-Web image
-![Web Picture](https://count.getloli.com/get/@even-preview?theme=konachan "Web Picture")
 
 Local image
 ![Local Picture](/apple-touch-icon.png "Local Picture")
 
 www.google.com
 
-contact@revolunet.com
+linstohu@gmail.com
 
-@revolunet
+@linstohu
 
 Issue #1
 
-https://github.com/revolunet/sublimetext-markdown-preview/
+https://github.com/linstohu/linstohu.github.io/
 
-This is a link https://github.com/revolunet/sublimetext-markdown-preview/.
+This is a link https://github.com/linstohu/linstohu.github.io/.
 
-This is a link "https://github.com/revolunet/sublimetext-markdown-preview/".
+This is a link "https://github.com/linstohu/linstohu.github.io/".
 
-With this link (https://github.com/revolunet/sublimetext-markdown-preview/), it still works.
+With this link (https://github.com/linstohu/linstohu.github.io/), it still works.
 
 ## Abbreviation
 
@@ -723,10 +717,10 @@ $$ E(\mathbf{v}, \mathbf{h}) = -\sum_{i,j}w_{ij}v_i h_j - \sum_i b_i v_i - \sum_
 ## YouTube
 
 ```
-{{%/* youtube "wC5pJm8RAu4" */%}}
+{{%/* youtube "CD1fjK6Nnl0" */%}}
 ```
 
-{{% youtube "wC5pJm8RAu4" %}}
+{{% youtube "CD1fjK6Nnl0" %}}
 
 ## Spotify
 
