@@ -35,15 +35,14 @@ menu:
     - name: Etc.
       weight: 40
       identifier: etc
-      pageRef: /post
+    - name: 同类同类
+      parent: etc
+      weight: 10
+      pageRef: /
     - name: 生活危险指南
       parent: etc
       weight: 20
-      pageRef: /post
-    - name: 同类同类
-      parent: etc
-      weight: 20
-      pageRef: /post
+      pageRef: /essays
 
 markup:
   goldmark:
@@ -87,10 +86,11 @@ params:
   mathjax: true # see https://www.mathjax.org/ 是否使用mathjax（数学公式）
   mathjaxEnableSingleDollar: true # 是否使用 $...$ 即可進行inline latex渲染
   mathjaxEnableAutoNumber: false # 是否使用公式自动编号
-  # load these files from public cdn
+  # Load these files from public cdn
+  # Use https://www.srihash.org/ for generate src link with integrity tag
   publicCDN:
     enable: true
-    jquery: <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    jquery: <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     slideout: <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
     fancyboxJS: <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
     fancyboxCSS: <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">

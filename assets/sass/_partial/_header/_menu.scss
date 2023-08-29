@@ -13,10 +13,8 @@
     font-family: $global-serif-font-family;
 
     .menu-item {
-      display: inline-block;
-
       & + .menu-item {
-        margin-left: $menu-item-margin-left;;
+        margin-left: $menu-item-margin-left;
       }
 
       @include underline-from-center;
@@ -24,6 +22,45 @@
 
     .menu-item-link {
       font-size: $menu-link-font-size;
+    }
+
+    .dropdown {
+      display: inline-flex;
+      position: relative;
+      // vertical-align: top;
+
+      .dropdown-menu {
+        display: none;
+        left: 0;
+        min-width: 12rem;
+        padding-top: 4px;
+        position: absolute;
+        top: 100%;
+        z-index: 20;
+      }
+
+      .dropdown-content {
+        background-color: $white;
+        border-radius: 4px;
+        box-shadow:
+          0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1),
+          0 0px 0 1px rgba(10, 10, 10, 0.02);
+        padding-bottom: 0.5rem;
+        padding-top: 0.5rem;
+      }
+
+      .dropdown-item {
+        color: #4a4a4a;
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        padding: 0.375rem 1rem;
+        position: relative;
+      }
+    }
+
+    .dropdown.is-active .dropdown-menu {
+      display: block;
     }
   }
 }

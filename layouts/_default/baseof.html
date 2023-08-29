@@ -13,14 +13,14 @@
         {{ end }}
       {{- end -}}
     </title>
-    {{ partial "head.html" . }}
+    {{ partial "head/head.html" . }}
   </head>
   <body>
     {{ partial "slideout.html" . }}
     <div class="container" id="mobile-panel">
       {{ if not .Params.hideHeaderAndFooter -}}
         <header id="header" class="header">
-          {{ partial "header.html" . }}
+          {{ partial "header/header.html" . }}
         </header>
       {{- end }}
 

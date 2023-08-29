@@ -1,0 +1,39 @@
+<div class="logo-wrapper">
+  <a href="{{ "/" | relLangURL }}" class="logo">
+    {{- if .Site.Params.logoTitle -}}
+      {{ .Site.Params.logoTitle }}
+    {{- else -}}
+      {{ .Site.Title }}
+    {{- end -}}
+  </a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    {{ range .Site.Menus.main -}}
+      {{ if .HasChildren }}
+        <li class="menu-item dropdown">
+          <a
+            href="#"
+            class="iconfont icon-dropdown menu-item-link dropdown-trigger"
+            >{{ .Name }}</a
+          >
+
+          <div class="dropdown-menu">
+            <div class="dropdown-content">
+              {{ range .Children -}}
+                <a class="dropdown-item" href="{{ .URL | safeURL }}"
+                  >{{ .Name }}</a
+                >
+              {{ end -}}
+            </div>
+          </div>
+        </li>
+      {{ else }}
+        <li class="menu-item">
+          <a class="menu-item-link" href="{{ .URL | safeURL }}">{{ .Name }}</a>
+        </li>
+      {{ end }}
+    {{- end }}
+  </ul>
+</nav>

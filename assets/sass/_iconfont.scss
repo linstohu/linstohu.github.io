@@ -146,6 +146,13 @@
 }
 
 /* Generic Icon */
+.icon-dropdown:after {
+  content: "\e908";
+  font-size: 0.85em;
+  position: relative;
+  top: 0px;
+}
+
 .icon-heart:before {
   content: "\e608";
 }
