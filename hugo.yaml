@@ -38,11 +38,11 @@ menu:
     - name: 同类同类
       parent: etc
       weight: 10
-      pageRef: /
+      pageRef: /nb
     - name: 生活危险指南
       parent: etc
       weight: 20
-      pageRef: /essays
+      pageRef: /danger
 
 markup:
   goldmark:
