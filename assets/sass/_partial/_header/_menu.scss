@@ -27,7 +27,7 @@
     .dropdown {
       .dropdown-menu {
         display: none;
-        left: 0;
+        left: -18px;
         min-width: 12rem;
         padding-top: 4px;
         position: absolute;
@@ -46,6 +46,8 @@
       }
 
       .dropdown-menu-item {
+        @include underline-from-center;
+
         color: #4a4a4a;
         display: block;
         font-size: 0.875rem;
@@ -55,8 +57,10 @@
       }
     }
 
-    .dropdown.is-active .dropdown-menu {
-      display: block;
+    .dropdown:hover {
+      .dropdown-menu {
+        display: block;
+      }
     }
   }
 }

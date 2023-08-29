@@ -15,20 +15,20 @@
         <li class="menu-item dropdown">
           <a
             href="#"
-            class="iconfont icon-dropdown menu-item-link dropdown-trigger"
+            class="iconfont icon-dropdown menu-item-link"
             >{{ .Name }}</a
           >
 
           <div class="dropdown-menu">
-            <ul class="dropdown-content">
+            <div class="dropdown-content">
               {{ range .Children -}}
-                <li class="dropdown-menu-item">
+                <div class="dropdown-menu-item">
                   <a class="menu-item-link" href="{{ .URL | safeURL }}"
                     >{{ .Name }}</a
                   >
-                </li>
+                </div>
               {{ end -}}
-            </ul>
+            </div>
           </div>
         </li>
       {{ else }}

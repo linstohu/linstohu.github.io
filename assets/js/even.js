@@ -2,18 +2,6 @@
 
 const Even = {};
 
-Even.dropdown = function () {
-  const $menu = $(".dropdown .dropdown-trigger")
-
-  $menu.click(function () {
-    var dropdown = $(this).parents('.dropdown');
-    dropdown.toggleClass('is-active');
-    dropdown.focusout(function() {
-			window.setTimeout(function() {dropdown.removeClass('is-active');}, 100);
-		});
-  })
-}
-
 Even.backToTop = function () {
   const $backToTop = $("#back-to-top");
 
