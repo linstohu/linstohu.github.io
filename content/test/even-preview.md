@@ -4,6 +4,7 @@ date: 2018-07-10T00:00:00+08:00
 lastmod: 2018-07-10T00:00:00+08:00
 contentCopyright: MIT
 autoCollapseToc: true
+mathjax: true
 ---
 
 > Based on [MarkdownPreview test.md](https://github.com/facelessuser/MarkdownPreview/blob/master/examples/test.md).

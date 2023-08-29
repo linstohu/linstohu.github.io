@@ -45,12 +45,14 @@
   </script>
 {{- end -}}
 
+
 {{ $even := resources.Get "js/even.js" }}
 {{ $main := resources.Get "js/main.js" }}
 {{ $js := slice $even $main | resources.Concat "js/main.js" | minify | fingerprint }}
 <script type="text/javascript" src="{{ $js.RelPermalink }}"></script>
 
-{{- if and (or .Params.mathjax (and .Site.Params.mathjax (ne .Params.mathjax false))) (or .IsPage .IsHome) }}
+
+{{- if and (or .Params.mathjax .Site.Params.mathjax) (or .IsPage .IsHome) }}
   <script type="text/javascript">
     window.MathJax = {
       tex: {
@@ -62,15 +64,8 @@
         {{ end -}}
       }
     };
-  </script> {{ if .Site.Params.publicCDN.enable -}}
-    {{ .Site.Params.publicCDN.mathjaxJS | safeHTML }}
-  {{- else -}}
-    <script
-      type="text/javascript"
-      async
-      src="{{ "lib/mathjax/es5/tex-mml-chtml.js" | relURL }}"
-    ></script>
-  {{- end }}
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
 {{- end }}
 
 
