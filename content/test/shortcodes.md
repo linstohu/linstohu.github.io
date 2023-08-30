@@ -117,27 +117,27 @@ biu biu biu.
 
 ## default
 
-![img](https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg "img")
+![img](/apple-touch-icon.png "img")
 
 {{% center %}}
 
 ## center
 
-![img](https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg "img")
+![img](/apple-touch-icon.png "img")
 {{% /center %}}
 
 {{% right %}}
 
 ## right
 
-![img](https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg "img")
+![img](/apple-touch-icon.png "img")
 {{% /right %}}
 
 {{% left %}}
 
 ## left
 
-![img](https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg "img")
+![img](/apple-touch-icon.png "img")
 {{% /left %}}
 
 ---
@@ -145,16 +145,16 @@ biu biu biu.
 ## figure with class
 
 ```
-{{%/* figure src="/path/to/img.gif" title="default" alt="img" */%}}
+{{%/* figure src="https://example.com/path/to/img.jpg" title="default" alt="img" */%}}
 {{%/* figure class="center" src="/path/to/img.gif" title="center" alt="img" */%}}
 {{%/* figure class="right" src="/path/to/img.gif" title="right" alt="img" */%}}
 {{%/* figure class="left" src="/path/to/img.gif" title="left" alt="img" */%}}
 ```
 
-{{% figure src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="default" alt="img" %}}
-{{% figure class="center" src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="center" alt="img" %}}
-{{% figure class="right" src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="right" alt="img" %}}
-{{% figure class="left" src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="left" alt="img" %}}
+{{% figure src="/apple-touch-icon.png" title="default" alt="img" %}}
+{{% figure class="center" src="/apple-touch-icon.png" title="center" alt="img" %}}
+{{% figure class="right" src="/apple-touch-icon.png" title="right" alt="img" %}}
+{{% figure class="left" src="/apple-touch-icon.png" title="left" alt="img" %}}
 
 ---
 
@@ -176,11 +176,9 @@ biu biu biu.
 
 ## hybrid in center
 
-{{% figure src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="default" alt="img" %}}
-{{% figure class="right" src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="right" alt="img" %}}
+{{% figure src="/apple-touch-icon.png" title="default" alt="img" %}}
+{{% figure class="right" src="/apple-touch-icon.png" title="right" alt="img" %}}
 {{% left %}}
-{{% figure src="https://wx1.sinaimg.cn/small/006SToa6ly1fm07summ2gj30qo0qomzu.jpg" title="default in left" alt="img" %}}
+{{% figure src="/apple-touch-icon.png" title="default in left" alt="img" %}}
 {{% /left %}}
 {{% /center %}}
-
----
