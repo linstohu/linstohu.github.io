@@ -6,4 +6,3 @@ $(document).ready(function () {
 });
 
 Even.responsiveTable();
-Even.chroma();

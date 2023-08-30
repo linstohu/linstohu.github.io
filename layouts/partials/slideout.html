@@ -15,19 +15,19 @@
   </div>
 </div>
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
-  <ul class="mobile-menu-list">
+  <div class="mobile-menu-list">
     {{ range .Site.Menus.main -}}
       {{ if .HasChildren }}
         {{ range .Children -}}
           <a href="{{ .URL | safeURL }}">
-            <li class="mobile-menu-item">{{ .Name }}</li>
+            <div class="mobile-menu-item">{{ .Name }}</div>
           </a>
         {{ end -}}
       {{ else }}
         <a href="{{ .URL | safeURL }}">
-          <li class="mobile-menu-item">{{ .Name }}</li>
+          <div class="mobile-menu-item">{{ .Name }}</div>
         </a>
       {{ end }}
     {{- end }}
-  </ul>
+  </div>
 </nav>
