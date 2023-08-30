@@ -39,10 +39,14 @@ menu:
       parent: etc
       weight: 10
       pageRef: /niu
-    - name: 生活危险指南
+    - name: 家庭防灾手册
       parent: etc
       weight: 20
-      pageRef: /danger
+      pageRef: /disaster
+    - name: 菜谱菜谱
+      parent: etc
+      weight: 30
+      pageRef: /cook
 
 markup:
   goldmark:
