@@ -6,13 +6,13 @@ lastmod: 2023-08-26T16:07:15+08:00
 
 > 基于以下资料汇编而成，感谢他们的无私分享
 >
-> 1. 新浪博文 [临清名吃什香面 · by 义珂姥姥](https://blog.sina.com.cn/s/blog_4d491e510102vosn.html)
-> 2. 至味山东纪录片 [聊城临清什香面](https://www.bilibili.com/video/BV1V3411b7Yy/)
-> 3. 德国的包子寻味临清 [什香面](https://www.bilibili.com/video/BV1cz4y1U758/)
-> 4. [炒豆芽](https://www.bilibili.com/video/BV1A8411F7m9/)
-> 5. [炒茄丝](https://www.bilibili.com/video/BV1EL4y1n7HC/)
-> 6. [蒜苔炒肉沫](https://www.bilibili.com/video/BV18K411K7nj/)
-> 7. [西红柿鸡蛋卤](https://www.bilibili.com/video/BV12o4y1U7GL/)
+> 1. 新浪博文 -> [临清名吃什香面 · by 义珂姥姥](https://blog.sina.com.cn/s/blog_4d491e510102vosn.html)
+> 2. 至味山东纪录片 -> [聊城临清什香面](https://www.bilibili.com/video/BV1V3411b7Yy/)
+> 3. 德国的包子寻味临清 -> [什香面](https://www.bilibili.com/video/BV1cz4y1U758/)
+> 4. -> [炒豆芽](https://www.bilibili.com/video/BV1A8411F7m9/)
+> 5. -> [炒茄丝](https://www.bilibili.com/video/BV1EL4y1n7HC/)
+> 6. -> [蒜苔炒肉沫](https://www.bilibili.com/video/BV18K411K7nj/)
+> 7. -> [西红柿鸡蛋卤](https://www.bilibili.com/video/BV12o4y1U7GL/)
 
 什香面烹饪制作工艺流程讲究，菜码品种多，名为十样菜，其实，菜料达十八样以上，且随季节变换蔬菜。
 

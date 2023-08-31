@@ -39,10 +39,10 @@ menu:
       parent: etc
       weight: 10
       pageRef: /niu
-    - name: 家庭防灾手册
+    - name: 家庭安全手册
       parent: etc
       weight: 20
-      pageRef: /disaster
+      pageRef: /safety
     - name: 菜谱菜谱
       parent: etc
       weight: 30
