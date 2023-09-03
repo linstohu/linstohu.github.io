@@ -3,7 +3,10 @@ title: "About Me"
 url: /about
 date: 2023-08-27T12:57:06+08:00
 lastmod: 2023-08-27T12:57:06+08:00
+postHeader: false # title, time or categories etc.
 toc: false
+postMetaInFooter: false # author or lastMod etc.
+postFooter: false # tags or post-pagination etc.
 ---
 
 Hi, I am Linsto Hu, originally from Hebei Province in North China. I usually surf the internet with the username linsto, which is also the domain of this blog. It is easy to find me on the Internet.
