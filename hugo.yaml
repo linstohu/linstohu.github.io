@@ -35,14 +35,14 @@ menu:
     - name: Etc.
       weight: 40
       identifier: etc
-    - name: 牛人堂
+    - name: 同类同类
       parent: etc
       weight: 10
       pageRef: /niu
-    - name: 家庭安全手册
+    - name: 知否知否
       parent: etc
       weight: 20
-      pageRef: /safety
+      pageRef: /zhi
     - name: 菜谱菜谱
       parent: etc
       weight: 30
