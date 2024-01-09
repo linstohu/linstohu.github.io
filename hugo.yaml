@@ -39,10 +39,10 @@ menu:
       parent: etc
       weight: 10
       pageRef: /niu
-    - name: 知否知否
-      parent: etc
-      weight: 20
-      pageRef: /zhi
+    # - name: 知否知否
+    #   parent: etc
+    #   weight: 20
+    #   pageRef: /zhi
     - name: 菜谱菜谱
       parent: etc
       weight: 30
