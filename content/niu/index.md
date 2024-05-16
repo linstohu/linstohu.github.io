@@ -1,7 +1,7 @@
 ---
 title: "牛人堂"
 date: 2023-09-20T17:49:00+08:00
-lastmod: 2023-09-20T17:49:00+08:00
+lastmod: 2024-05-16T14:42:00+08:00
 toc: false
 postFooter: false # tags or post-pagination etc.
 ---
@@ -22,15 +22,16 @@ postFooter: false # tags or post-pagination etc.
 
 ## 吾辈同侪
 
+- [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman)
 - 许倬云
 - 史铁生
+- 查理·芒格
 - 李敖
 - 冯唐
 - 马未都
 - 王石
 - 冯仑
 - 任志强
-- 查理·芒格
 - 巴菲特
 - 李录
 - 张昕宇&梁红|[侣行](https://zh.wikipedia.org/zh-cn/侣行)
@@ -40,7 +41,6 @@ postFooter: false # tags or post-pagination etc.
 - [罗振宇](https://www.youtube.com/@LuogicTalk)
 - [李笑来](https://lixiaolai.com/)
 - [吴军](https://web.archive.org/web/20161010182318/https://sites.google.com/site/junwu02/)
-- 曹政|caoz的梦呓
 - TK教主
 - 硅谷王川
 - 余晟
