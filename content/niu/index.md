@@ -22,33 +22,35 @@ postFooter: false # tags or post-pagination etc.
 
 ## 吾辈同侪
 
-- [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman)
-- 许倬云
-- 史铁生
-- 查理·芒格
-- 李敖
-- 冯唐
-- 马未都
-- 王石
-- 冯仑
-- 任志强
 - 巴菲特
-- 李录
-- 张昕宇&梁红|[侣行](https://zh.wikipedia.org/zh-cn/侣行)
-- 和菜头|槽边往事
-- 王建硕
-- 陈皓|左耳朵耗子|[酷壳Blog](https://coolshell.org/)
-- [罗振宇](https://www.youtube.com/@LuogicTalk)
-- [李笑来](https://lixiaolai.com/)
-- [吴军](https://web.archive.org/web/20161010182318/https://sites.google.com/site/junwu02/)
-- TK教主
-- 硅谷王川
-- 余晟
 - [渤海小吏](https://www.youtube.com/channel/UC9bYDXoFxWC2DQatWI366UA)
+- 查理·芒格
+- 陈皓|左耳朵耗子|[酷壳Blog](https://coolshell.org/)
+- 冯唐
+- 冯仑
+- 硅谷王川
+- 和菜头|槽边往事
+- 李录
+- 李敖
+- [李笑来](https://lixiaolai.com/)
+- [罗振宇](https://www.youtube.com/@LuogicTalk)
+- 马未都
+- 任志强
+- [Richard Feynman](https://en.wikipedia.org/wiki/Richard_Feynman)
+- 史铁生
+- TK教主
+- 王建硕
+- 王石
+- [吴军](https://web.archive.org/web/20161010182318/https://sites.google.com/site/junwu02/)
+- 许倬云
+- 余晟
+- 张昕宇&梁红|[侣行](https://zh.wikipedia.org/zh-cn/侣行)
+
+<small>* 注: 按姓氏拼音排序</small>
 
 ---
 
 ## 往圣绝学
 
-- 曾国藩
 - 司马光 -[《资治通鉴》](https://zh.wikisource.org/zh-hant/資治通鑑)
+- 曾国藩
