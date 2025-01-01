@@ -47,6 +47,10 @@ menu:
       parent: etc
       weight: 30
       pageRef: /so
+    - name: 投资茶观
+      parent: etc
+      weight: 30
+      pageRef: /vv
 
 markup:
   goldmark:
@@ -81,7 +85,7 @@ params:
   # Social Accounts
   social:
     a-email: mailto:linstohu@gmail.com
-    b-twitter: https://twitter.com/linstohu
+    b-twitter: https://x.com/linstohu
     c-mastodon: https://mastodon.social/@linstohu
     d-telegram: https://t.me/linstohu
   # Display of images

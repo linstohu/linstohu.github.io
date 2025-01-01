@@ -19,7 +19,7 @@ If you have any questions or would like to contact me, feel free to send me an e
 
 I guess some friends hate boring emails. In the overwhelming age of social media, you can also follow me:
 
-- [Twitter](https://twitter.com/linstohu)
+- [Twitter](https://x.com/linstohu)
 - [Mastodon](https://mastodon.social/@linstohu)
 
 I extend my heartfelt gratitude to every reader for their companionship and support.
