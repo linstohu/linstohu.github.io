@@ -168,8 +168,11 @@
 .icon-close:before {
   content: "\e60f";
 }
-.icon-link:before {
+.icon-link:after {
   content: "\e909";
+  font-size: 0.85em;
+  position: relative;
+  top: 0px;
 }
 
 /* Admonition Icon */

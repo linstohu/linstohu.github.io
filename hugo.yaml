@@ -49,6 +49,8 @@ menu:
     - name: 英语听说
       parent: etc
       weight: 10
+      params:
+        rel: external
       url: https://www.linsto.org/
     - name: 投资茶观
       parent: etc

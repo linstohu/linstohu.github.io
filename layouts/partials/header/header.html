@@ -19,9 +19,12 @@
             <div class="dropdown-content">
               {{ range .Children -}}
                 <div class="dropdown-menu-item">
-                  <a class="menu-item-link" href="{{ .URL | safeURL }}"
-                    >{{ .Name }}</a
-                  >
+                  <a class="menu-item-link" href="{{ .URL | safeURL }}">
+                    {{ .Name }}
+                  </a>
+                  {{ if .Params.rel }}
+                    <span class="iconfont icon-link"></span>
+                  {{ end }}
                 </div>
               {{ end -}}
             </div>
