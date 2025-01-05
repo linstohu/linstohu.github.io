@@ -4,13 +4,12 @@ languageCode: en-us
 defaultContentLanguage: en
 timeZone: Asia/Shanghai
 hasCJKLanguage: true
-paginate: 10
 enableEmoji: true
 enableRobotsTXT: true
 googleAnalytics: G-RH55QJFKK1
 
-author:
-  name: Linsto Hu
+pagination:
+  pagerSize: 12
 
 taxonomies:
   category: categories
@@ -35,22 +34,26 @@ menu:
     - name: Etc.
       weight: 40
       identifier: etc
-    - name: 同类同类
+    # - name: 同类同类
+    #   parent: etc
+    #   weight: 10
+    #   pageRef: /niu
+    # - name: 菜谱菜谱
+    #   parent: etc
+    #   weight: 30
+    #   pageRef: /cook
+    # - name: 如是我闻
+    #   parent: etc
+    #   weight: 30
+    #   pageRef: /so
+    - name: 英语听说
       parent: etc
       weight: 10
-      pageRef: /niu
-    - name: 菜谱菜谱
-      parent: etc
-      weight: 30
-      pageRef: /cook
-    - name: 如是我闻
-      parent: etc
-      weight: 30
-      pageRef: /so
+      url: https://www.linsto.org/
     - name: 投资茶观
       parent: etc
       weight: 30
-      pageRef: /vv
+      pageRef: /value
 
 markup:
   goldmark:
@@ -69,6 +72,8 @@ markup:
 # Params of theme
 params:
   # basic
+  author:
+    name: Linsto Hu
   since: 2023
   location: China·Hebei
   description: "linsto's blog"

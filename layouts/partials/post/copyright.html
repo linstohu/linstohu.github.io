@@ -6,7 +6,7 @@
         >{{ if .Params.author }}
           {{ .Params.author | safeHTML }}
         {{ else }}
-          {{ .Site.Author.name | safeHTML }}
+          {{ .Site.Params.author.name | safeHTML }}
         {{ end }}</span
       >
     </p>

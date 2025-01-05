@@ -47,7 +47,7 @@
       >{{ if .Site.Copyright }}
         {{ .Site.Copyright | safeHTML }}
       {{ else }}
-        {{ .Site.Author.name | safeHTML }}
+        {{ .Site.Params.author.name | safeHTML }}
       {{ end }}</span
     >
   </span>
