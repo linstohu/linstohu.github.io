@@ -1,8 +1,0 @@
-{
-  "recommendations": [
-    "esbenp.prettier-vscode",
-    "redhat.vscode-yaml",
-    "mohsen1.prettify-json",
-    "streetsidesoftware.code-spell-checker"
-  ]
-}
