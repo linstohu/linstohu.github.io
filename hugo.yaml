@@ -42,10 +42,6 @@ menu:
     #   parent: etc
     #   weight: 30
     #   pageRef: /cook
-    # - name: 如是我闻
-    #   parent: etc
-    #   weight: 30
-    #   pageRef: /so
     - name: 英语读听说
       parent: etc
       weight: 10
@@ -59,7 +55,7 @@ menu:
     - name: 投资小学生
       parent: etc
       weight: 30
-      pageRef: /touzi
+      pageRef: /tz
 
 markup:
   goldmark:
