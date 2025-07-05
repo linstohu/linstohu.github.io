@@ -1,9 +1,13 @@
 ---
 title: "牛人堂"
 date: 2023-09-20T17:49:00+08:00
-lastmod: 2024-05-16T14:42:00+08:00
+lastmod: 2025-07-05T22:00:00+08:00
 toc: false
-postFooter: false # tags or post-pagination etc.
+postFooter: false
+---
+
+> 本文兹定于 2025 年 07 月 05 日不再维护，原因是世界之宽阔、之浩瀚，人才济济，到处都有老师，人人皆有自己安身立命之独到理解，我们不能靠名气来排智慧的座次。农民伯伯看似生活清苦、低眉顺眼，但在我的观察中，我发现，清苦、土气、低眉顺眼...这些所有受人鄙视的特征，皆是境遇使然、命运使然，甚至是时代使然。不要瞧不起任何人，他们是另一个平行时空下的自己，人与人之间的行为、抉择模式以及养成的性格特征，看似天差地别，实则是同出而异名；也不要太把有名气的人当回事儿，他们亦是平行时空下的另一个自己，我们可以做得好，甚至可以做得比他们更好，你我皆凡人。
+
 ---
 
 {{% admonition info "立志成圣" %}}
@@ -23,12 +27,9 @@ postFooter: false # tags or post-pagination etc.
 ## 吾辈同侪
 
 - 巴菲特
-- [渤海小吏](https://www.youtube.com/channel/UC9bYDXoFxWC2DQatWI366UA)
 - 查理·芒格
-- 陈皓|左耳朵耗子|[酷壳Blog](https://coolshell.org/)
-- 冯唐
 - 冯仑
-- 硅谷王川
+- 冯唐
 - 和菜头|槽边往事
 - 李录
 - 李敖
@@ -43,8 +44,11 @@ postFooter: false # tags or post-pagination etc.
 - 王石
 - [吴军](https://web.archive.org/web/20161010182318/https://sites.google.com/site/junwu02/)
 - 许倬云
+- 硅谷王川
+- 陈皓|左耳朵耗子|[酷壳Blog](https://coolshell.org/)
 - 余晟
 - 张昕宇&梁红|[侣行](https://zh.wikipedia.org/zh-cn/侣行)
+- [渤海小吏](https://www.youtube.com/channel/UC9bYDXoFxWC2DQatWI366UA)
 
 <small>* 注: 按姓氏拼音排序</small>
 
