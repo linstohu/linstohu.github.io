@@ -42,12 +42,12 @@ menu:
     #   parent: etc
     #   weight: 30
     #   pageRef: /cook
-    - name: 英语读听说
-      parent: etc
-      weight: 10
-      params:
-        rel: external
-      url: https://aichatstorm.podcast.xyz/
+    # - name: 英语读听说
+    #   parent: etc
+    #   weight: 10
+    #   params:
+    #     rel: external
+    #   url: https://aichatstorm.podcast.xyz/
     - name: 生活艺术家
       parent: etc
       weight: 20
