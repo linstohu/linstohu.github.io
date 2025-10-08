@@ -1,0 +1,7 @@
+<details class="enhanced-fold" id="fold-{{ .Ordinal }}" {{ if .Get "open" }}open{{ end }}>
+    <summary class="fold-header">
+        <span class="fold-title">{{ .Get "title" | default "点击展开内容" }}</span>
+        <span class="fold-icon">▼</span>
+    </summary>
+    {{ .Inner | safeHTML }}
+</details>
