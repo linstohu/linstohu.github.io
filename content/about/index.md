@@ -1,31 +1,22 @@
 ---
 title: "About Me"
 url: /about
-date: 2023-08-27T12:57:06+08:00
-lastmod: 2023-08-27T12:57:06+08:00
-postHeader: false # title, time or categories etc.
 toc: false
-postMetaInFooter: false # author or lastMod etc.
-postFooter: false # tags or post-pagination etc.
+postHeader: false
+postMetaInFooter: false
+postFooter: false
+date: 2023-08-27T12:57:06+08:00
+lastmod: 2026-01-27T22:00:00+08:00
 ---
 
-Hi, I am Linsto Hu, originally from Hebei Province in North China. I usually surf the internet with the username linsto, which is also the domain of this blog. It is easy to find me on the Internet.
+你好，我是 Linsto Hu。
 
-## Contact Me
+我认为，`耐心`是很重要的。
 
-The best way to contact me is by email：linstohu@gmail.com
+我认为，`RETHINK`是很重要的。
 
-If you have any questions or would like to contact me, feel free to send me an email.
+我认为，`科学决策`是很重要的。
 
-I guess some friends hate boring emails. In the overwhelming age of social media, you can also follow me:
+我是一名并不算技术精湛的软件开发工程师，我曾经供职于 Action Tech、XROCK、Gate。现在，我是一位自以为是的创造者，我希望这个世界因为我的存在而有一点点的不一样。
 
-- [Twitter](https://x.com/linstohu)
-- [Mastodon](https://mastodon.social/@linstohu)
-
-I extend my heartfelt gratitude to every reader for their companionship and support.
-
-</br>
-
-With curiosity and sincere appreciation,
-
-Linsto Hu
+我坚信：遍地阳光，充满希望。

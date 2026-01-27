@@ -42,12 +42,6 @@ menu:
     #   parent: etc
     #   weight: 30
     #   pageRef: /cook
-    # - name: 英语读听说
-    #   parent: etc
-    #   weight: 10
-    #   params:
-    #     rel: external
-    #   url: https://aichatstorm.podcast.xyz/
     - name: 生活艺术家
       parent: etc
       weight: 20
@@ -91,10 +85,8 @@ params:
   autoCollapseToc: false # Auto expand and collapse toc
   # Social Accounts
   social:
-    a-email: mailto:linstohu@gmail.com
-    b-twitter: https://x.com/linstohu
-    c-mastodon: https://mastodon.social/@linstohu
-    d-telegram: https://t.me/linstohu
+    a-x: https://x.com/linstohu
+    b-mastodon: https://mastodon.social/@linstohu
   # Display of images
   fancybox: true # see https://github.com/fancyapps/fancybox
   # Display of mathematics

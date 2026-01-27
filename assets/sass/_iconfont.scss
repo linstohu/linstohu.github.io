@@ -61,7 +61,7 @@
   top: -1.5px;
 }
 
-.icon-twitter:before {
+.icon-x:before {
   content: "\e900";
   font-size: 0.78em;
   position: relative;
@@ -96,13 +96,6 @@
   top: -4px;
 }
 
-.icon-google-drive:before {
-  content: "\ea8f";
-  font-size: 0.85em;
-  position: relative;
-  top: -4px;
-}
-
 .icon-spotify:before {
   content: "\ea94";
   font-size: 0.87em;
@@ -131,20 +124,6 @@
   top: -4px;
 }
 
-.icon-paypal:before {
-  content: "\ead8";
-  font-size: 0.88em;
-  position: relative;
-  top: -2.1px;
-}
-
-.icon-facebook:before {
-  content: "\ea90";
-  font-size: 0.83em;
-  position: relative;
-  top: -3.2px;
-}
-
 /* Generic Icon */
 .icon-dropdown:after {
   content: "\e908";
@@ -156,70 +135,26 @@
 .icon-heart:before {
   content: "\e608";
 }
+
 .icon-right:before {
   content: "\e60a";
 }
+
 .icon-left:before {
   content: "\e60b";
 }
+
 .icon-up:before {
   content: "\e60c";
 }
+
 .icon-close:before {
   content: "\e60f";
 }
+
 .icon-link:after {
   content: "\e909";
   font-size: 0.85em;
   position: relative;
   top: 0px;
 }
-
-/* Admonition Icon */
-/*
-.icon-chevron-down:before {
-  content: "\e908";
-}
-.icon-format-quote:before {
-  content: "\e904";
-}
-.icon-pencil:before {
-  content: "\e903";
-}
-.icon-list-numbered:before {
-  content: "\e9b9";
-}
-.icon-list:before {
-  content: "\e9bb";
-}
-.icon-warning:before {
-  content: "\ea07";
-}
-.icon-question:before {
-  content: "\ea09";
-}
-.icon-info:before {
-  content: "\ea0c";
-}
-.icon-cross:before {
-  content: "\ea0f";
-}
-.icon-checkmark:before {
-  content: "\ea10";
-}
-.icon-fire:before {
-  content: "\e905";
-}
-.icon-danger:before {
-  content: "\e905";
-}
-.icon-flame:before {
-  content: "\e905";
-}
-.icon-hot:before {
-  content: "\e905";
-}
-.icon-bulb:before {
-  content: "\e906";
-}
-*/
