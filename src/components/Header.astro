@@ -4,6 +4,7 @@ interface Props {
   section: string;
 }
 const { section } = Astro.props;
+const Brand = section === 'home' ? 'h1' : 'a';
 const pages = [
   ['home', '/', '首页'],
   ['writing', '/writing/', '文字'],
@@ -13,12 +14,17 @@ const pages = [
 ];
 ---
 
-<header data-site-header>
+<header data-site-header data-home-art={section === 'home' || undefined}>
   <div class="wrap">
-    <a class="brand" href="/" aria-label={`${site.title} · 首页`}>
+    <Brand
+      class="brand"
+      href={section === 'home' ? undefined : '/'}
+      tabindex={section === 'home' ? -1 : undefined}
+      aria-label={section === 'home' ? undefined : `${site.title} · 首页`}
+    >
       <span class="greeting">{site.greeting}</span>{' '}
       <span class="name">{site.name}</span>
-    </a>
+    </Brand>
     <nav id="primary-navigation" aria-label="主导航">
       {pages.map(([key, url, label]) => (
         <a href={url} aria-current={section === key ? 'page' : undefined}>

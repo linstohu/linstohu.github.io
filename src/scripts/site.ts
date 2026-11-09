@@ -115,3 +115,9 @@ if (document.querySelector('[data-audio-player]'))
   import('./audio').then((module) => module.initAudio());
 if (document.querySelector('.image-open'))
   import('./images').then((module) => module.initImages());
+
+document.querySelectorAll<HTMLElement>('[data-home-art]').forEach((artwork) => {
+  for (const event of ['contextmenu', 'dragstart', 'selectstart']) {
+    artwork.addEventListener(event, (event) => event.preventDefault());
+  }
+});
