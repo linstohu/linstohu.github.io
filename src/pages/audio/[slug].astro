@@ -3,12 +3,13 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import {
   loadContent,
-  audioLabel,
+  address,
   dateLabel,
   durationLabel,
   type Audio,
 } from '../../lib/content';
 import Row from '../../components/Row.astro';
+import AudioCover from '../../components/AudioCover.astro';
 export async function getStaticPaths() {
   const { sounds } = await loadContent();
   return sounds.map((entry) => ({
@@ -21,7 +22,15 @@ interface Props {
 }
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { series, posts } = await loadContent();
+const { series, posts, sounds } = await loadContent();
+const show = series.find((item) => item.id === entry.data.series);
+const links = entry.data.listen ?? [];
+const episodes = sounds.filter(
+  (item) => item.data.series === entry.data.series,
+);
+const index = episodes.findIndex((item) => item.id === entry.id);
+const older = episodes[index + 1];
+const newer = episodes[index - 1];
 const related = posts.filter((post) =>
   entry.data.relatedWriting.includes(post.data.slug),
 );
@@ -34,89 +43,165 @@ const related = posts.filter((post) =>
   entryKey={`audio:${entry.data.slug}`}
   noindex={entry.data.draft}
 >
-  <article class="reader" data-pagefind-body>
-    <a class="more" href="/audio/">
-      返回声音列表 →
+  <article
+    class="audio-detail"
+    aria-labelledby="audio-title"
+    data-pagefind-body
+  >
+    <a class="audio-return" href="/audio/">
+      ← 声音
     </a>
-    <h1 data-pagefind-meta="title">{entry.data.title}</h1>
-    <div class="meta">
-      {dateLabel(entry.data.publishedAt)} · {audioLabel(entry, series)}
-      {entry.data.draft ? ' · 草稿预览' : ''}
-    </div>
-    <p>{entry.data.description}</p>
-    {entry.data.listen?.length > 0 && (
-      <nav class="listening-links" aria-label="选择收听平台">
-        {entry.data.listen.map((link) => (
-          <a
-            class="episode-link"
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            去{link.platform}收听 ↗
-          </a>
-        ))}
-      </nav>
-    )}
-    {entry.data.src && entry.data.duration && (
-      <aside
-        data-audio-player
-        data-duration={entry.data.duration}
-        data-pagefind-ignore
+    <header class="audio-hero">
+      <div
+        class:list={[
+          'show-cover',
+          'audio-detail-cover',
+          { 'recording-cover': !show },
+        ]}
+        aria-hidden="true"
       >
-        <span class="eyebrow">收听这段声音</span>
-        <audio
-          class="audio-fallback"
-          controls
-          preload="metadata"
-          src={entry.data.src}
-        >
-          你的浏览器暂不支持音频播放。<a href={entry.data.src}>打开音频文件</a>
-        </audio>
-        <div class="player" hidden>
-          <button id="play" class="pill" aria-pressed="false">
-            播放
-          </button>
-          <input
-            type="range"
-            id="seek"
-            min="0"
-            max={entry.data.duration}
-            value="0"
-            aria-label="播放进度"
-          />
-          <output class="mono" aria-live="off">
-            0:00 / {durationLabel(entry.data.duration)}
-          </output>
+        <AudioCover show={show} />
+      </div>
+      <div class="audio-hero-copy">
+        <div class="audio-kicker">
+          {entry.data.episode && (
+            <span class="episode-number">EP.{entry.data.episode}</span>
+          )}
+          <span>{show?.data.title || '声音手记'}</span>
+          {entry.data.draft && <span>草稿预览</span>}
         </div>
-        <p class="search-notice" data-audio-status role="status" hidden></p>
-      </aside>
-    )}
+        <h1 id="audio-title" data-pagefind-meta="title">
+          {entry.data.title}
+        </h1>
+        <p class="audio-deck">{entry.data.description}</p>
+        <div class="audio-publication">
+          <time datetime={entry.data.publishedAt.toISOString()}>
+            {dateLabel(entry.data.publishedAt)}
+          </time>
+          {entry.data.duration && (
+            <span>时长 {durationLabel(entry.data.duration)}</span>
+          )}
+        </div>
+        {links.length > 0 && (
+          <nav
+            class="audio-listening"
+            aria-label="选择收听平台"
+            data-pagefind-ignore
+          >
+            {links.map((link, index) => (
+              <a
+                class:list={[
+                  'audio-listen',
+                  { 'audio-listen-primary': index === 0 },
+                ]}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {index === 0 && (
+                  <span class="listen-symbol" aria-hidden="true">
+                    ▶
+                  </span>
+                )}
+                去{link.platform}收听<span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </nav>
+        )}
+        {entry.data.src && entry.data.duration && (
+          <aside
+            class="audio-playback"
+            data-audio-player
+            data-duration={entry.data.duration}
+            data-pagefind-ignore
+          >
+            <audio
+              class="audio-fallback"
+              controls
+              preload="metadata"
+              src={entry.data.src}
+            >
+              你的浏览器暂不支持音频播放。
+              <a href={entry.data.src}>打开音频文件</a>
+            </audio>
+            <div class="player" hidden>
+              <button id="play" class="pill" aria-pressed="false">
+                播放
+              </button>
+              <input
+                type="range"
+                id="seek"
+                min="0"
+                max={entry.data.duration}
+                value="0"
+                aria-label="播放进度"
+              />
+              <output class="mono" aria-live="off">
+                0:00 / {durationLabel(entry.data.duration)}
+              </output>
+            </div>
+            <p class="search-notice" data-audio-status role="status" hidden></p>
+          </aside>
+        )}
+      </div>
+    </header>
     {entry.data.src && entry.data.chapters.length > 0 && (
-      <>
-        <h2>声音章节</h2>
-        {entry.data.chapters.map((chapter) => (
-          <button class="row chapter" data-time={chapter.time}>
-            <time>{durationLabel(chapter.time)}</time>
-            {chapter.title}
-          </button>
-        ))}
-      </>
+      <section class="audio-body-layout audio-chapters">
+        <h2 class="audio-section-label">声音章节</h2>
+        <div>
+          {entry.data.chapters.map((chapter) => (
+            <button class="row chapter" data-time={chapter.time}>
+              <time>{durationLabel(chapter.time)}</time>
+              {chapter.title}
+            </button>
+          ))}
+        </div>
+      </section>
     )}
     {entry.body?.trim() && (
-      <section class="audio-notes">
-        <h2>{entry.data.series ? '单集笔记' : '录音手记'}</h2>
-        <Content />
+      <section class="audio-body-layout">
+        <h2 class="audio-section-label">{show ? '这一期' : '录音手记'}</h2>
+        <div class="audio-prose">
+          <Content />
+        </div>
       </section>
     )}
 
     {related.length > 0 && (
-      <>
-        <h2>相关文字</h2>
-        {related.map((post) => (
-          <Row entry={post} series={series} />
-        ))}
-      </>
+      <section class="audio-body-layout audio-related">
+        <h2 class="audio-section-label">相关文字</h2>
+        <div>
+          {related.map((post) => (
+            <Row entry={post} series={series} />
+          ))}
+        </div>
+      </section>
+    )}
+    {(older || newer) && (
+      <nav class="audio-neighbors" aria-label="继续收听">
+        {older ? (
+          <a href={address(older)}>
+            <span>
+              ← {show ? '上一期' : '较早的手记'}
+              {older.data.episode && ' · EP.' + older.data.episode}
+            </span>
+            <strong>{older.data.title}</strong>
+          </a>
+        ) : (
+          <span />
+        )}
+        {newer ? (
+          <a href={address(newer)}>
+            <span>
+              {show ? '下一期' : '较新的手记'}
+              {newer.data.episode && ' · EP.' + newer.data.episode} →
+            </span>
+            <strong>{newer.data.title}</strong>
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
     )}
   </article>
 </Base>
