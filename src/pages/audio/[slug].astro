@@ -1,0 +1,109 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import {
+  loadContent,
+  audioLabel,
+  dateLabel,
+  durationLabel,
+  type Audio,
+} from '../../lib/content';
+import Row from '../../components/Row.astro';
+export async function getStaticPaths() {
+  const { sounds } = await loadContent();
+  return sounds.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+interface Props {
+  entry: Audio;
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { series, posts } = await loadContent();
+const related = posts.filter((post) =>
+  entry.data.relatedWriting.includes(post.data.slug),
+);
+---
+
+<Base
+  title={entry.data.title}
+  section="audio"
+  description={entry.data.description}
+  entryKey={`audio:${entry.data.slug}`}
+  noindex={entry.data.draft}
+>
+  <article class="reader" data-pagefind-body>
+    <a class="more" href="/audio/">
+      返回声音列表 →
+    </a>
+    <h1 data-pagefind-meta="title">{entry.data.title}</h1>
+    <div class="meta">
+      {dateLabel(entry.data.publishedAt)} · {audioLabel(entry, series)}
+      {entry.data.sample ? ' · 示例数据' : ''}
+      {entry.data.draft ? ' · 草稿预览' : ''}
+    </div>
+    <p>{entry.data.description}</p>
+    <aside
+      data-audio-player
+      data-duration={entry.data.duration}
+      data-demo={!entry.data.src}
+      data-pagefind-ignore
+    >
+      <span class="eyebrow">
+        {entry.data.src ? '收听这段声音' : '模拟播放器 · 无音频'}
+      </span>
+      {entry.data.src && (
+        <audio
+          class="audio-fallback"
+          controls
+          preload="metadata"
+          src={entry.data.src}
+        >
+          你的浏览器暂不支持音频播放。<a href={entry.data.src}>打开音频文件</a>
+        </audio>
+      )}
+      <div class="player" hidden={!!entry.data.src}>
+        <button id="play" class="pill" aria-pressed="false">
+          播放演示
+        </button>
+        <input
+          type="range"
+          id="seek"
+          min="0"
+          max={entry.data.duration}
+          value="0"
+          aria-label="播放进度"
+        />
+        <output class="mono" aria-live="off">
+          0:00 / {durationLabel(entry.data.duration)}
+        </output>
+      </div>
+      <p class="search-notice" data-audio-status role="status" hidden></p>
+    </aside>
+    {entry.data.chapters.length > 0 && (
+      <>
+        <h2>声音章节</h2>
+        {entry.data.chapters.map((chapter) => (
+          <button class="row chapter" data-time={chapter.time}>
+            <time>{durationLabel(chapter.time)}</time>
+            {chapter.title}
+          </button>
+        ))}
+      </>
+    )}
+    <details>
+      <summary>{entry.data.series ? '阅读文字稿摘录' : '录音说明'}</summary>
+      <Content />
+    </details>
+    {related.length > 0 && (
+      <>
+        <h2>相关文字</h2>
+        {related.map((post) => (
+          <Row entry={post} series={series} />
+        ))}
+      </>
+    )}
+  </article>
+</Base>

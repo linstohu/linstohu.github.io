@@ -1,0 +1,115 @@
+---
+import {
+  address,
+  dateLabel,
+  audioLabel,
+  type Writing,
+  type Audio,
+  type Snapshot,
+} from '../lib/content';
+import type { CollectionEntry } from 'astro:content';
+interface Props {
+  entry: Writing | Audio | Snapshot;
+  series: CollectionEntry<'series'>[];
+  variant?: string;
+  initiallyHidden?: boolean;
+}
+const {
+  entry,
+  series,
+  variant = 'generic',
+  initiallyHidden = false,
+} = Astro.props;
+const label =
+  entry.collection === 'audio'
+    ? audioLabel(entry, series)
+    : entry.collection === 'now'
+      ? '月份快照'
+      : entry.data.category;
+const key =
+  entry.collection +
+  ':' +
+  (entry.collection === 'now' ? entry.data.period : entry.data.slug);
+const description =
+  entry.collection === 'now'
+    ? entry.data.notes[0]?.text
+    : entry.data.description;
+const tag =
+  entry.collection === 'audio'
+    ? series.find((item) => item.id === entry.data.series)?.data.title ||
+      '独立录音'
+    : entry.collection === 'writing'
+      ? entry.data.category
+      : '此刻';
+const searchText = [entry.data.title, description, label, tag]
+  .join(' ')
+  .toLowerCase();
+---
+
+{variant === 'audio' && entry.collection === 'audio' ? (
+  <a
+    class="episode-row"
+    href={address(entry)}
+    data-entry-key={key}
+    data-tag={tag}
+    data-type={entry.collection}
+    data-search-text={searchText}
+    hidden={initiallyHidden}
+  >
+    {entry.data.episode ? (
+      <span
+        class="episode-number"
+        aria-label={`第${Number(entry.data.episode)}期`}
+      >
+        {entry.data.episode}
+      </span>
+    ) : (
+      <span class="recording-mark" aria-label="独立录音">
+        ≋
+      </span>
+    )}
+    <span class="episode-copy">
+      <span class="episode-meta">
+        <span>{label}</span>
+        <time datetime={entry.data.publishedAt.toISOString()}>
+          {dateLabel(entry.data.publishedAt)}
+        </time>
+      </span>
+      <h3>{entry.data.title}</h3>
+      <p>{description}</p>
+    </span>
+    <span class="episode-row-action" aria-hidden="true">
+      ↗
+    </span>
+  </a>
+) : (
+  <a
+    class:list={['row', { 'writing-row': variant === 'writing' }]}
+    href={address(entry)}
+    data-entry-key={key}
+    data-tag={tag}
+    data-type={entry.collection}
+    data-search-text={searchText}
+    hidden={initiallyHidden}
+  >
+    <time datetime={entry.data.publishedAt.toISOString()}>
+      {variant === 'writing'
+        ? dateLabel(entry.data.publishedAt)
+        : dateLabel(entry.data.publishedAt).slice(5)}
+    </time>
+    <span>
+      <small>
+        {variant === 'writing'
+          ? label
+          : { writing: '文字', audio: '声音', now: '此刻' }[entry.collection] +
+            ' / ' +
+            label}
+      </small>
+      <strong>{entry.data.title}</strong>
+      {variant === 'writing' && <p>{description}</p>}
+    </span>
+    <span class="arrow" aria-hidden="true">
+      ↗
+    </span>
+  </a>
+)}

@@ -1,0 +1,11 @@
+{
+  "title": "Hi, Linsto",
+  "description": "一个人的长期记录。文字、声音与每月的生活快照。",
+  "sampleMode": true,
+  "homeImage": "/images/ridgelines.png",
+  "footerCredit": "Designed by Linsto · Built by GPT-6.1 Sol",
+  "url": "https://linsto.org",
+  "author": "Linsto",
+  "greeting": "Hi,",
+  "name": "Linsto"
+}

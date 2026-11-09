@@ -1,0 +1,67 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../lib/site';
+import { loadContent, address, dateLabel, audioLabel } from '../lib/content';
+const { posts, sounds, snapshots, series } = await loadContent();
+const recent = [posts[0], sounds[0], snapshots[0]].filter(
+  (entry) => entry !== undefined,
+);
+const tiles = [
+  ['writing', '文字', 'Essays'],
+  ['audio', '声音', 'Audio'],
+  ['now', '此刻', 'Now'],
+  ['about', '关于', 'About'],
+];
+---
+
+<Base title={site.title} section="home">
+  <h1 class="sr-only">{site.title}</h1>
+  <img
+    class="mountains"
+    src={site.homeImage}
+    width="900"
+    height="480"
+    alt="赭色落日下，层层青绿山脊延伸至远处"
+    fetchpriority="high"
+  />
+  <section class="composition" aria-label="浏览栏目">
+    {tiles.map(([path, title, en]) => (
+      <a class={`tile tile-${path}`} href={`/${path}/`}>
+        <span>{title}</span>
+        <em lang="en">{en}</em>
+        <i aria-hidden="true">↗</i>
+      </a>
+    ))}
+  </section>
+  <section class="latest">
+    <div class="stream-head">
+      <h2>最近更新</h2>
+      <a href="/archive/" class="more">
+        全部归档 →
+      </a>
+    </div>
+    <div class="recent-grid">
+      {recent.map((entry) => (
+        <a href={address(entry)}>
+          <small>
+            {entry.collection === 'audio'
+              ? '声音 · ' + audioLabel(entry, series)
+              : entry.collection === 'writing'
+                ? '文字'
+                : '此刻'}
+            {entry.data.sample && ' · 示例'}
+            <time datetime={entry.data.publishedAt.toISOString()}>
+              {dateLabel(entry.data.publishedAt).slice(5)}
+            </time>
+          </small>
+          <h3>{entry.data.title}</h3>
+          <p>
+            {entry.collection === 'now'
+              ? entry.data.notes[0]?.text
+              : entry.data.description}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

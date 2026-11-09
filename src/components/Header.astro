@@ -1,0 +1,40 @@
+---
+import { site } from '../lib/site';
+interface Props {
+  section: string;
+}
+const { section } = Astro.props;
+const pages = [
+  ['home', '/', '首页'],
+  ['writing', '/writing/', '文字'],
+  ['audio', '/audio/', '声音'],
+  ['now', '/now/', '此刻'],
+  ['about', '/about/', '关于'],
+];
+---
+
+<header data-site-header>
+  <div class="wrap">
+    <a class="brand" href="/" aria-label={`${site.title} · 首页`}>
+      <span class="greeting">{site.greeting}</span>{' '}
+      <span class="name">{site.name}</span>
+    </a>
+    <nav id="primary-navigation" aria-label="主导航">
+      {pages.map(([key, url, label]) => (
+        <a href={url} aria-current={section === key ? 'page' : undefined}>
+          {label}
+        </a>
+      ))}
+    </nav>
+    {site.sampleMode && <span class="sample">示例数据</span>}
+    <button
+      class="mobile-menu"
+      aria-label="展开网站导航"
+      aria-expanded="false"
+      aria-controls="primary-navigation"
+    >
+      <span>导航</span>
+      <span class="menu-glyph" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>

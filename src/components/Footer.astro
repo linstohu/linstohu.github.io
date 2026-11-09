@@ -1,0 +1,67 @@
+---
+import { site } from '../lib/site';
+import { quotes } from '../lib/classics';
+const quote = quotes[0];
+---
+
+<div class="foot-area">
+  <aside class="quote-strip" aria-label="经典摘句">
+    <blockquote class="foot-quote">
+      <div class="quote-copy">
+        {quote && (
+          <>
+            <p>{quote.text}</p>
+            <cite>
+              <a href={quote.url} target="_blank" rel="noopener noreferrer">
+                {quote.author}《{quote.work}》
+              </a>
+            </cite>
+          </>
+        )}
+      </div>
+    </blockquote>
+  </aside>
+  <footer class="site-foot">
+    <div class="wrap foot-grid">
+      <div>
+        <a class="foot-brand" href="/">
+          {site.domain}
+        </a>
+        <p>文字、声音与每月的生活记录。</p>
+      </div>
+      <section>
+        <h2>栏目</h2>
+        <a href="/writing/">文字</a>
+        <a href="/audio/">声音</a>
+        <a href="/now/">此刻 Now</a>
+      </section>
+      <section>
+        <h2>归档</h2>
+        <a href="/archive/">搜索全部内容</a>
+        <a href="/now/archive/">按月回看近况</a>
+        <a href="/rss.xml">订阅文字 RSS ↗</a>
+        <a href="/audio/rss.xml">订阅声音 RSS ↗</a>
+      </section>
+      <section>
+        <h2>本站</h2>
+        <a href="/about/">关于 {site.author}</a>
+        <a href="/">回到首页</a>
+        <button data-back-top>返回页顶 ↑</button>
+        <button class="theme" aria-label="切换到深色主题">
+          ☾ 深色模式
+        </button>
+      </section>
+    </div>
+    <div class="wrap colophon">
+      <span>
+        © {new Date().getFullYear()} {site.domain}
+      </span>
+      <span>{site.footerCredit}</span>
+    </div>
+  </footer>
+</div>
+<script
+  type="application/json"
+  id="classics-library"
+  set:html={JSON.stringify(quotes).replaceAll('<', '\\u003c')}
+/>

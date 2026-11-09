@@ -1,0 +1,91 @@
+---
+import { loadContent, address, type Snapshot } from '../lib/content';
+interface Props {
+  entry: Snapshot;
+  indexed?: boolean;
+}
+const { entry, indexed = false } = Astro.props;
+const { snapshots } = await loadContent();
+const index = snapshots.findIndex((item) => item.id === entry.id);
+const older = snapshots[index + 1],
+  newer = snapshots[index - 1];
+const month = Number(entry.data.period.slice(-2));
+---
+
+<section class="now-page">
+  <div class="collection-heading">
+    <h1>此刻</h1>
+    <p>此时关注的事，按月留一份底稿。</p>
+  </div>
+  <div class="now-layout">
+    <aside class="now-aside">
+      <div class="month-stamp">
+        <span>{entry.data.period.slice(0, 4)} 年</span>
+        <strong>
+          {String(month).padStart(2, '0')}
+          <small>月</small>
+        </strong>
+        <time datetime={entry.data.publishedAt.toISOString()}>
+          记录于{' '}
+          {new Intl.DateTimeFormat('en-US', {
+            timeZone: 'Asia/Shanghai',
+            month: 'numeric',
+            day: 'numeric',
+          })
+            .format(entry.data.publishedAt)
+            .replace('/', '.')}
+        </time>
+      </div>
+      <nav class="month-list" aria-label="选择月份">
+        <span class="month-label">过往快照</span>
+        {snapshots.map((item, n) => (
+          <a
+            href={address(item)}
+            aria-current={item.id === entry.id ? 'page' : undefined}
+          >
+            <span>{item.data.period.replace('-', '.')}</span>
+            {n === 0 && <small>最新</small>}
+          </a>
+        ))}
+        <a class="all-months" href="/now/archive/">
+          月份归档 ↗
+        </a>
+      </nav>
+    </aside>
+    <div class="now-content" data-pagefind-body={indexed || undefined}>
+      <div class="snapshot-head">
+        <span class="eyebrow">
+          {index === 0 ? '当前快照' : '历史快照'}
+          {entry.data.sample ? ' · 示例数据' : ''}
+        </span>
+        <h2 data-pagefind-meta="title">{entry.data.title}</h2>
+      </div>
+      <div class="now-notes">
+        {entry.data.notes.map((note) => (
+          <section>
+            <h3>{note.title}</h3>
+            <p>{note.text}</p>
+          </section>
+        ))}
+      </div>
+      <nav class="snapshot-neighbors" aria-label="相邻月份">
+        {older ? (
+          <a href={address(older)}>
+            ← {older.data.period.replace('-', '.')}
+            <small>{older.data.title}</small>
+          </a>
+        ) : (
+          <span />
+        )}
+        {newer ? (
+          <a href={address(newer)}>
+            {newer.data.period.replace('-', '.')} →
+            <small>{newer.data.title}</small>
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    </div>
+  </div>
+</section>

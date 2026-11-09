@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import Now from '../../components/Now.astro';
+import { loadContent } from '../../lib/content';
+const { snapshots } = await loadContent();
+---
+
+<Base title="此刻" section="now">
+  {snapshots[0] ? (
+    <Now entry={snapshots[0]} />
+  ) : (
+    <div class="page">
+      <h1>此刻</h1>
+      <p>第一份生活快照正在准备中。</p>
+    </div>
+  )}
+</Base>

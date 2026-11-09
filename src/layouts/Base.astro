@@ -1,0 +1,96 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+import '../styles/site.css';
+interface Props {
+  title: string;
+  section: string;
+  description?: string;
+  entryKey?: string;
+  noindex?: boolean;
+}
+const {
+  title,
+  section,
+  description = site.description,
+  entryKey,
+  noindex = false,
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="zh-CN" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title} · {site.domain}</title>
+    <meta name="description" content={description} />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={`${title} · ${site.domain}`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content={entryKey ? 'article' : 'website'} />
+    <meta property="og:image" content={new URL(site.homeImage, Astro.site)} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    {entryKey && (
+      <meta data-pagefind-meta="entry_key[content]" content={entryKey} />
+    )}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="文字订阅"
+      href="/rss.xml"
+    />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="声音订阅"
+      href="/audio/rss.xml"
+    />
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+      try {
+        const choice = localStorage.getItem('linsto-theme');
+        document.documentElement.dataset.theme =
+          choice === 'dark' || choice === 'light'
+            ? choice
+            : matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+      } catch {
+        document.documentElement.dataset.theme = matchMedia(
+          '(prefers-color-scheme: dark)',
+        ).matches
+          ? 'dark'
+          : 'light';
+      }
+    </script>
+  </head>
+  <body class:list={{ 'at-home': section === 'home' }}>
+    <a class="skip" href="#content">
+      跳至正文
+    </a>
+    <Header section={section} />
+    <main id="content" class="wrap" data-section={section} tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <dialog id="article-image-dialog" aria-label="图片大图">
+      <button class="image-close" autofocus>
+        关闭 ×
+      </button>
+      <img alt="" />
+      <p class="image-caption"></p>
+    </dialog>
+    <script>
+      import '../scripts/site.ts';
+    </script>
+  </body>
+</html>

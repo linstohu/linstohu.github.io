@@ -1,0 +1,217 @@
+---
+import {
+  loadContent,
+  address,
+  dateLabel,
+  audioLabel,
+  durationLabel,
+  type Writing,
+  type Audio,
+} from '../lib/content';
+import Row from './Row.astro';
+interface Props {
+  group: 'writing' | 'audio' | 'archive';
+}
+const { group } = Astro.props;
+const { posts, sounds, snapshots, series } = await loadContent();
+const isCollection = group !== 'archive';
+const entries =
+  group === 'writing'
+    ? posts
+    : group === 'audio'
+      ? sounds
+      : [...posts, ...sounds, ...snapshots].sort(
+          (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+        );
+const latest = entries[0];
+const article = group === 'writing' ? (latest as Writing) : undefined;
+const sound = group === 'audio' ? (latest as Audio) : undefined;
+const show = sound
+  ? series.find((item) => item.id === sound.data.series)
+  : undefined;
+const label = group === 'writing' ? '文字' : '声音';
+const tags = [
+  ...new Set(
+    entries.map((entry) =>
+      group === 'archive'
+        ? { writing: '文字', audio: '声音', now: '此刻' }[entry.collection]
+        : entry.collection === 'audio'
+          ? series.find((item) => item.id === entry.data.series)?.data.title ||
+            '独立录音'
+          : entry.collection === 'writing'
+            ? entry.data.category
+            : '此刻',
+    ),
+  ),
+];
+---
+
+<section
+  class:list={[{ 'collection-index': isCollection }, `${group}-collection`]}
+  data-collection
+  data-group={group}
+  data-latest={
+    isCollection && latest
+      ? latest.collection +
+        ':' +
+        (latest.collection === 'now' ? latest.data.period : latest.data.slug)
+      : ''
+  }
+>
+  {isCollection ? (
+    <div class="collection-heading">
+      <h1>{label}</h1>
+      <p>
+        {group === 'writing'
+          ? '写下做过的事，也留住暂时没有答案的问题。'
+          : '播客、独白，以及随手留下的声音。'}
+      </p>
+    </div>
+  ) : (
+    <div class="page">
+      <span class="eyebrow">ARCHIVE</span>
+      <h1>全部归档</h1>
+      <p class="intro">按时间翻阅文字、声音与此刻，也可以输入关键词查找。</p>
+    </div>
+  )}
+  {article && (
+    <section
+      class="collection-feature writing-feature"
+      data-feature
+      aria-label="最新文章"
+    >
+      <div class="feature-copy">
+        <div class="feature-meta">
+          <span>最新文字 · {article.data.category}</span>
+          <time datetime={article.data.publishedAt.toISOString()}>
+            {dateLabel(article.data.publishedAt)}
+          </time>
+        </div>
+        <h2>
+          <a href={address(article)}>{article.data.title}</a>
+        </h2>
+        <p>{article.data.description}</p>
+        <a class="more" href={address(article)}>
+          读这篇文章 →
+        </a>
+      </div>
+      <blockquote class="feature-fragment">
+        <span class="fragment-label">文中一段</span>
+        <button
+          class="fragment-toggle"
+          aria-expanded="false"
+          aria-controls="fragment-copy"
+        >
+          <span>读一段正文</span>
+          <span aria-hidden="true">＋</span>
+        </button>
+        <div class="fragment-copy" id="fragment-copy">
+          <p>{article.data.featuredExcerpt || article.data.description}</p>
+          <cite>
+            <a href={address(article)}>
+              摘自「{article.data.excerptTitle || article.data.title}」 ↗
+            </a>
+          </cite>
+        </div>
+      </blockquote>
+    </section>
+  )}
+  {sound && (
+    <section
+      class="collection-feature podcast-feature"
+      data-feature
+      aria-label="最新声音"
+    >
+      <a
+        class:list={['show-cover', { 'recording-cover': !show }]}
+        href={address(sound)}
+        aria-label={`打开${show?.data.title || '独立录音'}`}
+      >
+        <span class="cover-title">
+          {(show?.data.coverTitle || [show?.data.title || '声音', '手记']).map(
+            (line, index) => (
+              <>
+                {index > 0 && <br />}
+                {line}
+              </>
+            ),
+          )}
+        </span>
+        <span class="cover-caption">
+          {show?.data.description || '随手留下的声音'}
+        </span>
+        <span class="cover-disc" aria-hidden="true"></span>
+      </a>
+      <div class="feature-copy">
+        <div class="feature-meta">
+          <span>最新声音 · {audioLabel(sound, series)}</span>
+          <time datetime={sound.data.publishedAt.toISOString()}>
+            {dateLabel(sound.data.publishedAt)}
+          </time>
+        </div>
+        <h2>
+          <a href={address(sound)}>{sound.data.title}</a>
+        </h2>
+        <p>{sound.data.description}</p>
+        <div class="episode-actions">
+          <a class="episode-link" href={address(sound)}>
+            <span aria-hidden="true">↗</span> 打开这段声音
+          </a>
+          <span class="episode-length">
+            音频时长 {durationLabel(sound.data.duration)}
+          </span>
+        </div>
+      </div>
+    </section>
+  )}
+  <section class="collection-browser" aria-label="查找内容">
+    <div class="browse-heading">
+      <h2 data-browse-heading>{isCollection ? '浏览' + label : '查找记录'}</h2>
+      <input
+        type="search"
+        aria-label="搜索内容"
+        placeholder={
+          group === 'writing'
+            ? '搜索文章内容…'
+            : group === 'audio'
+              ? '搜索声音内容…'
+              : '搜索全部内容…'
+        }
+      />
+    </div>
+    <div class="index-controls">
+      <div class="filters" aria-label="分类筛选">
+        {['全部', ...tags].map((tag) => (
+          <button
+            data-filter={tag}
+            aria-pressed={tag === '全部' ? 'true' : 'false'}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+      <span class="mono muted" role="status">
+        {isCollection ? Math.max(0, entries.length - 1) : entries.length}{' '}
+        {group === 'writing'
+          ? '篇文字'
+          : group === 'audio'
+            ? '条声音'
+            : '条记录'}
+      </span>
+    </div>
+    <p class="search-notice" hidden></p>
+    <div id="rows">
+      {entries.map((entry, index) => (
+        <Row
+          entry={entry}
+          series={series}
+          variant={group}
+          initiallyHidden={isCollection && index === 0}
+        />
+      ))}
+      <p class="empty-list" hidden={entries.length > 0}>
+        下一份记录，会留在这里。
+      </p>
+    </div>
+  </section>
+</section>

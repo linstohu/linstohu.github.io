@@ -1,0 +1,96 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../lib/site';
+import { loadContent, dateLabel, type Writing } from '../../lib/content';
+export async function getStaticPaths() {
+  const { posts } = await loadContent();
+  return posts.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+interface Props {
+  entry: Writing;
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Base
+  title={entry.data.title}
+  section="writing"
+  description={entry.data.description}
+  entryKey={`writing:${entry.data.slug}`}
+  noindex={entry.data.draft}
+>
+  <div class="reading-page">
+    <article
+      class="reader article-paper"
+      aria-labelledby="article-title"
+      data-pagefind-body
+    >
+      <div class="article-path" data-pagefind-ignore>
+        <a href="/writing/">← 文字</a>
+        <span>{entry.data.category}</span>
+      </div>
+      <header class="article-head">
+        <h1 id="article-title" data-pagefind-meta="title">
+          {entry.data.title}
+        </h1>
+        <div class="byline" data-pagefind-ignore>
+          <span>{site.author}</span>
+          <time datetime={entry.data.publishedAt.toISOString()}>
+            {dateLabel(entry.data.publishedAt)}
+          </time>
+          {entry.data.draft ? (
+            <span>草稿预览</span>
+          ) : (
+            entry.data.sample && <span>示例文章</span>
+          )}
+        </div>
+      </header>
+      <div class="article-body">
+        <p class="standfirst">{entry.data.description}</p>
+        <Content />
+      </div>
+      {entry.data.videos.map((video) => (
+        <section class="video-recommendation">
+          <h2>延伸观看</h2>
+          <a
+            class="video-link"
+            href={video.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="video-symbol" aria-hidden="true">
+              ▷
+            </span>
+            <span>
+              <strong>{video.title}</strong>
+              <small>
+                {video.creator}
+                <br />
+                站外视频 ↗
+              </small>
+            </span>
+          </a>
+          {video.description && <p>{video.description}</p>}
+        </section>
+      ))}
+      {entry.data.appendix && (
+        <details class="article-appendix">
+          <summary>{entry.data.appendix.title}</summary>
+          <ul>
+            {entry.data.appendix.notes.map((note) => (
+              <li>{note}</li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </article>
+    <nav class="article-end" aria-label="文章末尾导航">
+      <a href="/writing/">← 返回文字列表</a>
+    </nav>
+  </div>
+</Base>

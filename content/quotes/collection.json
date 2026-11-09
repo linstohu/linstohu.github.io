@@ -1,0 +1,74 @@
+{
+  "quotes": [
+    {
+      "id": "wangwei-water",
+      "text": "行到水穷处，坐看云起时。",
+      "author": "王维",
+      "work": "终南别业",
+      "url": "https://zh.wikisource.org/zh-hans/終南別業"
+    },
+    {
+      "id": "wangwei-autumn",
+      "text": "空山新雨后，天气晚来秋。",
+      "author": "王维",
+      "work": "山居秋暝",
+      "url": "https://zh.wikisource.org/zh-hans/山居秋暝"
+    },
+    {
+      "id": "wangwei-moon",
+      "text": "明月松间照，清泉石上流。",
+      "author": "王维",
+      "work": "山居秋暝",
+      "url": "https://zh.wikisource.org/zh-hans/山居秋暝"
+    },
+    {
+      "id": "tao-mountain",
+      "text": "采菊东篱下，悠然见南山。",
+      "author": "陶渊明",
+      "work": "饮酒·其五",
+      "url": "https://zh.wikisource.org/zh-hans/飲酒二十首#其五"
+    },
+    {
+      "id": "tao-meaning",
+      "text": "此中有真意，欲辩已忘言。",
+      "author": "陶渊明",
+      "work": "饮酒·其五",
+      "url": "https://zh.wikisource.org/zh-hans/飲酒二十首#其五"
+    },
+    {
+      "id": "tao-birds",
+      "text": "山气日夕佳，飞鸟相与还。",
+      "author": "陶渊明",
+      "work": "饮酒·其五",
+      "url": "https://zh.wikisource.org/zh-hans/飲酒二十首#其五"
+    },
+    {
+      "id": "su-perspective",
+      "text": "横看成岭侧成峰，远近高低各不同。",
+      "author": "苏轼",
+      "work": "题西林壁",
+      "url": "https://zh.wikisource.org/zh-hans/題西林壁"
+    },
+    {
+      "id": "su-moon",
+      "text": "何夜无月？何处无竹柏？但少闲人如吾两人者耳。",
+      "author": "苏轼",
+      "work": "记承天寺夜游",
+      "url": "https://zh.wikisource.org/zh-hans/記承天寺夜遊"
+    },
+    {
+      "id": "du-rain",
+      "text": "随风潜入夜，润物细无声。",
+      "author": "杜甫",
+      "work": "春夜喜雨",
+      "url": "https://zh.wikisource.org/zh-hans/春夜喜雨"
+    },
+    {
+      "id": "confucius-friends",
+      "text": "有朋自远方来，不亦乐乎？",
+      "author": "孔子",
+      "work": "论语·学而",
+      "url": "https://zh.wikisource.org/zh-hans/論語/學而第一"
+    }
+  ]
+}

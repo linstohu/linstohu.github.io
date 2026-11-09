@@ -1,0 +1,28 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Now from '../../../components/Now.astro';
+import { loadContent, type Snapshot } from '../../../lib/content';
+export async function getStaticPaths() {
+  const { snapshots } = await loadContent();
+  return snapshots.map((entry) => ({
+    params: {
+      year: entry.data.period.slice(0, 4),
+      month: entry.data.period.slice(-2),
+    },
+    props: { entry },
+  }));
+}
+interface Props {
+  entry: Snapshot;
+}
+const { entry } = Astro.props;
+---
+
+<Base
+  title={entry.data.title}
+  section="now"
+  entryKey={`now:${entry.data.period}`}
+  noindex={entry.data.draft}
+>
+  <Now entry={entry} indexed />
+</Base>

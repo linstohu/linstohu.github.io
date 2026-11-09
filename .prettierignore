@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+pnpm-lock.yaml
+
+# Author content is validated by schemas; preserve Markdown whitespace.
+content/
