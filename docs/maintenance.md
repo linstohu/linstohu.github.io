@@ -49,7 +49,9 @@ pnpm run preview
 pnpm run new writing my-essay --title "文章标题" --category "随笔"
 ```
 
-用 VS Code 打开生成的 Markdown 文件，编辑标题、摘要和正文。`slug` 是固定地址，`description` 是首页及列表显示的一句话。Markdown 图片可以带说明：
+用 VS Code 打开生成的 Markdown 文件，编辑标题、摘要和正文。`slug` 是固定地址，`description` 是首页及列表显示的一句话。文章详情直接从 Markdown 正文开始。要为文字页最新文章的「文中一段」指定摘录，在信息区填写 `featuredExcerpt`；留空时由站点自动选取。
+
+Markdown 图片可以带说明：
 
 ```md
 ![图片替代文字](/images/photo.webp '图片下方的说明。')
@@ -79,14 +81,18 @@ pnpm run audio --file "/path/to/voice.m4a" --slug autumn --title "秋日手记" 
 pnpm run publish:content audio/autumn/index.md
 ```
 
-播客先建节目：
+上面的上传命令默认创建独立录音（`kind: recording`），省略 `--series` 即可。首条公开录音发布后，「声音」页显示「独立录音」筛选项。最新一条声音为独立录音时，封面题为「声音手记」。
+
+「老大不小」已配置在 `content/series/thirty-plus.json`。发布单集时直接引用 `thirty-plus`，首期公开后，节目名会出现在筛选栏。
 
 ```sh
-pnpm run new series my-show --title "节目名称" --description "一句介绍"
-pnpm run audio --file "/path/to/episode.mp3" --slug episode-one --title "第一期" --description "这一期聊什么" --kind podcast --series my-show --episode 1
+pnpm run audio --file "/path/to/episode.mp3" --slug episode-one --title "第一期" --description "这一期聊什么" --kind podcast --series thirty-plus --episode 1
+pnpm run publish:content audio/episode-one/index.md
 ```
 
-不指定节目就是独立录音。`uid` 用于 RSS，请保持不变。声音信息区的 `relatedWriting` 可以填写文章的固定标识列表（如 `["my-essay"]`），不填写就不显示相关文字；不会根据节目名称猜测关联。正式音频必须填写有效地址、时长、字节数和 MIME 类型。上传前可加 `--dry-run` 检查元数据，不连接 R2。首次上传后建议检查浏览器播放、进度拖动、章节跳转及手机播放；本地构建不会探测远程媒体是否可用。浏览器和系统支持的音频格式不同，优先使用 MP3 或 M4A。
+开设另一档节目时，先运行 `pnpm run new series my-show --title "节目名称" --description "一句介绍"`，再在上传命令中使用 `--series my-show`。
+
+`uid` 用于 RSS，请保持不变。声音信息区的 `relatedWriting` 可以填写文章的固定标识列表（如 `["my-essay"]`），不填写就不显示相关文字；不会根据节目名称猜测关联。正式音频必须填写有效地址、时长、字节数和 MIME 类型。上传前可加 `--dry-run` 检查元数据，不连接 R2。首次上传后建议检查浏览器播放、进度拖动、章节跳转及手机播放；本地构建不会探测远程媒体是否可用。浏览器和系统支持的音频格式不同，优先使用 MP3 或 M4A。
 
 图片或附件：
 
@@ -126,7 +132,7 @@ pnpm run validate
 
 依次执行代码格式检查、Node 内置测试、Astro 类型检查与完整构建。`content/` 下的作者内容不设代码格式门槛，保留 Markdown 原始排版，内容结构由共享 schema 校验。CI 使用同一条命令及冻结锁文件；部署工具 Wrangler 也由该锁文件固定。依赖安装只允许明确列出的构建脚本，并要求新版本至少发布一天。
 
-测试覆盖草稿与定时内容边界、内容引用、章节时序、发布日期保留、正文空白、无覆盖新建、失败不写入及相对链接/锚点检查。架构边界与审查记录见[架构说明](architecture.md)。
+测试覆盖草稿与定时内容边界、内容引用、章节时序、发布日期保留、正文空白、无覆盖新建、失败不写入及相对链接/锚点检查。内容模型与部署边界见[架构说明](architecture.md)。
 
 ## 运行边界
 
