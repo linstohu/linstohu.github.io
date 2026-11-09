@@ -37,7 +37,7 @@ Node.js 版本以 `.nvmrc` 为准，pnpm 版本以 `package.json` 的 `packageMa
 - 文章和声音使用目录内的 `index.md`，此刻使用 `content/now/YYYY-MM.md`；模型定义集中在 `src/lib/schemas.ts`。
 - 生产公开条件为 `draft: false` 且 `publishedAt` 不晚于构建时间；页面、订阅、站点地图与搜索索引沿用同一公开集合。未来内容在发布时间之后的下一次构建上线。
 - 日期为带引号、带时区的 ISO 字符串，展示使用 `Asia/Shanghai`。`slug` 是文章和声音的固定地址标识，`uid` 是声音订阅标识，`period` 是月份快照标识；标题与这些标识分开维护。
-- 声音包含播客与独立录音，节目由 `series` 关联，相关文字由 `relatedWriting` 显式关联。历史月份分别保存，`/now/` 展示最新公开快照。
+- 声音包含栏目单集与声音手记，栏目由 `series` 关联，外部收听地址由 `listen` 提供，相关文字由 `relatedWriting` 显式关联。历史月份分别保存，`/now/` 展示最新公开快照。
 - 发布工具默认保留已发布文章的 `publishedAt`、更新 `updatedAt`，校验成功后原子写回文件并保留正文空白。`content/` 不参与代码格式检查，结构由共享 schema 校验。
 - 站点地址、作者与品牌资料在 `content/settings/site.json`；经典摘句在 `content/quotes/collection.json`。
 

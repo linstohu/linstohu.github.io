@@ -44,7 +44,21 @@ const related = posts.filter((post) =>
       {entry.data.draft ? ' · 草稿预览' : ''}
     </div>
     <p>{entry.data.description}</p>
-    {entry.data.src && (
+    {entry.data.listen.length > 0 && (
+      <nav class="listening-links" aria-label="选择收听平台">
+        {entry.data.listen.map((link) => (
+          <a
+            class="episode-link"
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            去{link.platform}收听 ↗
+          </a>
+        ))}
+      </nav>
+    )}
+    {entry.data.src && entry.data.duration && (
       <aside
         data-audio-player
         data-duration={entry.data.duration}
@@ -89,10 +103,13 @@ const related = posts.filter((post) =>
         ))}
       </>
     )}
-    <details>
-      <summary>{entry.data.series ? '阅读文字稿摘录' : '录音说明'}</summary>
-      <Content />
-    </details>
+    {entry.body?.trim() && (
+      <section class="audio-notes">
+        <h2>{entry.data.series ? '单集笔记' : '录音手记'}</h2>
+        <Content />
+      </section>
+    )}
+
     {related.length > 0 && (
       <>
         <h2>相关文字</h2>

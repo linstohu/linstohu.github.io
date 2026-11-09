@@ -69,30 +69,43 @@ pnpm run build
 
 ## 发布声音
 
-首次配置 R2：创建存储桶，为其绑定 HTTPS 公共域名（如 `media.linsto.org`），创建仅允许该桶读写的 R2 API 密钥。把 `.env.example` 复制为 `.env`，填入 `R2_ACCOUNT_ID`、`R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY`、`R2_BUCKET`、`MEDIA_PUBLIC_URL`。`.env` 已忽略，不要提交。R2 的公共域名与 Pages 域名是两个独立配置。
+「声音」包含具名栏目和独立录音。栏目单集关联 `content/series/` 中的资料，外部平台的收听地址填写在 `listen`；独立录音以「声音手记」展示，使用本站播放器。首页、归档和声音列表按发布时间展示单集或录音。空栏目隐藏。
+
+### 外部平台上的栏目
+
+「老大不小」的标识为 `thirty-plus`。在小宇宙发布后，复制单集的网页地址，新建一份本站笔记：
+
+```sh
+pnpm run new audio episode-one --title "第一期" --description "这一期聊什么" --series thirty-plus --platform "小宇宙" --listen-url "https://www.xiaoyuzhoufm.com/episode/单集标识" --episode 1
+```
+
+工具创建草稿。可在生成的 Markdown 中填写单集笔记、文字稿和 `relatedWriting`，再发布：
+
+```sh
+pnpm run publish:content audio/episode-one/index.md
+```
+
+`listen` 是平台名称与单集 URL 的列表，可添加其他平台地址。详情页展示相应的收听按钮，音频仍由平台提供。`duration` 按秒填写，外部单集可省略。节目本身的订阅链接填写在 `content/series/thirty-plus.json` 的 `listen` 中。
+
+开设另一档栏目，先运行 `pnpm run new series my-show --title "栏目名称" --description "一句介绍"`，再在单集命令里使用 `--series my-show`。栏目名和封面在节目 JSON 内维护。现有的 `kind: podcast` 表示栏目单集。
+
+### 声音手记
+
+首次配置 R2：创建存储桶，为其绑定 HTTPS 公共域名（如 `media.linsto.org`），创建该桶的 R2 API 密钥。在本地 `.env` 中填写 `.env.example` 对应的 R2 配置。
 
 ```sh
 pnpm run audio --file "/path/to/voice.m4a" --slug autumn --title "秋日手记" --description "一句话介绍"
 ```
 
-工具读取时长、大小、类型，以文件内容哈希生成长期稳定的地址，用分片上传支持大文件。成功后才生成草稿，不覆盖已有内容。编辑文字稿与 `chapters` 后发布：
+工具默认创建 `kind: recording`，省略 `--series`。它读取音频时长、大小和类型，以文件内容哈希生成 R2 地址。上传完成后生成本地草稿，已有文件会被保留。先用 `--dry-run` 可查看元数据，再编辑文字稿与章节，最后发布：
 
 ```sh
 pnpm run publish:content audio/autumn/index.md
 ```
 
-上面的上传命令默认创建独立录音（`kind: recording`），省略 `--series` 即可。首条公开录音发布后，「声音」页显示「独立录音」筛选项。最新一条声音为独立录音时，封面题为「声音手记」。
+站内播放器需要音频地址、时长、字节数和 MIME 类型。首条录音公开后，「声音手记」入口出现。栏目若使用自托管音频，上传时追加 `--kind podcast --series thirty-plus`。
 
-「老大不小」已配置在 `content/series/thirty-plus.json`。发布单集时直接引用 `thirty-plus`，首期公开后，节目名会出现在筛选栏。
-
-```sh
-pnpm run audio --file "/path/to/episode.mp3" --slug episode-one --title "第一期" --description "这一期聊什么" --kind podcast --series thirty-plus --episode 1
-pnpm run publish:content audio/episode-one/index.md
-```
-
-开设另一档节目时，先运行 `pnpm run new series my-show --title "节目名称" --description "一句介绍"`，再在上传命令中使用 `--series my-show`。
-
-`uid` 用于 RSS，请保持不变。声音信息区的 `relatedWriting` 可以填写文章的固定标识列表（如 `["my-essay"]`），不填写就不显示相关文字；不会根据节目名称猜测关联。正式音频必须填写有效地址、时长、字节数和 MIME 类型。上传前可加 `--dry-run` 检查元数据，不连接 R2。首次上传后建议检查浏览器播放、进度拖动、章节跳转及手机播放；本地构建不会探测远程媒体是否可用。浏览器和系统支持的音频格式不同，优先使用 MP3 或 M4A。
+`uid` 为声音的稳定标识。站内声音 RSS 只收录有完整音频文件信息的条目，外部单集从对应平台订阅。首次上传后检查浏览器播放、拖动和章节跳转，构建只检查元数据与站内文件。远程音频的可访问性需要实际播放验证，格式优先使用 MP3 或 M4A。
 
 图片或附件：
 

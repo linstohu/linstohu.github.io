@@ -43,6 +43,7 @@ export const writingSchema = z.object({
     .default([]),
   appendix: z.object({ title: text, notes: z.array(text).min(1) }).optional(),
 });
+const listeningLink = z.object({ platform: text, url: httpUrl });
 export const audioSchema = z
   .object({
     ...common,
@@ -52,8 +53,9 @@ export const audioSchema = z
     kind: z.enum(['podcast', 'recording']),
     series: slugSchema.optional(),
     episode: text.optional(),
-    duration: z.number().positive(),
-    category: text,
+    duration: z.number().positive().optional(),
+    category: text.optional(),
+    listen: z.array(listeningLink).default([]),
     src: httpUrl.optional(),
     bytes: z.number().int().positive().optional(),
     mime: z
@@ -73,13 +75,17 @@ export const audioSchema = z
       .default([]),
   })
   .superRefine((entry, ctx) => {
-    if (!entry.draft) {
-      for (const key of ['src', 'bytes', 'mime'] as const) {
+    if (
+      !entry.draft &&
+      (entry.kind === 'recording' || entry.src || entry.listen.length === 0)
+    ) {
+      for (const key of ['src', 'bytes', 'mime', 'duration'] as const) {
         if (!entry[key])
           ctx.addIssue({
             code: 'custom',
             path: [key],
-            message: '正式声音需要音频地址、字节数和 MIME 类型，请先上传音频',
+            message:
+              '站内播放需要音频地址、字节数、MIME 类型和时长；栏目单集也可填写 listen 平台收听链接',
           });
       }
     }
@@ -89,9 +95,18 @@ export const audioSchema = z
         path: ['series'],
         message: '播客需要关联节目',
       });
+    if (entry.chapters.length > 0 && !entry.duration)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['duration'],
+        message: '填写章节时需要提供音频总时长',
+      });
     let previous = -1;
     entry.chapters.forEach((chapter, index) => {
-      if (chapter.time <= previous || chapter.time >= entry.duration)
+      if (
+        chapter.time <= previous ||
+        (entry.duration !== undefined && chapter.time >= entry.duration)
+      )
         ctx.addIssue({
           code: 'custom',
           path: ['chapters', index, 'time'],
@@ -109,6 +124,7 @@ export const seriesSchema = z.object({
   title: text,
   description: text,
   coverTitle: z.array(text).min(1).optional(),
+  listen: z.array(listeningLink).default([]),
 });
 export const aboutSchema = z.object({
   title: text,

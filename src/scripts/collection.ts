@@ -41,10 +41,15 @@ export function initCollection() {
     const notice = collection.querySelector<HTMLElement>('.search-notice');
     const empty = collection.querySelector<HTMLElement>('.empty-list');
     const parameters = new URLSearchParams(location.search);
+    const requestedTag =
+      collection.dataset.group === 'audio' &&
+      parameters.get('tag') === '独立录音'
+        ? '声音手记'
+        : parameters.get('tag');
     let selected = buttons.some(
-      (button) => button.dataset.filter === parameters.get('tag'),
+      (button) => button.dataset.filter === requestedTag,
     )
-      ? parameters.get('tag')!
+      ? requestedTag!
       : '全部';
     input.value = parameters.get('q') || '';
     let generation = 0;

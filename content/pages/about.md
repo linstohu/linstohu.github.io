@@ -14,11 +14,11 @@ image: /images/ridgelines.png
 *How many roads must a man walk down*<br />
 *Before you call him a man?*
 
-Bob Dylan 在《Blowin’ in the Wind》里问了这句话。我也喜欢他唱的那句回答。
+Bob Dylan 在 `Blowin' in the Wind` 里问了这句话。我也喜欢他的那句回答：
 
-*The answer, my friend, is blowin’ in the wind*<br />
-*The answer is blowin’ in the wind*
+*The answer, my friend, is blowin' in the wind*<br />
+*The answer is blowin' in the wind*
 
-## 日子要去向哪里呢
+## 日子要流向哪里呢
 
 我期待未来的日子，我希望那里生生不息，我希望，那里遍地阳光、充满希望。

@@ -1,5 +1,7 @@
 import path from 'node:path';
-import { writeFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { audioSchema } from '../src/lib/schemas.ts';
+import { writeFile, readFile, mkdir } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import {
   root,
@@ -19,11 +21,16 @@ const { values, positionals } = parseArgs({
     period: { type: 'string' },
     date: { type: 'string' },
     help: { type: 'boolean' },
+    series: { type: 'string' },
+    platform: { type: 'string' },
+    'listen-url': { type: 'string' },
+    episode: { type: 'string' },
   },
 });
 const [command, kind, name] = positionals;
 if (values.help || !command) {
   console.log(`新建文字：pnpm run new writing my-essay --title "文章标题" --category "技术"
+新建外部栏目单集：pnpm run new audio episode-one --title "第一期" --series thirty-plus --platform "小宇宙" --listen-url "单集网页地址"
 新建此刻：pnpm run new now --period 2026-11 --title "十一月，慢一点"
 新建节目：pnpm run new series my-show --title "节目名称"
 发布内容：pnpm run publish:content writing/my-essay/index.md
@@ -51,6 +58,34 @@ if (values.help || !command) {
           '## 从这里落笔\n\n正文支持 Markdown、图片、代码与链接。',
         );
         console.log(`已新建草稿：${path.relative(root, file)}`);
+      } else if (kind === 'audio') {
+        const id = slug(name);
+        const series = slug(required(values.series, '--series 栏目标识'));
+        await readFile(
+          path.join(root, 'content/series', series + '.json'),
+          'utf8',
+        );
+        const data = {
+          slug: id,
+          uid: randomUUID(),
+          title,
+          description: values.description || '请写一句单集介绍。',
+          kind: 'podcast',
+          series,
+          ...(values.episode ? { episode: values.episode } : {}),
+          listen: [
+            {
+              platform: required(values.platform, '--platform 平台名称'),
+              url: required(values['listen-url'], '--listen-url 单集网页地址'),
+            },
+          ],
+          publishedAt: timestamp(),
+          draft: true,
+        };
+        audioSchema.parse(data);
+        const file = path.join(root, 'content/audio', id, 'index.md');
+        await createDocument(file, data, '');
+        console.log(`已新建单集草稿：${path.relative(root, file)}`);
       } else if (kind === 'now') {
         const period = values.period || timestamp().slice(0, 7);
         if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(period))
@@ -77,6 +112,7 @@ if (values.help || !command) {
       } else if (kind === 'series') {
         const id = slug(name);
         const file = path.join(root, 'content/series', id + '.json');
+        await mkdir(path.dirname(file), { recursive: true });
         await writeFile(
           file,
           JSON.stringify(
@@ -91,7 +127,7 @@ if (values.help || !command) {
           { flag: 'wx' },
         );
         console.log(`已新建节目：${path.relative(root, file)}`);
-      } else throw new Error('内容类型请选择 writing、now 或 series。');
+      } else throw new Error('内容类型请选择 writing、audio、now 或 series。');
     } else if (command === 'publish') {
       const relative = required(kind, 'content 下的文件路径');
       if (

@@ -43,6 +43,10 @@ else
     await mustNotExist(target);
     if (kind === 'podcast' && !values.series)
       throw new Error('播客请指定 --series 节目标识。');
+    if (kind === 'recording' && values.series)
+      throw new Error(
+        '关联栏目时请指定 --kind podcast。声音手记请省略 --series。',
+      );
     if (values.series) {
       const series = slug(values.series);
       await readFile(
@@ -98,14 +102,16 @@ else
           ...(values.episode ? { episode: values.episode } : {}),
           publishedAt: timestamp(),
           draft: true,
-          category: kind === 'podcast' ? '播客' : '独立录音',
+          category: kind === 'podcast' ? '栏目' : '声音手记',
           duration: Math.round(duration * 1000) / 1000,
           src,
           bytes: info.bytes,
           mime,
           chapters: [],
         },
-        '## 这一期\n\n写下声音介绍或文字稿。',
+        kind === 'podcast'
+          ? '## 这一期\n\n写下单集笔记或文字稿。'
+          : '写下这段录音的缘起或文字稿。',
       );
       console.log(
         `音频已上传，草稿已生成：${path.relative(root, target)}\n检查正文后，再执行 pnpm run publish:content audio/${id}/index.md`,

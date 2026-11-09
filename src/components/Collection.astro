@@ -128,7 +128,7 @@ const tags = [
       <a
         class:list={['show-cover', { 'recording-cover': !show }]}
         href={address(sound)}
-        aria-label={`打开${show?.data.title || '独立录音'}`}
+        aria-label={`打开${show?.data.title || '声音手记'}`}
       >
         <AudioCover show={show} />
       </a>
@@ -144,12 +144,30 @@ const tags = [
         </h2>
         <p>{sound.data.description}</p>
         <div class="episode-actions">
-          <a class="episode-link" href={address(sound)}>
-            <span aria-hidden="true">↗</span> 打开这段声音
-          </a>
-          <span class="episode-length">
-            音频时长 {durationLabel(sound.data.duration)}
-          </span>
+          {sound.data.listen[0] ? (
+            <>
+              <a
+                class="episode-link"
+                href={sound.data.listen[0].url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                去{sound.data.listen[0].platform}收听 ↗
+              </a>
+              <a class="more" href={address(sound)}>
+                单集笔记 →
+              </a>
+            </>
+          ) : (
+            <a class="episode-link" href={address(sound)}>
+              收听这段声音 →
+            </a>
+          )}
+          {sound.data.duration && (
+            <span class="episode-length">
+              音频时长 {durationLabel(sound.data.duration)}
+            </span>
+          )}
         </div>
       </div>
     </section>
@@ -158,6 +176,49 @@ const tags = [
     <p class="empty-list">暂无{isCollection ? label : '记录'}。</p>
   ) : (
     <section class="collection-browser" aria-label="查找内容">
+      {group === 'audio' && (
+        <div class="audio-sources" aria-label="选择声音栏目">
+          {tags.map((tag) => {
+            const item = series.find((entry) => entry.data.title === tag);
+            const count = sounds.filter((entry) =>
+              collectionTags(entry, series, false).includes(tag),
+            ).length;
+            return (
+              <div class="audio-source-card">
+                <button
+                  class="audio-source"
+                  data-filter={tag}
+                  aria-pressed="false"
+                >
+                  <span class="eyebrow">{item ? '栏目' : '独立录音'}</span>
+                  <strong>{tag}</strong>
+                  <span class="source-description">
+                    {item?.data.description ||
+                      '独白、现场，以及随手留下的声音。'}
+                  </span>
+                  <span class="source-count">
+                    {count} {item ? '期' : '条'}
+                    <span aria-hidden="true">↗</span>
+                  </span>
+                </button>
+                {item && item.data.listen.length > 0 && (
+                  <div class="source-platforms">
+                    {item.data.listen.map((link) => (
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        在{link.platform}订阅 ↗
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
       <div class="browse-heading">
         <h2 data-browse-heading>
           {isCollection ? '浏览' + label : '查找记录'}
@@ -176,7 +237,7 @@ const tags = [
       </div>
       <div class="index-controls">
         <div class="filters" aria-label="分类筛选">
-          {['全部', ...tags].map((tag) => (
+          {['全部', ...(group === 'audio' ? [] : tags)].map((tag) => (
             <button
               data-filter={tag}
               aria-pressed={tag === '全部' ? 'true' : 'false'}

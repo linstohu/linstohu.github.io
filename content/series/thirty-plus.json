@@ -1,5 +1,14 @@
 {
   "title": "老大不小",
   "description": "生活里的对谈",
-  "coverTitle": ["老大", "不小"]
+  "coverTitle": [
+    "老大",
+    "不小"
+  ],
+  "listen": [
+    {
+      "platform": "小宇宙",
+      "url": "https://www.xiaoyuzhoufm.com/podcast/699c2a572e0fc42cf525259d"
+    }
+  ]
 }

@@ -54,7 +54,7 @@ export function audioLabel(
   return show
     ? show.data.title +
         (entry.data.episode ? ` · EP.${entry.data.episode}` : '')
-    : '独立录音';
+    : '声音手记';
 }
 
 export function collectionTags(
@@ -72,7 +72,7 @@ export function collectionTags(
   if (entry.collection === 'audio')
     return [
       series.find((item) => item.id === entry.data.series)?.data.title ||
-        '独立录音',
+        '声音手记',
     ];
   return ['此刻'];
 }

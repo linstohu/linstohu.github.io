@@ -47,6 +47,7 @@ test(
     try {
       for (const item of [
         'src',
+        'scripts',
         'public',
         'content/settings',
         'content/quotes',
@@ -60,6 +61,10 @@ test(
           recursive: true,
         });
       }
+      await writeFile(
+        path.join(project, 'content/series/unpublished.json'),
+        JSON.stringify({ title: '未公开栏目', description: '留待发布' }),
+      );
       const audioData = {
         slug: id,
         uid: id,
@@ -76,16 +81,27 @@ test(
       };
       await createDocument(path.join(recording, 'index.md'), audioData, '');
       const episodeFile = path.join(project, 'content/audio/episode/index.md');
-      const episode = {
-        ...audioData,
-        slug: 'episode',
-        uid: 'episode',
-        kind: 'podcast',
-        series: 'thirty-plus',
-        category: '播客',
-        draft: true,
-      };
-      await createDocument(episodeFile, episode, '');
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'new',
+          'audio',
+          'episode',
+          '--title',
+          '栏目测试',
+          '--series',
+          'thirty-plus',
+          '--platform',
+          '小宇宙',
+          '--listen-url',
+          'https://www.xiaoyuzhoufm.com/episode/test',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
+      const draftEpisode = await readFile(episodeFile, 'utf8');
+      assert.match(draftEpisode, /draft: true/);
+      assert.match(draftEpisode, /thirty-plus/);
       for (const [index, kind] of ['draft', 'future', 'public'].entries()) {
         const data = {
           slug: `${id}-${kind}`,
@@ -140,13 +156,14 @@ test(
         /class="cover-title">\s*声音\s*<br\s*\/?>\s*手记\s*<\/span>/,
       );
       assert.doesNotMatch(audioListing, /老大不小/);
-      assert.match(audioListing, /data-filter="独立录音"/);
+      assert.match(audioListing, /data-filter="声音手记"/);
       assert.ok(audioListing.includes(`href="/audio/${id}/"`));
       const recordingPage = await readFile(
         path.join(output, 'audio', id, 'index.html'),
         'utf8',
       );
-      assert.match(recordingPage, /独立录音/);
+      assert.match(recordingPage, /声音手记/);
+      assert.match(recordingPage, /data-audio-player/);
       const listing = await readFile(
         path.join(output, 'writing/index.html'),
         'utf8',
@@ -167,9 +184,17 @@ test(
       assert.match(article, /<img[^>]+width="900"/);
       assert.match(article, /<figcaption>测试图注<\/figcaption>/);
 
-      await rm(recording, { recursive: true });
-      await rm(episodeFile);
-      await createDocument(episodeFile, { ...episode, draft: false }, '');
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'publish',
+          'audio/episode/index.md',
+          '--date',
+          '2000-01-02T00:00:00+08:00',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
       const postFile = path.join(fixtures[2], 'index.md');
       const post = await readFile(postFile, 'utf8');
       await writeFile(
@@ -184,7 +209,21 @@ test(
       );
       assert.match(podcastListing, /data-filter="老大不小"/);
       assert.match(podcastListing, /href="\/audio\/episode\/"/);
-      assert.doesNotMatch(podcastListing, /data-filter="独立录音"|声音手记/);
+      assert.match(podcastListing, /data-filter="声音手记"/);
+      const externalPage = await readFile(
+        path.join(output, 'audio/episode/index.html'),
+        'utf8',
+      );
+      assert.match(externalPage, /去小宇宙收听/);
+      assert.match(
+        externalPage,
+        /href="https:\/\/www.xiaoyuzhoufm.com\/episode\/test"/,
+      );
+      assert.doesNotMatch(externalPage, /data-audio-player|id="play"/);
+      const feed = await readFile(path.join(output, 'audio/rss.xml'), 'utf8');
+      assert.match(feed, /recording.mp3/);
+      assert.doesNotMatch(feed, /xiaoyuzhoufm.com\/episode\/test/);
+      assert.doesNotMatch(podcastListing, /未公开栏目/);
       const curatedListing = await readFile(
         path.join(output, 'writing/index.html'),
         'utf8',

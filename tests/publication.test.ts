@@ -134,3 +134,44 @@ test('duplicate permalinks and broken content references fail before deployment'
     /文章/,
   );
 });
+
+test('platform episodes publish with listening links while recordings require playable media', () => {
+  const external = {
+    ...post,
+    uid: 'external',
+    kind: 'podcast',
+    series: 'thirty-plus',
+    draft: false,
+    listen: [
+      { platform: '小宇宙', url: 'https://www.xiaoyuzhoufm.com/episode/test' },
+    ],
+  };
+  assert.equal(audioSchema.safeParse(external).success, true);
+  assert.equal(
+    audioSchema.safeParse({ ...external, listen: [] }).success,
+    false,
+  );
+  assert.equal(
+    audioSchema.safeParse({ ...external, series: undefined }).success,
+    false,
+  );
+  assert.equal(
+    audioSchema.safeParse({ ...external, kind: 'recording', series: undefined })
+      .success,
+    false,
+  );
+  assert.equal(
+    audioSchema.safeParse({
+      ...external,
+      listen: [{ platform: '小宇宙', url: 'javascript:alert(1)' }],
+    }).success,
+    false,
+  );
+  assert.equal(
+    audioSchema.safeParse({
+      ...external,
+      chapters: [{ time: 0, title: '开场' }],
+    }).success,
+    false,
+  );
+});
