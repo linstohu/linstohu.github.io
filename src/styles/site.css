@@ -1049,17 +1049,14 @@ main[data-section='now'] .reader h2 {
 .byline > :first-child {
   color: var(--ink);
 }
+.article-body {
+  margin-block-start: 1.375rem;
+}
 .article-paper .article-body p {
   font-size: 18px;
   line-height: 1.95;
   margin: 0 0 17px;
   text-wrap: pretty;
-}
-.article-paper .article-body .standfirst {
-  font-size: 19px;
-  line-height: 1.85;
-  color: var(--ink);
-  margin: 22px 0 23px;
 }
 .article-paper .article-body h2 {
   font:
@@ -1141,9 +1138,6 @@ main[data-section='now'] .reader h2 {
   .article-paper .article-body p {
     font-size: 17px;
     line-height: 1.95;
-  }
-  .article-paper .article-body .standfirst {
-    font-size: 18px;
   }
   .byline {
     column-gap: 12px;
@@ -2731,11 +2725,6 @@ main[data-section='now'] .reader h2 {
     font-size: 17px;
     line-height: 1.95;
     margin-bottom: 16px;
-  }
-  .article-paper .article-body .standfirst {
-    font-size: 18px;
-    line-height: 1.9;
-    margin-block: 20px 25px;
   }
   .article-paper .article-body h2 {
     margin-top: 27px;

@@ -10,6 +10,8 @@ import {
   type Audio,
 } from '../lib/content';
 import { site } from '../lib/site';
+import { articleExcerpt } from '../lib/excerpt';
+import AudioCover from './AudioCover.astro';
 import Row from './Row.astro';
 interface Props {
   group: 'writing' | 'audio' | 'archive';
@@ -27,6 +29,10 @@ const entries =
         );
 const latest = entries[0];
 const article = group === 'writing' ? (latest as Writing) : undefined;
+const excerpt =
+  article &&
+  (article.data.featuredExcerpt ||
+    articleExcerpt(article.rendered?.html ?? '', article.data.description));
 const sound = group === 'audio' ? (latest as Audio) : undefined;
 const show = sound
   ? series.find((item) => item.id === sound.data.series)
@@ -85,7 +91,9 @@ const tags = [
         <h2>
           <a href={address(article)}>{article.data.title}</a>
         </h2>
-        <p>{article.data.description}</p>
+        {excerpt !== article.data.description && (
+          <p>{article.data.description}</p>
+        )}
         <a class="more" href={address(article)}>
           读这篇文章 →
         </a>
@@ -101,7 +109,7 @@ const tags = [
           <span aria-hidden="true">＋</span>
         </button>
         <div class="fragment-copy" id="fragment-copy">
-          <p>{article.data.featuredExcerpt || article.data.description}</p>
+          <p>{excerpt}</p>
           <cite>
             <a href={address(article)}>
               摘自「{article.data.excerptTitle || article.data.title}」 ↗
@@ -122,20 +130,7 @@ const tags = [
         href={address(sound)}
         aria-label={`打开${show?.data.title || '独立录音'}`}
       >
-        <span class="cover-title">
-          {(show?.data.coverTitle || [show?.data.title || '声音', '手记']).map(
-            (line, index) => (
-              <>
-                {index > 0 && <br />}
-                {line}
-              </>
-            ),
-          )}
-        </span>
-        <span class="cover-caption">
-          {show?.data.description || '随手留下的声音'}
-        </span>
-        <span class="cover-disc" aria-hidden="true"></span>
+        <AudioCover show={show} />
       </a>
       <div class="feature-copy">
         <div class="feature-meta">

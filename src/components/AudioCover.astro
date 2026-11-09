@@ -1,0 +1,20 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props {
+  show?: CollectionEntry<'series'>;
+}
+const { show } = Astro.props;
+---
+
+<span class="cover-title">
+  {(show?.data.coverTitle || (show ? [show.data.title] : ['声音', '手记'])).map(
+    (line, index) => (
+      <>
+        {index > 0 && <br />}
+        {line}
+      </>
+    ),
+  )}
+</span>
+<span class="cover-caption">{show?.data.description || '随手留下的声音'}</span>
+<span class="cover-disc" aria-hidden="true"></span>

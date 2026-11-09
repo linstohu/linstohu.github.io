@@ -87,6 +87,11 @@ test(
         path.join(output, 'writing', `${id}-public/index.html`),
         'utf8',
       );
+      assert.match(article, /<meta name="description" content="集成检查"/);
+      assert.doesNotMatch(
+        article.split('<div class="article-body">')[1].split('</article>')[0],
+        /集成检查/,
+      );
       assert.match(article, /class="image-open"/);
       assert.match(article, /src="\/_astro\/[^"]+"/);
       assert.match(article, /<img[^>]+width="900"/);
