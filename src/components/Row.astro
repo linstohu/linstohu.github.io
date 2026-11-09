@@ -51,28 +51,25 @@ const searchText = [entry.data.title, description, label, ...tags]
     data-search-text={searchText}
     hidden={initiallyHidden}
   >
-    {entry.data.episode ? (
-      <span
-        class="episode-number"
-        aria-label={`第${Number(entry.data.episode)}期`}
-      >
-        {entry.data.episode}
-      </span>
-    ) : (
-      <span class="recording-mark" aria-label="独立录音">
-        ≋
-      </span>
-    )}
-    <span class="episode-copy">
-      <span class="episode-meta">
-        <span>{label}</span>
+    <div class="episode-copy">
+      <div class="episode-meta">
+        {entry.data.episode && (
+          <span class="episode-number" aria-label={`第${entry.data.episode}期`}>
+            EP.{entry.data.episode}
+          </span>
+        )}
+        <span class="episode-series">
+          {entry.data.series
+            ? series.find((item) => item.id === entry.data.series)?.data.title
+            : '声音手记'}
+        </span>
         <time datetime={entry.data.publishedAt.toISOString()}>
           {dateLabel(entry.data.publishedAt)}
         </time>
-      </span>
+      </div>
       <h3>{entry.data.title}</h3>
       <p>{description}</p>
-    </span>
+    </div>
     <span class="episode-row-action" aria-hidden="true">
       ↗
     </span>

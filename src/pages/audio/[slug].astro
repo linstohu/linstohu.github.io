@@ -44,7 +44,7 @@ const related = posts.filter((post) =>
       {entry.data.draft ? ' · 草稿预览' : ''}
     </div>
     <p>{entry.data.description}</p>
-    {entry.data.listen.length > 0 && (
+    {entry.data.listen?.length > 0 && (
       <nav class="listening-links" aria-label="选择收听平台">
         {entry.data.listen.map((link) => (
           <a

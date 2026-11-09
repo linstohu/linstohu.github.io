@@ -144,7 +144,7 @@ const tags = [
         </h2>
         <p>{sound.data.description}</p>
         <div class="episode-actions">
-          {sound.data.listen[0] ? (
+          {sound.data.listen?.[0] ? (
             <>
               <a
                 class="episode-link"
@@ -201,7 +201,7 @@ const tags = [
                     <span aria-hidden="true">↗</span>
                   </span>
                 </button>
-                {item && item.data.listen.length > 0 && (
+                {item && item.data.listen?.length > 0 && (
                   <div class="source-platforms">
                     {item.data.listen.map((link) => (
                       <a

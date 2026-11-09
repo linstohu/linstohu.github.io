@@ -1623,27 +1623,38 @@ main[data-section='now'] .reader h2 {
 }
 .episode-row {
   display: grid;
-  grid-template-columns: 76px minmax(0, 1fr) 25px;
+  grid-template-columns: minmax(0, 1fr) 20px;
   gap: 20px;
   align-items: center;
   padding: 24px 0;
   border-bottom: 1px solid var(--line);
 }
+.episode-copy {
+  min-width: 0;
+}
 .episode-number {
-  font:
-    500 28px/1 Georgia,
-    serif;
   color: var(--accent);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.episode-number + .episode-series {
+  border-inline-start: 1px solid var(--line);
+  padding-inline-start: 14px;
 }
 .episode-meta {
   display: flex;
+  align-items: baseline;
   flex-wrap: wrap;
   gap: 5px 16px;
   color: var(--muted);
   font-size: 11px;
 }
 .episode-meta time {
+  margin-inline-start: auto;
+  white-space: nowrap;
   font: inherit;
   letter-spacing: 0.02em;
 }
@@ -1784,12 +1795,9 @@ main[data-section='now'] .reader h2 {
     font-size: 10px;
   }
   .episode-row {
-    grid-template-columns: 44px minmax(0, 1fr) 16px;
+    grid-template-columns: minmax(0, 1fr) 16px;
     gap: 12px;
     padding-block: 20px;
-  }
-  .episode-number {
-    font-size: 23px;
   }
   .episode-row h3 {
     font-size: 21px;
@@ -1817,17 +1825,6 @@ main[data-section='now'] .reader h2 {
   }
 }
 
-.recording-mark {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  background: var(--tint);
-  color: var(--ink);
-  font:
-    34px/1 Georgia,
-    serif;
-}
 .recording-cover {
   background: #56705c;
 }
@@ -2671,20 +2668,15 @@ main[data-section='now'] .reader h2 {
     font-size: 11px;
   }
   .episode-row {
-    grid-template-columns: 37px minmax(0, 1fr) 15px;
+    grid-template-columns: minmax(0, 1fr) 15px;
     gap: 12px;
     padding-block: 20px;
   }
-  .episode-number {
-    font-size: 22px;
-  }
-  .recording-mark {
-    width: 34px;
-    height: 34px;
-    font-size: 29px;
-  }
   .episode-meta {
     gap: 3px 10px;
+  }
+  .episode-number + .episode-series {
+    padding-inline-start: 10px;
   }
   .episode-row h3 {
     font-size: 21px;

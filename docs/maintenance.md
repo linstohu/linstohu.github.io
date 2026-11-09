@@ -73,7 +73,7 @@ pnpm run build
 
 ### 外部平台上的栏目
 
-「老大不小」的标识为 `thirty-plus`。在小宇宙发布后，复制单集的网页地址，新建一份本站笔记：
+「老大不小」的标识为 `thirty-plus`。单集固定地址使用 `thirty-plus-ep期号`（如 `thirty-plus-ep32`），并在 `episode` 中填写原期号。部分历史导入同样沿用原期号。在小宇宙发布后，复制单集的网页地址，新建一份本站笔记：
 
 ```sh
 pnpm run new audio episode-one --title "第一期" --description "这一期聊什么" --series thirty-plus --platform "小宇宙" --listen-url "https://www.xiaoyuzhoufm.com/episode/单集标识" --episode 1
