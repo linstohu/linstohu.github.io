@@ -6,14 +6,14 @@
 
 <p align="center">
   写一点文字，留一些声音，记下此刻。<br />
-  <a href="https://linsto.org">linsto.org</a>
+  <a href="https://www.linsto.org">www.linsto.org</a>
 </p>
 
 <p align="center">
-  <a href="https://linsto.org/writing/">文字</a> &nbsp; · &nbsp;
-  <a href="https://linsto.org/audio/">声音</a> &nbsp; · &nbsp;
-  <a href="https://linsto.org/now/">此刻</a> &nbsp; · &nbsp;
-  <a href="https://linsto.org/about/">关于</a>
+  <a href="https://www.linsto.org/writing/">文字</a> &nbsp; · &nbsp;
+  <a href="https://www.linsto.org/audio/">声音</a> &nbsp; · &nbsp;
+  <a href="https://www.linsto.org/now/">此刻</a> &nbsp; · &nbsp;
+  <a href="https://www.linsto.org/about/">关于</a>
 </p>
 
 <br />
@@ -58,8 +58,8 @@
 
 <p align="center">
   <sub>
-    <a href="https://linsto.org/archive/">全部归档</a> ·
-    <a href="https://linsto.org/rss.xml">订阅文字</a> ·
-    <a href="https://linsto.org/audio/rss.xml">订阅声音</a>
+    <a href="https://www.linsto.org/archive/">全部归档</a> ·
+    <a href="https://www.linsto.org/rss.xml">订阅文字</a> ·
+    <a href="https://www.linsto.org/audio/rss.xml">订阅声音</a>
   </sub>
 </p>

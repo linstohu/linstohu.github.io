@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { loadContent, address } from '../lib/content';
 import { xml, xmlResponse } from '../lib/feeds';
+import { site as settings } from '../lib/site';
 export const GET: APIRoute = async ({ site }) => {
   const { posts, sounds, snapshots } = await loadContent();
-  const base = site || new URL('https://linsto.org');
+  const base = site || new URL(settings.url);
   const urls = [
     '/',
     '/writing/',

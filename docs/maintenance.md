@@ -111,7 +111,8 @@ pnpm run new now --period 2026-11 --title "十一月，慢一点"
 1. 在 Cloudflare 创建 Pages **Direct Upload** 项目（例如 `linsto`），生产分支设为 `main`。也可用 Wrangler `pages project create linsto --production-branch main` 创建。
 2. GitHub 仓库 Settings → Secrets and variables → Actions，添加 Secrets：`CLOUDFLARE_API_TOKEN`（有该账户 Pages 编辑权限）、`CLOUDFLARE_ACCOUNT_ID`；添加 Variable：`CLOUDFLARE_PAGES_PROJECT=linsto`。
 3. 推送当前功能分支：Actions 检查并构建，发布到 Cloudflare 的分支预览地址。推送或合并到 `main` 才更新生产站。拉取请求只检查构建，不使用部署密钥。
-4. 在 Pages 项目 Custom domains 绑定 `linsto.org`，按 Cloudflare 提示调整 DNS。确认新站可用后，在 GitHub Settings → Pages 关闭旧站发布。代码库的 `CNAME` 和 Hugo 发布流程已删除，旧站在 GitHub 的账户级设置不会由本地代码自动关闭。
+4. 确认 Pages 生产部署可用，在项目 Custom domains 添加 `www.linsto.org`。在权威 DNS 中设置 CNAME，名称为 `www`，目标为 `linsto.pages.dev`。等域名显示 Active，验证 HTTPS 访问。
+5. 根域 `linsto.org` 使用 Cloudflare 代理。若 DNS 仍托管在其他服务商，先导入并核对原有记录，再在注册商更新 nameservers。为根域配置 Single Redirect，条件为 `http.host eq "linsto.org"`，动态目标为 `concat("https://www.linsto.org", http.request.uri.path)`，使用 301 并保留查询参数。确认根域 HTTPS 跳转正常后，在 GitHub Settings → Pages 关闭旧站发布。代码库的 `CNAME` 和 Hugo 发布流程已删除，旧站在 GitHub 的账户级设置不会由本地代码自动关闭。
 
 缺少上述配置时，Actions 仍构建并保留下载产物，会明确提示部署未启用。站点域名、作者与品牌文案统一在 `content/settings/site.json` 维护；如需换域名，修改其中的 `url`。构建环境的 `SITE_URL` 可显式覆盖 canonical、站点地图与 RSS 的目标地址。预览站同样指向正式 canonical，避免替代正式域名。
 

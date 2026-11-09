@@ -1,12 +1,12 @@
 {
   "title": "Hi, Linsto",
-  "description": "一个人的长期记录。文字、声音与每月的生活快照。",
-  "writingSubtitle": "",
-  "audioSubtitle": "",
+  "description": "linsto's blog",
+  "writingSubtitle": "写下做过的事，也留住暂时没有答案的问题。",
+  "audioSubtitle": "播客、独白，以及随手留下的声音。",
   "homeImage": "/images/ridgelines.png",
   "footerCredit": "Designed by Linsto · Built by GPT-6.1 Sol",
-  "url": "https://linsto.org",
-  "author": "Linsto",
+  "url": "https://www.linsto.org",
+  "author": "Linsto Hu",
   "greeting": "Hi,",
   "name": "Linsto"
 }
