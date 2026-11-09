@@ -24,7 +24,8 @@
     "preinstall": "node scripts/check-package-manager.mjs",
     "test": "node --test tests/*.test.ts",
     "validate": "pnpm format:check && pnpm test && pnpm check && pnpm build",
-    "publish:content": "node --env-file-if-exists=.env scripts/content.mjs publish"
+    "publish:content": "node --env-file-if-exists=.env scripts/content.mjs publish",
+    "stop": "astro dev stop && astro preview stop"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
