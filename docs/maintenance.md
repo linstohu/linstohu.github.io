@@ -2,10 +2,6 @@
 
 本手册供 linsto.org 的内容发布者和代码维护者使用。以下命令均在仓库根目录运行。系统分层见[架构说明](architecture.md)，面向读者的个人介绍见[README](../README.md)。
 
-## 首次上线准备
-
-仓库附带用于预览的示例文章、声音、此刻和关于文案。首次正式上线前，替换这些内容，并把 `content/settings/site.json` 中的 `sampleMode` 改为 `false`；各条内容通过 `sample` 标记是否为示例。示例音频没有音频文件，仅演示播放进度，不会进入声音 RSS。
-
 ## 本地运行
 
 使用 Node.js 24（版本见 `.nvmrc`）与 pnpm 12.18.0（`package.json` 的 `packageManager` 已锁定）。安装方式见 [pnpm 官方文档](https://pnpm.io/installation)。已有 pnpm 会按项目配置选择锁定版本；不要混用 npm 或 yarn。
@@ -43,7 +39,9 @@ pnpm run preview
 | 站点资料 | `content/settings/site.json`        | 全站                   |
 | 经典摘句 | `content/quotes/collection.json`    | 页脚上方，每次刷新随机 |
 
-固定地址与标题分离，改标题不会改链接。时间必须填写**带引号、带时区**的 ISO 字符串，例如 `2026-11-09T18:30:00+08:00`。分类按内容自动生成，前台不需要修改代码。正文使用标准 Markdown。文章可在信息区添加 `videos` 与 `appendix`，参考 `walk` 示例。
+文字与声音页的副标题分别填写在 `content/settings/site.json` 的 `writingSubtitle` 和 `audioSubtitle`，留空即可隐藏。关于页可直接在 `content/pages/about.md` 的信息区下方写 Markdown 正文。
+
+固定地址与标题分离，改标题不会改链接。时间必须填写**带引号、带时区**的 ISO 字符串，例如 `2026-11-09T18:30:00+08:00`。分类按内容自动生成，前台不需要修改代码。正文使用标准 Markdown。文章可在信息区添加 `videos` 与 `appendix`，字段定义见 `src/lib/schemas.ts`。
 
 ## 写一篇文章
 

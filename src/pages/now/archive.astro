@@ -15,6 +15,7 @@ const years = [
         回到当前快照 →
       </a>
     </div>
+    {years.length === 0 && <p class="empty-list">暂无历史快照。</p>}
     {years.map((year) => (
       <section class="snapshot-year">
         <h2>{year}</h2>

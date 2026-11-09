@@ -21,13 +21,12 @@ const common = {
   title: text,
   publishedAt: timestampSchema,
   draft: z.boolean().default(true),
-  sample: z.boolean().default(false),
 };
 export const writingSchema = z.object({
   ...common,
   slug: slugSchema,
   description: text,
-  category: text,
+  category: text.optional(),
   tags: z.array(text).default([]),
   updatedAt: timestampSchema.optional(),
   featuredExcerpt: text.optional(),
@@ -74,7 +73,7 @@ export const audioSchema = z
       .default([]),
   })
   .superRefine((entry, ctx) => {
-    if (!entry.sample && !entry.draft) {
+    if (!entry.draft) {
       for (const key of ['src', 'bytes', 'mime'] as const) {
         if (!entry[key])
           ctx.addIssue({
@@ -113,11 +112,10 @@ export const seriesSchema = z.object({
 });
 export const aboutSchema = z.object({
   title: text,
-  greeting: text,
-  description: text,
-  sample: z.boolean().default(false),
-  intro: z.array(text).min(1),
-  image: resource,
+  greeting: text.optional(),
+  description: text.optional(),
+  intro: z.array(text).default([]),
+  image: resource.optional(),
 });
 export const siteSchema = z.object({
   url: z.url().refine((value) => {
@@ -136,7 +134,8 @@ export const siteSchema = z.object({
   greeting: text,
   name: text,
   description: text,
-  sampleMode: z.boolean(),
+  writingSubtitle: z.string().trim().default(''),
+  audioSubtitle: z.string().trim().default(''),
   homeImage: resource,
   footerCredit: text,
 });

@@ -14,26 +14,34 @@ const { Content } = await render(entry);
   <section class="about-page">
     <div class="collection-heading">
       <h1>{entry.data.title}</h1>
-      <p>{entry.data.description}</p>
+      {entry.data.description && <p>{entry.data.description}</p>}
     </div>
-    <div class="about-opening">
-      <div>
-        <h2>{entry.data.greeting}</h2>
-        {entry.data.intro.map((text) => (
-          <p>{text}</p>
-        ))}
+    {(entry.data.greeting ||
+      entry.data.intro.length > 0 ||
+      entry.data.image) && (
+      <div class="about-opening">
+        <div>
+          {entry.data.greeting && <h2>{entry.data.greeting}</h2>}
+          {entry.data.intro.map((text) => (
+            <p>{text}</p>
+          ))}
+        </div>
+        {entry.data.image && (
+          <figure class="about-art">
+            <img
+              src={entry.data.image}
+              width="900"
+              height="480"
+              alt="本站的山景插画，赭色落日下层层青绿山脊延伸至远处。"
+            />
+          </figure>
+        )}
       </div>
-      <figure class="about-art">
-        <img
-          src={entry.data.image}
-          width="900"
-          height="480"
-          alt="本站的山景插画，赭色落日下层层青绿山脊延伸至远处。"
-        />
-      </figure>
-    </div>
-    <div class="about-notes about-markdown">
-      <Content />
-    </div>
+    )}
+    {entry.body?.trim() && (
+      <div class="about-notes about-markdown">
+        <Content />
+      </div>
+    )}
   </section>
 </Base>

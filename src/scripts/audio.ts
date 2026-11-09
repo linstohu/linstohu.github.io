@@ -11,12 +11,11 @@ export function initAudio() {
     const seek = controls.querySelector<HTMLInputElement>('input')!;
     const output = controls.querySelector('output')!;
     const message = player.querySelector<HTMLElement>('[data-audio-status]')!;
-    const demo = !audio;
+    if (!audio) return;
+
     let duration = Number(player.dataset.duration);
-    let position = 0;
-    let timer: ReturnType<typeof setInterval> | undefined;
-    function sync() {
-      if (audio) position = audio.currentTime;
+    const sync = () => {
+      const position = audio.currentTime;
       seek.max = String(duration);
       seek.value = String(position);
       output.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
@@ -24,64 +23,40 @@ export function initAudio() {
         'aria-valuetext',
         `${formatTime(position)}，共 ${formatTime(duration)}`,
       );
-      const playing = demo ? timer !== undefined : !audio!.paused;
-      button.textContent = playing
-        ? demo
-          ? '暂停演示'
-          : '暂停'
-        : demo
-          ? '播放演示'
-          : '播放';
+      const playing = !audio.paused;
+      button.textContent = playing ? '暂停' : '播放';
       button.setAttribute('aria-pressed', String(playing));
-    }
-    function stopDemo() {
-      clearInterval(timer);
-      timer = undefined;
-      sync();
-    }
+    };
     button.addEventListener('click', async () => {
-      if (audio) {
-        if (!audio.paused) audio.pause();
-        else {
-          try {
-            await audio.play();
-            message.hidden = true;
-          } catch {
-            message.hidden = false;
-            message.textContent =
-              '暂时无法播放，请稍后重试，或使用下方原生播放器。';
-            audio.hidden = false;
-          }
-        }
-      } else if (timer !== undefined) stopDemo();
+      if (!audio.paused) audio.pause();
       else {
-        if (position >= duration) position = 0;
-        timer = setInterval(() => {
-          position = Math.min(duration, position + 1);
-          if (position >= duration) stopDemo();
-          sync();
-        }, 1000);
-        sync();
+        try {
+          await audio.play();
+          message.hidden = true;
+        } catch {
+          message.hidden = false;
+          message.textContent =
+            '暂时无法播放，请稍后重试，或使用下方原生播放器。';
+          audio.hidden = false;
+        }
       }
     });
-    function jump(value: number) {
-      if (audio) {
-        if (audio.readyState >= 1) audio.currentTime = value;
-        else {
-          audio.addEventListener(
-            'loadedmetadata',
-            () => {
-              audio.currentTime = value;
-              sync();
-            },
-            { once: true },
-          );
-          audio.load();
-        }
+    const jump = (value: number) => {
+      if (audio.readyState >= 1) audio.currentTime = value;
+      else {
+        audio.addEventListener(
+          'loadedmetadata',
+          () => {
+            audio.currentTime = value;
+            sync();
+          },
+          { once: true },
+        );
+        audio.load();
       }
-      position = value;
+
       sync();
-    }
+    };
     seek.addEventListener('input', () => jump(Number(seek.value)));
     document
       .querySelectorAll<HTMLButtonElement>('.chapter')
@@ -90,26 +65,21 @@ export function initAudio() {
           jump(Number(chapter.dataset.time)),
         ),
       );
-    if (audio) {
-      audio.hidden = true;
-      controls.hidden = false;
-      button.textContent = '播放';
-      for (const event of ['timeupdate', 'play', 'pause', 'ended'])
-        audio.addEventListener(event, sync);
-      audio.addEventListener('loadedmetadata', () => {
-        if (Number.isFinite(audio.duration)) duration = audio.duration;
-        sync();
-      });
-      audio.addEventListener('error', () => {
-        message.hidden = false;
-        message.textContent = '音频暂时无法载入，请稍后重试。';
-        audio.hidden = false;
-      });
-    }
-    window.addEventListener('pagehide', () => {
-      stopDemo();
-      audio?.pause();
+    audio.hidden = true;
+    controls.hidden = false;
+    button.textContent = '播放';
+    for (const event of ['timeupdate', 'play', 'pause', 'ended'])
+      audio.addEventListener(event, sync);
+    audio.addEventListener('loadedmetadata', () => {
+      if (Number.isFinite(audio.duration)) duration = audio.duration;
+      sync();
     });
+    audio.addEventListener('error', () => {
+      message.hidden = false;
+      message.textContent = '音频暂时无法载入，请稍后重试。';
+      audio.hidden = false;
+    });
+    window.addEventListener('pagehide', () => audio.pause());
     sync();
   }
 }

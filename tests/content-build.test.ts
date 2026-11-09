@@ -25,7 +25,7 @@ test(
           title: `${id}-${kind}`,
           description: '集成检查',
           category: '测试',
-          sample: true,
+          tags: ['自定义标签'],
           publishedAt:
             kind === 'future'
               ? '2099-01-01T00:00:00+08:00'
@@ -78,6 +78,11 @@ test(
           `Private content leaked into ${file}`,
         );
       }
+      const listing = await readFile(
+        path.join(output, 'writing/index.html'),
+        'utf8',
+      );
+      assert.match(listing, /data-filter="自定义标签"/);
       const article = await readFile(
         path.join(output, 'writing', `${id}-public/index.html`),
         'utf8',

@@ -41,20 +41,16 @@ const related = posts.filter((post) =>
     <h1 data-pagefind-meta="title">{entry.data.title}</h1>
     <div class="meta">
       {dateLabel(entry.data.publishedAt)} · {audioLabel(entry, series)}
-      {entry.data.sample ? ' · 示例数据' : ''}
       {entry.data.draft ? ' · 草稿预览' : ''}
     </div>
     <p>{entry.data.description}</p>
-    <aside
-      data-audio-player
-      data-duration={entry.data.duration}
-      data-demo={!entry.data.src}
-      data-pagefind-ignore
-    >
-      <span class="eyebrow">
-        {entry.data.src ? '收听这段声音' : '模拟播放器 · 无音频'}
-      </span>
-      {entry.data.src && (
+    {entry.data.src && (
+      <aside
+        data-audio-player
+        data-duration={entry.data.duration}
+        data-pagefind-ignore
+      >
+        <span class="eyebrow">收听这段声音</span>
         <audio
           class="audio-fallback"
           controls
@@ -63,26 +59,26 @@ const related = posts.filter((post) =>
         >
           你的浏览器暂不支持音频播放。<a href={entry.data.src}>打开音频文件</a>
         </audio>
-      )}
-      <div class="player" hidden={!!entry.data.src}>
-        <button id="play" class="pill" aria-pressed="false">
-          播放演示
-        </button>
-        <input
-          type="range"
-          id="seek"
-          min="0"
-          max={entry.data.duration}
-          value="0"
-          aria-label="播放进度"
-        />
-        <output class="mono" aria-live="off">
-          0:00 / {durationLabel(entry.data.duration)}
-        </output>
-      </div>
-      <p class="search-notice" data-audio-status role="status" hidden></p>
-    </aside>
-    {entry.data.chapters.length > 0 && (
+        <div class="player" hidden>
+          <button id="play" class="pill" aria-pressed="false">
+            播放
+          </button>
+          <input
+            type="range"
+            id="seek"
+            min="0"
+            max={entry.data.duration}
+            value="0"
+            aria-label="播放进度"
+          />
+          <output class="mono" aria-live="off">
+            0:00 / {durationLabel(entry.data.duration)}
+          </output>
+        </div>
+        <p class="search-notice" data-audio-status role="status" hidden></p>
+      </aside>
+    )}
+    {entry.data.src && entry.data.chapters.length > 0 && (
       <>
         <h2>声音章节</h2>
         {entry.data.chapters.map((chapter) => (

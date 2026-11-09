@@ -28,7 +28,7 @@ const { values } = parseArgs({
 });
 if (values.help)
   console.log(`独立录音：pnpm run audio --file "/path/to/voice.m4a" --slug autumn --title "秋日手记" --description "一句话介绍"
-播客单集：在以上参数后追加 --kind podcast --series old-enough --episode 42
+播客单集：在以上参数后追加 --kind podcast --series my-show --episode 42
 本地检查：追加 --dry-run（不上传、不写文件）
 上传成功后生成声音草稿，自动填写时长、大小、文件类型和公共地址。编辑文字稿后再运行 pnpm run publish:content。`);
 else
@@ -98,7 +98,6 @@ else
           ...(values.episode ? { episode: values.episode } : {}),
           publishedAt: timestamp(),
           draft: true,
-          sample: false,
           category: kind === 'podcast' ? '播客' : '独立录音',
           duration: Math.round(duration * 1000) / 1000,
           src,

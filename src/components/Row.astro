@@ -1,6 +1,7 @@
 ---
 import {
   address,
+  collectionTags,
   dateLabel,
   audioLabel,
   type Writing,
@@ -34,14 +35,8 @@ const description =
   entry.collection === 'now'
     ? entry.data.notes[0]?.text
     : entry.data.description;
-const tag =
-  entry.collection === 'audio'
-    ? series.find((item) => item.id === entry.data.series)?.data.title ||
-      '独立录音'
-    : entry.collection === 'writing'
-      ? entry.data.category
-      : '此刻';
-const searchText = [entry.data.title, description, label, tag]
+const tags = collectionTags(entry, series, variant === 'archive');
+const searchText = [entry.data.title, description, label, ...tags]
   .join(' ')
   .toLowerCase();
 ---
@@ -51,7 +46,7 @@ const searchText = [entry.data.title, description, label, tag]
     class="episode-row"
     href={address(entry)}
     data-entry-key={key}
-    data-tag={tag}
+    data-tags={JSON.stringify(tags)}
     data-type={entry.collection}
     data-search-text={searchText}
     hidden={initiallyHidden}
@@ -87,7 +82,7 @@ const searchText = [entry.data.title, description, label, tag]
     class:list={['row', { 'writing-row': variant === 'writing' }]}
     href={address(entry)}
     data-entry-key={key}
-    data-tag={tag}
+    data-tags={JSON.stringify(tags)}
     data-type={entry.collection}
     data-search-text={searchText}
     hidden={initiallyHidden}
@@ -102,8 +97,7 @@ const searchText = [entry.data.title, description, label, tag]
         {variant === 'writing'
           ? label
           : { writing: '文字', audio: '声音', now: '此刻' }[entry.collection] +
-            ' / ' +
-            label}
+            (label ? ' / ' + label : '')}
       </small>
       <strong>{entry.data.title}</strong>
       {variant === 'writing' && <p>{description}</p>}

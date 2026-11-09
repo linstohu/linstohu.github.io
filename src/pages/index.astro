@@ -33,35 +33,36 @@ const tiles = [
       </a>
     ))}
   </section>
-  <section class="latest">
-    <div class="stream-head">
-      <h2>最近更新</h2>
-      <a href="/archive/" class="more">
-        全部归档 →
-      </a>
-    </div>
-    <div class="recent-grid">
-      {recent.map((entry) => (
-        <a href={address(entry)}>
-          <small>
-            {entry.collection === 'audio'
-              ? '声音 · ' + audioLabel(entry, series)
-              : entry.collection === 'writing'
-                ? '文字'
-                : '此刻'}
-            {entry.data.sample && ' · 示例'}
-            <time datetime={entry.data.publishedAt.toISOString()}>
-              {dateLabel(entry.data.publishedAt).slice(5)}
-            </time>
-          </small>
-          <h3>{entry.data.title}</h3>
-          <p>
-            {entry.collection === 'now'
-              ? entry.data.notes[0]?.text
-              : entry.data.description}
-          </p>
+  {recent.length > 0 && (
+    <section class="latest">
+      <div class="stream-head">
+        <h2>最近更新</h2>
+        <a href="/archive/" class="more">
+          全部归档 →
         </a>
-      ))}
-    </div>
-  </section>
+      </div>
+      <div class="recent-grid">
+        {recent.map((entry) => (
+          <a href={address(entry)}>
+            <small>
+              {entry.collection === 'audio'
+                ? '声音 · ' + audioLabel(entry, series)
+                : entry.collection === 'writing'
+                  ? '文字'
+                  : '此刻'}
+              <time datetime={entry.data.publishedAt.toISOString()}>
+                {dateLabel(entry.data.publishedAt).slice(5)}
+              </time>
+            </small>
+            <h3>{entry.data.title}</h3>
+            <p>
+              {entry.collection === 'now'
+                ? entry.data.notes[0]?.text
+                : entry.data.description}
+            </p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 </Base>

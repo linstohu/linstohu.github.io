@@ -54,10 +54,7 @@ const month = Number(entry.data.period.slice(-2));
     </aside>
     <div class="now-content" data-pagefind-body={indexed || undefined}>
       <div class="snapshot-head">
-        <span class="eyebrow">
-          {index === 0 ? '当前快照' : '历史快照'}
-          {entry.data.sample ? ' · 示例数据' : ''}
-        </span>
+        <span class="eyebrow">{index === 0 ? '当前快照' : '历史快照'}</span>
         <h2 data-pagefind-meta="title">{entry.data.title}</h2>
       </div>
       <div class="now-notes">

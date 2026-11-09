@@ -100,17 +100,9 @@ export function initCollection() {
       }
       let count = 0;
       for (const row of rows) {
-        const tag =
-          collection!.dataset.group === 'archive'
-            ? (
-                { writing: '文字', audio: '声音', now: '此刻' } as Record<
-                  string,
-                  string
-                >
-              )[row.dataset.type!]
-            : row.dataset.tag;
+        const tags: string[] = JSON.parse(row.dataset.tags!);
         const matches =
-          (selected === '全部' || selected === tag) &&
+          (selected === '全部' || tags.includes(selected)) &&
           (!query ||
             (keys
               ? keys.has(row.dataset.entryKey!)

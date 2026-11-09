@@ -56,3 +56,23 @@ export function audioLabel(
         (entry.data.episode ? ` · EP.${entry.data.episode}` : '')
     : '独立录音';
 }
+
+export function collectionTags(
+  entry: Writing | Audio | Snapshot,
+  series: CollectionEntry<'series'>[],
+  archive: boolean,
+): string[] {
+  if (archive)
+    return [{ writing: '文字', audio: '声音', now: '此刻' }[entry.collection]];
+  if (entry.collection === 'writing')
+    return [
+      ...(entry.data.category ? [entry.data.category] : []),
+      ...entry.data.tags,
+    ];
+  if (entry.collection === 'audio')
+    return [
+      series.find((item) => item.id === entry.data.series)?.data.title ||
+        '独立录音',
+    ];
+  return ['此刻'];
+}

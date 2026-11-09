@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#f7f5ef"/><circle cx="47" cy="18" r="7" fill="#a24e35"/><text x="13" y="50" fill="#28372f" font-family="Georgia,serif" font-size="46">L</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Linsto · STO</title>
+  <rect width="32" height="32" rx="4" fill="#4D756E"/>
+  <g fill="#FAF7E9">
+    <path d="M4 6H9Q11 6 11 8V12H8V9H5V12L11 19V24Q11 26 9 26H4Q2 26 2 24V20H5V23H8V20L2 13V8Q2 6 4 6Z"/>
+    <path d="M12 6H20V9H17.5V26H14.5V9H12Z"/>
+    <path fill-rule="evenodd" d="M23 6H28Q30 6 30 8V24Q30 26 28 26H23Q21 26 21 24V8Q21 6 23 6ZM24 9V23H27V9Z"/>
+  </g>
+</svg>

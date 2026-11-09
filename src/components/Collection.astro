@@ -1,6 +1,7 @@
 ---
 import {
   loadContent,
+  collectionTags,
   address,
   dateLabel,
   audioLabel,
@@ -8,6 +9,7 @@ import {
   type Writing,
   type Audio,
 } from '../lib/content';
+import { site } from '../lib/site';
 import Row from './Row.astro';
 interface Props {
   group: 'writing' | 'audio' | 'archive';
@@ -30,17 +32,12 @@ const show = sound
   ? series.find((item) => item.id === sound.data.series)
   : undefined;
 const label = group === 'writing' ? '文字' : '声音';
+const subtitle =
+  group === 'writing' ? site.writingSubtitle : site.audioSubtitle;
 const tags = [
   ...new Set(
-    entries.map((entry) =>
-      group === 'archive'
-        ? { writing: '文字', audio: '声音', now: '此刻' }[entry.collection]
-        : entry.collection === 'audio'
-          ? series.find((item) => item.id === entry.data.series)?.data.title ||
-            '独立录音'
-          : entry.collection === 'writing'
-            ? entry.data.category
-            : '此刻',
+    entries.flatMap((entry) =>
+      collectionTags(entry, series, group === 'archive'),
     ),
   ),
 ];
@@ -48,7 +45,7 @@ const tags = [
 
 <section
   class:list={[{ 'collection-index': isCollection }, `${group}-collection`]}
-  data-collection
+  data-collection={entries.length > 0 || undefined}
   data-group={group}
   data-latest={
     isCollection && latest
@@ -61,11 +58,7 @@ const tags = [
   {isCollection ? (
     <div class="collection-heading">
       <h1>{label}</h1>
-      <p>
-        {group === 'writing'
-          ? '写下做过的事，也留住暂时没有答案的问题。'
-          : '播客、独白，以及随手留下的声音。'}
-      </p>
+      {subtitle && <p>{subtitle}</p>}
     </div>
   ) : (
     <div class="page">
@@ -82,7 +75,9 @@ const tags = [
     >
       <div class="feature-copy">
         <div class="feature-meta">
-          <span>最新文字 · {article.data.category}</span>
+          <span>
+            最新文字{article.data.category && ' · ' + article.data.category}
+          </span>
           <time datetime={article.data.publishedAt.toISOString()}>
             {dateLabel(article.data.publishedAt)}
           </time>
@@ -164,54 +159,60 @@ const tags = [
       </div>
     </section>
   )}
-  <section class="collection-browser" aria-label="查找内容">
-    <div class="browse-heading">
-      <h2 data-browse-heading>{isCollection ? '浏览' + label : '查找记录'}</h2>
-      <input
-        type="search"
-        aria-label="搜索内容"
-        placeholder={
-          group === 'writing'
-            ? '搜索文章内容…'
-            : group === 'audio'
-              ? '搜索声音内容…'
-              : '搜索全部内容…'
-        }
-      />
-    </div>
-    <div class="index-controls">
-      <div class="filters" aria-label="分类筛选">
-        {['全部', ...tags].map((tag) => (
-          <button
-            data-filter={tag}
-            aria-pressed={tag === '全部' ? 'true' : 'false'}
-          >
-            {tag}
-          </button>
-        ))}
-      </div>
-      <span class="mono muted" role="status">
-        {isCollection ? Math.max(0, entries.length - 1) : entries.length}{' '}
-        {group === 'writing'
-          ? '篇文字'
-          : group === 'audio'
-            ? '条声音'
-            : '条记录'}
-      </span>
-    </div>
-    <p class="search-notice" hidden></p>
-    <div id="rows">
-      {entries.map((entry, index) => (
-        <Row
-          entry={entry}
-          series={series}
-          variant={group}
-          initiallyHidden={isCollection && index === 0}
+  {entries.length === 0 ? (
+    <p class="empty-list">暂无{isCollection ? label : '记录'}。</p>
+  ) : (
+    <section class="collection-browser" aria-label="查找内容">
+      <div class="browse-heading">
+        <h2 data-browse-heading>
+          {isCollection ? '浏览' + label : '查找记录'}
+        </h2>
+        <input
+          type="search"
+          aria-label="搜索内容"
+          placeholder={
+            group === 'writing'
+              ? '搜索文章内容…'
+              : group === 'audio'
+                ? '搜索声音内容…'
+                : '搜索全部内容…'
+          }
         />
-      ))}
-      <p class="empty-list" hidden={entries.length > 0}>
-        下一份记录，会留在这里。
-      </p>
-    </div>
-  </section>
+      </div>
+      <div class="index-controls">
+        <div class="filters" aria-label="分类筛选">
+          {['全部', ...tags].map((tag) => (
+            <button
+              data-filter={tag}
+              aria-pressed={tag === '全部' ? 'true' : 'false'}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+        <span class="mono muted" role="status">
+          {isCollection ? Math.max(0, entries.length - 1) : entries.length}{' '}
+          {group === 'writing'
+            ? '篇文字'
+            : group === 'audio'
+              ? '条声音'
+              : '条记录'}
+        </span>
+      </div>
+      <p class="search-notice" hidden></p>
+      <div id="rows">
+        {entries.map((entry, index) => (
+          <Row
+            entry={entry}
+            series={series}
+            variant={group}
+            initiallyHidden={isCollection && index === 0}
+          />
+        ))}
+        <p class="empty-list" hidden={entries.length > 0}>
+          下一份记录，会留在这里。
+        </p>
+      </div>
+    </section>
+  )}
 </section>

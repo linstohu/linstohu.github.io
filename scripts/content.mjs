@@ -45,8 +45,7 @@ if (values.help || !command) {
             description: values.description || '请写一句内容摘要。',
             publishedAt: timestamp(),
             draft: true,
-            sample: false,
-            category: values.category || '随笔',
+            ...(values.category && { category: values.category }),
             tags: [],
           },
           '## 从这里落笔\n\n正文支持 Markdown、图片、代码与链接。',
@@ -64,7 +63,6 @@ if (values.help || !command) {
             title,
             publishedAt: timestamp(),
             draft: true,
-            sample: false,
             notes: [
               { title: '正在做', text: '写下这段时间关注的一件事。' },
               {

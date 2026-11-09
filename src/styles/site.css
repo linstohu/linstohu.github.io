@@ -154,7 +154,6 @@ nav a[aria-current='page']::before {
   font-size: 12px;
   line-height: 1.5;
 }
-.sample,
 .mono,
 time,
 .eyebrow {
@@ -164,15 +163,10 @@ time,
     monospace;
   letter-spacing: 0.04em;
 }
-.sample,
 .muted,
 .meta,
 time {
   color: var(--muted);
-}
-.sample {
-  border-left: 1px solid var(--line);
-  padding-left: 16px;
 }
 .eyebrow {
   color: var(--accent);
@@ -217,8 +211,7 @@ main:focus {
   padding: clamp(23px, 3vw, 42px) 0 21px;
   border: 0;
 }
-.at-home header nav,
-.at-home header .sample {
+.at-home header nav {
   display: none;
 }
 .at-home .brand {
@@ -812,9 +805,6 @@ main[data-section='now'] .reader h2 {
   nav {
     gap: 12px;
   }
-  .sample {
-    padding-left: 10px;
-  }
 }
 @media (max-width: 640px) {
   .at-home .wrap {
@@ -902,11 +892,6 @@ main[data-section='now'] .reader h2 {
   }
   .brand {
     font-size: 29px;
-  }
-  .sample {
-    border: 0;
-    order: 1;
-    padding-left: 0;
   }
   nav {
     order: 3;
@@ -2304,13 +2289,6 @@ main[data-section='now'] .reader h2 {
     font-size: 25px;
     order: 0;
   }
-  header .sample {
-    order: 1;
-    padding: 0;
-    border: 0;
-    font-size: 10px;
-    letter-spacing: 0;
-  }
   .mobile-menu {
     order: 2;
     display: inline-flex;
@@ -3105,9 +3083,6 @@ main[data-section='now'] .reader h2 {
   }
   .at-home main.wrap {
     width: 100%;
-  }
-  header .sample {
-    font-size: 9px;
   }
   .composition {
     grid-template-columns: 1.08fr 1fr 0.9fr;

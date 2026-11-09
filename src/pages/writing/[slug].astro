@@ -32,7 +32,7 @@ const { Content } = await render(entry);
     >
       <div class="article-path" data-pagefind-ignore>
         <a href="/writing/">← 文字</a>
-        <span>{entry.data.category}</span>
+        {entry.data.category && <span>{entry.data.category}</span>}
       </div>
       <header class="article-head">
         <h1 id="article-title" data-pagefind-meta="title">
@@ -43,11 +43,7 @@ const { Content } = await render(entry);
           <time datetime={entry.data.publishedAt.toISOString()}>
             {dateLabel(entry.data.publishedAt)}
           </time>
-          {entry.data.draft ? (
-            <span>草稿预览</span>
-          ) : (
-            entry.data.sample && <span>示例文章</span>
-          )}
+          {entry.data.draft && <span>草稿预览</span>}
         </div>
       </header>
       <div class="article-body">
