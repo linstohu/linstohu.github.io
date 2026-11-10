@@ -1,8 +1,6 @@
+import { durationLabel } from '../lib/duration';
+
 export function initAudio() {
-  function formatTime(value: number) {
-    const seconds = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
-    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  }
   const player = document.querySelector<HTMLElement>('[data-audio-player]');
   if (player) {
     const audio = player.querySelector<HTMLAudioElement>('audio');
@@ -18,10 +16,10 @@ export function initAudio() {
       const position = audio.currentTime;
       seek.max = String(duration);
       seek.value = String(position);
-      output.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+      output.textContent = `${durationLabel(position)} / ${durationLabel(duration)}`;
       seek.setAttribute(
         'aria-valuetext',
-        `${formatTime(position)}，共 ${formatTime(duration)}`,
+        `${durationLabel(position)}，共 ${durationLabel(duration)}`,
       );
       const playing = !audio.paused;
       button.textContent = playing ? '暂停' : '播放';

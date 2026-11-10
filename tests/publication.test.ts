@@ -53,6 +53,11 @@ test('published real audio needs an address, enclosure metadata and ordered chap
     mime: 'audio/mpeg',
   };
   assert.equal(audioSchema.safeParse(valid).success, true);
+  for (const draft of [true, false])
+    assert.equal(
+      audioSchema.safeParse({ ...valid, draft, series: 'thirty-plus' }).success,
+      false,
+    );
   assert.equal(
     audioSchema.safeParse({
       ...valid,

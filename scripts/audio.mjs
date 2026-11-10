@@ -1,6 +1,7 @@
 import { parseArgs } from 'node:util';
 import { parseFile } from 'music-metadata';
 import { randomUUID } from 'node:crypto';
+import { audioSchema } from '../src/lib/schemas.ts';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
 import { describeMedia, uploadMedia } from './media.mjs';
@@ -37,16 +38,20 @@ else
       title = required(values.title, '--title'),
       description = required(values.description, '--description');
     const kind = values.kind;
-    if (!['podcast', 'recording'].includes(kind))
-      throw new Error('--kind 应为 podcast 或 recording。');
+    const data = {
+      uid: randomUUID(),
+      slug: id,
+      title,
+      description,
+      kind,
+      ...(values.series ? { series: values.series } : {}),
+      ...(values.episode ? { episode: values.episode } : {}),
+      publishedAt: timestamp(),
+      draft: true,
+    };
+    audioSchema.parse(data);
     const target = path.join(root, 'content/audio', id, 'index.md');
     await mustNotExist(target);
-    if (kind === 'podcast' && !values.series)
-      throw new Error('播客请指定 --series 节目标识。');
-    if (kind === 'recording' && values.series)
-      throw new Error(
-        '关联栏目时请指定 --kind podcast。声音手记请省略 --series。',
-      );
     if (values.series) {
       const series = slug(values.series);
       await readFile(
@@ -93,16 +98,7 @@ else
       await createDocument(
         target,
         {
-          uid: randomUUID(),
-          slug: id,
-          title,
-          description,
-          kind,
-          ...(values.series ? { series: values.series } : {}),
-          ...(values.episode ? { episode: values.episode } : {}),
-          publishedAt: timestamp(),
-          draft: true,
-          category: kind === 'podcast' ? '栏目' : '声音手记',
+          ...data,
           duration: Math.round(duration * 1000) / 1000,
           src,
           bytes: info.bytes,

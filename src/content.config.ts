@@ -18,7 +18,11 @@ export const collections = {
     schema: writingSchema,
   }),
   audio: defineCollection({
-    loader: glob({ base: './content/audio', pattern: '**/index.md' }),
+    loader: glob({
+      base: './content/audio',
+      pattern: '**/index.md',
+      generateId: ({ entry }) => entry.replace(/\/index\.md$/, ''),
+    }),
     schema: audioSchema,
   }),
   now: defineCollection({

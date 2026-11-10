@@ -13,7 +13,7 @@ Astro 静态个人网站，包含文字、声音、此刻及归档、关于页�
 | `src/pages/`、`src/layouts/`、`src/components/` | 路由、页面布局和共享组件                                   |
 | `src/scripts/`、`src/styles/site.css`           | 按页面加载的浏览器交互与站点样式                           |
 | `scripts/`                                      | 作者工具、媒体上传及构建产物检查                           |
-| `tests/`                                        | Node 内置测试及真实 Astro 构建集成测试                     |
+| `tests/`                                        | Node 内置测试、真实 Astro 构建与浏览器交互测试             |
 
 维护与部署操作见[维护手册](docs/maintenance.md)；系统分层和部署边界见[架构说明](docs/architecture.md)。
 
@@ -21,14 +21,14 @@ Astro 静态个人网站，包含文字、声音、此刻及归档、关于页�
 
 Node.js 版本以 `.nvmrc` 为准，pnpm 版本以 `package.json` 的 `packageManager` 为准。依赖及安装策略由 `pnpm-lock.yaml` 和 `pnpm-workspace.yaml` 维护。
 
-首次安装使用 `pnpm install --frozen-lockfile`。
+首次安装使用 `pnpm install --frozen-lockfile`，随后运行 `pnpm exec playwright install chromium` 安装测试浏览器。
 
-| 命令                                 | 用途                                         |
-| ------------------------------------ | -------------------------------------------- |
-| `pnpm run dev`                       | 编辑预览，包含草稿和未来内容；搜索标题与摘要 |
-| `pnpm run build`、`pnpm run preview` | 生成并预览生产站，包含 Pagefind 正文索引     |
-| `pnpm run validate`                  | 依次检查代码格式、测试、类型和完整生产构建   |
-| `pnpm run stop`                      | 关闭本站已登记的开发及构建预览服务           |
+| 命令                                 | 用途                                            |
+| ------------------------------------ | ----------------------------------------------- |
+| `pnpm run dev`                       | 编辑预览，包含草稿和未来内容；搜索标题与摘要    |
+| `pnpm run build`、`pnpm run preview` | 生成并预览生产站，包含 Pagefind 正文索引        |
+| `pnpm run validate`                  | 检查格式、Node 测试、类型、生产构建与浏览器交互 |
+| `pnpm run stop`                      | 关闭本站已登记的开发及构建预览服务              |
 
 完成改动后运行 `pnpm run validate`。界面改动还需核对桌面与移动布局、明暗主题、键盘操作及涉及的交互。开发服务与构建预览是独立进程，后台启动的服务使用 `pnpm run stop` 关闭。
 

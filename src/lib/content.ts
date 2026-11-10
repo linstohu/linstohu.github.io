@@ -41,11 +41,6 @@ export function dateLabel(date: Date): string {
     .format(date)
     .replaceAll('-', '.');
 }
-export function durationLabel(seconds: number): string {
-  const whole = Math.max(0, Math.floor(seconds));
-  const minutes = Math.floor(whole / 60);
-  return `${minutes}:${String(whole % 60).padStart(2, '0')}`;
-}
 export function audioLabel(
   entry: Audio,
   series: CollectionEntry<'series'>[],

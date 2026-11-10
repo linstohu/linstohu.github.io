@@ -29,3 +29,7 @@ CLAUDE.local.md
 
 # Serialize article creation and publication
 /content/writing/.authoring.lock
+
+# Browser test reports and failure traces
+/test-results/
+/playwright-report/

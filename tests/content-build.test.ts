@@ -1,30 +1,21 @@
 import test from 'node:test';
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
-import {
-  mkdtemp,
-  readFile,
-  rm,
-  copyFile,
-  stat,
-  cp,
-  writeFile,
-} from 'node:fs/promises';
+import { readFile, rm, copyFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createDocument } from '../scripts/lib.mjs';
 import { writingDirectory } from '../src/lib/publication.ts';
+import { createTestProject, repository as root } from './helpers/project.mjs';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
 test(
   'production builds render public content, responsive artwork and audio categories',
   { timeout: 90000 },
   async () => {
     const id = 'qa-' + randomUUID().slice(0, 8);
-    const project = await mkdtemp(path.join(root, '.test-build-'));
-    const output = path.join(project, 'dist');
+    const fixture = await createTestProject();
+    const { directory: project, output, build } = fixture;
     const fixtures = ['draft', 'future', 'public'].map((type) =>
       path.join(
         project,
@@ -40,40 +31,7 @@ test(
       ),
     );
     const recording = path.join(project, 'content/audio', id);
-    function build() {
-      execFileSync(
-        process.execPath,
-        [
-          path.join(root, 'node_modules/astro/bin/astro.mjs'),
-          'build',
-          '--outDir',
-          output,
-        ],
-        {
-          cwd: project,
-          env: { ...process.env, ASTRO_TELEMETRY_DISABLED: '1' },
-          stdio: 'pipe',
-          timeout: 75000,
-        },
-      );
-    }
     try {
-      for (const item of [
-        'src',
-        'scripts',
-        'public',
-        'content/settings',
-        'content/quotes',
-        'content/pages',
-        'content/series/thirty-plus.json',
-        'astro.config.mjs',
-        'package.json',
-        'tsconfig.json',
-      ]) {
-        await cp(path.join(root, item), path.join(project, item), {
-          recursive: true,
-        });
-      }
       await writeFile(
         path.join(project, 'content/series/unpublished.json'),
         JSON.stringify({ title: '未公开栏目', description: '留待发布' }),
@@ -83,7 +41,6 @@ test(
         uid: id,
         title: id,
         description: '录音检查',
-        category: '独立录音',
         kind: 'recording',
         publishedAt: '2000-01-01T00:00:00+08:00',
         draft: false,
@@ -233,6 +190,10 @@ test(
         'utf8',
       );
       assert.match(article, /<meta name="description" content="原文首段。"/);
+      assert.match(
+        article,
+        /data-pagefind-filter="type\[content\]" content="writing"/,
+      );
       const body = article
         .split('<div class="article-body">')[1]
         .split('</article>')[0];
@@ -275,6 +236,10 @@ test(
       assert.match(externalPage, /去小宇宙收听/);
       assert.match(
         externalPage,
+        /data-pagefind-filter="type\[content\]" content="audio"/,
+      );
+      assert.match(
+        externalPage,
         /href="https:\/\/www.xiaoyuzhoufm.com\/episode\/test"/,
       );
       assert.doesNotMatch(externalPage, /data-audio-player|id="play"/);
@@ -290,8 +255,23 @@ test(
         curatedListing,
         /id="fragment-copy">\s*<p>手选的一句。<\/p>/,
       );
+      const duplicate = path.join(project, 'content/audio/copy/index.md');
+      for (const draft of [false, true]) {
+        await rm(path.dirname(duplicate), { recursive: true, force: true });
+        await createDocument(
+          duplicate,
+          { ...audioData, uid: 'different-uid', draft },
+          '复制的单集',
+        );
+        assert.throws(build, (error: unknown) => {
+          const failure = error as Error & { stdout?: Buffer; stderr?: Buffer };
+          return /重复的声音地址/.test(
+            `${failure.message} ${failure.stdout} ${failure.stderr}`,
+          );
+        });
+      }
     } finally {
-      await rm(project, { recursive: true, force: true });
+      await fixture.dispose();
     }
   },
 );

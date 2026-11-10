@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
-import { loadContent, address, durationLabel } from '../../lib/content';
+import { loadContent, address } from '../../lib/content';
 import { site as settings } from '../../lib/site';
+import { durationLabel } from '../../lib/duration';
 import { xml, xmlResponse } from '../../lib/feeds';
 export const GET: APIRoute = async ({ site }) => {
   const { sounds } = await loadContent();

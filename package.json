@@ -23,14 +23,16 @@
     "format:check": "prettier --check .",
     "preinstall": "node scripts/check-package-manager.mjs",
     "test": "node --test tests/*.test.ts",
-    "validate": "pnpm format:check && pnpm test && pnpm check && pnpm build",
+    "validate": "pnpm format:check && pnpm test && pnpm check && pnpm build && pnpm test:browser",
     "publish:content": "node --env-file-if-exists=.env scripts/content.mjs publish",
-    "stop": "astro dev stop && astro preview stop"
+    "stop": "astro dev stop && astro preview stop",
+    "test:browser": "playwright test"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
     "@aws-sdk/client-s3": "3.1164.0",
     "@aws-sdk/lib-storage": "3.1164.0",
+    "@playwright/test": "1.65.0",
     "@types/node": "24.19.2",
     "music-metadata": "12.3.5",
     "pagefind": "1.6.0",

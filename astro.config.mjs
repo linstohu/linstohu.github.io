@@ -12,6 +12,7 @@ export default defineConfig({
   site: process.env.SITE_URL || site.url,
   output: 'static',
   trailingSlash: 'always',
+  prerenderConflictBehavior: 'error',
   markdown: { processor: unified({ rehypePlugins: [rehypeFigures] }) },
   devToolbar: { enabled: false },
 });

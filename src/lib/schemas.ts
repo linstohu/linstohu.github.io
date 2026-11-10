@@ -54,7 +54,6 @@ export const audioSchema = z
     series: slugSchema.optional(),
     episode: text.optional(),
     duration: z.number().positive().optional(),
-    category: text.optional(),
     listen: z.array(listeningLink).default([]),
     src: httpUrl.optional(),
     bytes: z.number().int().positive().optional(),
@@ -94,6 +93,12 @@ export const audioSchema = z
         code: 'custom',
         path: ['series'],
         message: '播客需要关联节目',
+      });
+    if (entry.kind === 'recording' && entry.series)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['series'],
+        message: '声音手记不能关联节目；栏目单集请使用 kind: podcast',
       });
     if (entry.chapters.length > 0 && !entry.duration)
       ctx.addIssue({

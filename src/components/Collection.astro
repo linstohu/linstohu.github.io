@@ -5,11 +5,11 @@ import {
   address,
   dateLabel,
   audioLabel,
-  durationLabel,
   type Writing,
   type Audio,
 } from '../lib/content';
 import { site } from '../lib/site';
+import { durationLabel } from '../lib/duration';
 import { articleExcerpt } from '../lib/excerpt';
 import AudioCover from './AudioCover.astro';
 import Row from './Row.astro';
@@ -234,6 +234,13 @@ const tags = [
                 : '搜索全部内容…'
           }
         />
+        <script is:inline>
+          {
+            const input = document.currentScript?.previousElementSibling;
+            if (input instanceof HTMLInputElement)
+              input.value = new URLSearchParams(location.search).get('q') || '';
+          }
+        </script>
       </div>
       <div class="index-controls">
         <div class="filters" aria-label="分类筛选">

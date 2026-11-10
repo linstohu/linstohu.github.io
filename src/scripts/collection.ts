@@ -15,6 +15,7 @@ export function initCollection() {
   interface Pagefind {
     search(
       query: string,
+      options?: { filters: { type: string } },
     ): Promise<{ results: { data(): Promise<SearchData> }[] }>;
   }
   let indexPromise: Promise<Pagefind> | undefined;
@@ -51,9 +52,13 @@ export function initCollection() {
     )
       ? requestedTag!
       : '全部';
-    input.value = parameters.get('q') || '';
     let generation = 0;
     let timeout: ReturnType<typeof setTimeout>;
+    const archiveTypes: Record<string, string> = {
+      文字: 'writing',
+      声音: 'audio',
+      此刻: 'now',
+    };
     const noun =
       collection.dataset.group === 'writing'
         ? '篇文字'
@@ -77,27 +82,31 @@ export function initCollection() {
         );
       let keys: Set<string> | undefined;
       if (notice) notice.hidden = true;
-      if (query) {
+      if (query && !import.meta.env.DEV) {
         if (status) status.textContent = '正在查找…';
         try {
-          if (import.meta.env.DEV) throw new Error('dev');
           const index = await getSearchIndex();
-          const result = await index.search(query);
+          const group = collection!.dataset.group;
+          const type = group === 'archive' ? archiveTypes[selected] : group;
+          const result = await index.search(
+            query,
+            type ? { filters: { type } } : undefined,
+          );
           const records = await Promise.all(
             result.results.map((item) => item.data()),
           );
           keys = new Set(records.map((item) => item.meta.entry_key));
         } catch {
-          if (current !== generation) return;
-          if (notice) {
-            notice.hidden = false;
-            notice.textContent = import.meta.env.DEV
-              ? '本地编辑预览仅搜索标题与摘要；完整正文搜索请运行构建预览。'
-              : '全文索引暂未载入，当前按标题与摘要查找。';
-          }
+          /* Leave keys unset so title and summary search remains available. */
         }
       }
       if (current !== generation) return;
+      if (query && !keys && notice) {
+        notice.hidden = false;
+        notice.textContent = import.meta.env.DEV
+          ? '本地编辑预览仅搜索标题与摘要；完整正文搜索请运行构建预览。'
+          : '全文索引暂未载入，当前按标题与摘要查找。';
+      }
       // Keep the visible results area steady when narrowing the list. Cap the
       // reserved space at one viewport so long archives do not leave a large gap.
       if (feature && results) {

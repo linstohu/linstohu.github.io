@@ -40,7 +40,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:image" content={new URL(site.homeImage, Astro.site)} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     {entryKey && (
-      <meta data-pagefind-meta="entry_key[content]" content={entryKey} />
+      <>
+        <meta data-pagefind-meta="entry_key[content]" content={entryKey} />
+        <meta data-pagefind-filter="type[content]" content={section} />
+      </>
     )}
     <link
       rel="alternate"

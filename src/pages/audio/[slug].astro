@@ -1,14 +1,9 @@
 ---
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import {
-  loadContent,
-  address,
-  dateLabel,
-  durationLabel,
-  type Audio,
-} from '../../lib/content';
+import { loadContent, address, dateLabel, type Audio } from '../../lib/content';
 import Row from '../../components/Row.astro';
+import { durationLabel } from '../../lib/duration';
 import AudioCover from '../../components/AudioCover.astro';
 export async function getStaticPaths() {
   const { sounds } = await loadContent();
@@ -24,7 +19,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const { series, posts, sounds } = await loadContent();
 const show = series.find((item) => item.id === entry.data.series);
-const links = entry.data.listen ?? [];
+const links = entry.data.listen;
 const episodes = sounds.filter(
   (item) => item.data.series === entry.data.series,
 );
