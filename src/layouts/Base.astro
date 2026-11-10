@@ -21,7 +21,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="no-js">
+<html lang="zh-CN" class="no-js" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -29,7 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       name="viewport"
       content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <title>{section === 'home' ? 'Linsto' : `${title} · linsto`}</title>
     <meta name="description" content={description} />
     {!noindex && <link rel="canonical" href={canonical} />}
@@ -59,17 +59,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       try {
         const choice = localStorage.getItem('linsto-theme');
         document.documentElement.dataset.theme =
-          choice === 'dark' || choice === 'light'
-            ? choice
-            : matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
+          choice === 'dark' ? 'dark' : 'light';
       } catch {
-        document.documentElement.dataset.theme = matchMedia(
-          '(prefers-color-scheme: dark)',
-        ).matches
-          ? 'dark'
-          : 'light';
+        /* Keep the default light theme when storage is unavailable. */
       }
     </script>
   </head>

@@ -19,21 +19,6 @@ themeButton?.addEventListener('click', () => {
   }
   syncTheme();
 });
-matchMedia('(prefers-color-scheme: dark)').addEventListener(
-  'change',
-  (event) => {
-    let choice: string | null = null;
-    try {
-      choice = localStorage.getItem('linsto-theme');
-    } catch {
-      /* Use system preference. */
-    }
-    if (!choice) {
-      root.dataset.theme = event.matches ? 'dark' : 'light';
-      syncTheme();
-    }
-  },
-);
 syncTheme();
 
 const header = document.querySelector('body > header');
