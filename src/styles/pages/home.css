@@ -1,0 +1,505 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .stream-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .at-home .wrap {
+    width: min(900px, 90%);
+  }
+  .at-home header .wrap {
+    position: relative;
+    justify-content: center;
+    border: 0;
+    height: var(--masthead-height);
+    min-height: 0;
+    padding: 0;
+    align-items: center;
+  }
+  .at-home header nav {
+    display: none;
+  }
+  .at-home .brand {
+    margin: 0;
+    font:
+      500 clamp(48px, 6vw, 78px)/1.1 Georgia,
+      serif;
+    letter-spacing: -0.045em;
+    color: #28372f;
+    font-size: clamp(48px, 5.3vw, 76px);
+    cursor: default;
+  }
+  .mountains {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .composition {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 0.76fr;
+    grid-template-rows: 80px 60px;
+    gap: 3px;
+    border: 3px solid #343e31;
+    background: #343e31;
+    margin-top: 14px;
+  }
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 13px 19px;
+    color: #26352b;
+    line-height: 1.15;
+  }
+  .tile:hover {
+    color: #26352b;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .tile span {
+    font: 600 26px/1.2 var(--serif);
+  }
+  .tile em {
+    font:
+      italic 18px Georgia,
+      serif;
+    margin-top: 3px;
+  }
+  .tile i {
+    position: absolute;
+    right: 12px;
+    top: 9px;
+    font: 16px/1.4 system-ui;
+  }
+  .tile-writing {
+    grid-row: span 2;
+    background: #dedbc5;
+  }
+  .tile-writing span {
+    font-size: 36px;
+  }
+  .tile-audio {
+    grid-column: 2/4;
+    background: #ad5439;
+    color: #fff9ed;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    align-content: end;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+  .tile-audio:hover {
+    color: #fff9ed;
+  }
+  .tile-now {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    background: #b1bba3;
+  }
+  .latest {
+    margin-top: 36px;
+  }
+  .stream-head h2 {
+    font-size: 23px;
+  }
+  .recent-grid {
+    gap: 24px;
+    margin-top: 20px;
+  }
+  .recent-grid small {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--accent);
+    font-size: 12px;
+  }
+  .recent-grid h3 {
+    font-size: 21px;
+    margin: 8px 0;
+  }
+  .recent-grid p {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .recent-grid a:hover h3 {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .at-home {
+    --masthead-height: 140px;
+  }
+  .at-home > header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 1;
+    background: transparent;
+  }
+  .at-home .greeting {
+    color: #a24e35;
+  }
+  .at-home main.wrap {
+    width: 100%;
+  }
+  .at-home .mountains {
+    height: calc(var(--masthead-height) + clamp(320px, 33.333vw, 720px));
+    object-fit: cover;
+    object-position: 38% 0;
+  }
+  .at-home .composition {
+    width: min(var(--page-max), calc(100% - 112px));
+    margin-inline: auto;
+  }
+  .at-home .latest {
+    width: min(var(--page-max), calc(100% - 112px));
+    margin-inline: auto;
+  }
+  .tile-about {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    background: #f2eddd;
+  }
+  @media (min-width: 901px) {
+    .at-home .wrap {
+      width: min(var(--page-max), calc(100% - 112px));
+    }
+    .at-home .brand {
+      font-weight: 500;
+      letter-spacing: -0.045em;
+    }
+    .mountains {
+      height: clamp(320px, 33.333vw, 720px);
+      object-fit: cover;
+      object-position: 50% 30%;
+    }
+    .composition {
+      width: min(var(--page-max), calc(100% - 112px));
+      margin-inline: auto;
+      grid-template-columns: 1.27fr 1fr 0.78fr;
+      grid-template-rows: 128px 88px;
+      gap: 2px;
+      border-width: 2px;
+      margin-top: 40px;
+    }
+    .latest {
+      width: min(var(--page-max), calc(100% - 112px));
+      margin-inline: auto;
+      margin-top: 54px;
+    }
+    .tile {
+      padding: 23px 30px;
+      transition: background-color 160ms ease;
+    }
+    .tile:hover {
+      box-shadow: none;
+    }
+    .tile span {
+      font-size: 30px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+    .tile em {
+      font-size: 18px;
+      margin-top: 7px;
+    }
+    .tile i {
+      right: 24px;
+      top: 19px;
+      font-size: 19px;
+      transition: transform 160ms ease;
+    }
+    .tile:hover i {
+      transform: translate(3px, -3px);
+    }
+    .tile-writing {
+      background: #d3dac7;
+    }
+    .tile-writing:hover {
+      background: #c6d0b9;
+    }
+    .tile-writing span {
+      font-size: 44px;
+    }
+    .tile-writing em {
+      font-size: 22px;
+    }
+    .tile-audio {
+      background: #a9533b;
+      align-content: center;
+      gap: 14px;
+    }
+    .tile-audio:hover {
+      background: #98462f;
+    }
+    .tile-now {
+      background: #ece6cd;
+      gap: 11px;
+    }
+    .tile-now:hover {
+      background: #e2d9b9;
+    }
+    .tile-now span {
+      font-size: 26px;
+    }
+    .tile-now em {
+      margin: 0;
+      font-size: 17px;
+    }
+    .stream-head {
+      padding-bottom: 17px;
+    }
+    .stream-head h2 {
+      font-size: 25px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+    .stream-head .more {
+      font-size: 13px;
+    }
+    .recent-grid {
+      gap: 0;
+      margin-top: 28px;
+    }
+    .recent-grid > a {
+      padding: 0 30px;
+    }
+    .recent-grid > a:first-child {
+      padding-left: 0;
+    }
+    .recent-grid > a:last-child {
+      padding-right: 0;
+    }
+    .recent-grid > a + a {
+      border-left: 1px solid var(--line);
+    }
+    .recent-grid small {
+      font-size: 12px;
+    }
+    .recent-grid h3 {
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.55;
+      min-height: 74px;
+      margin: 14px 0 10px;
+      text-wrap: balance;
+    }
+    .recent-grid p {
+      font-size: 14px;
+      line-height: 1.9;
+    }
+    .recent-grid > a:hover h3 {
+      color: var(--accent);
+    }
+    .tile-about {
+      background: #f3f0e5;
+      gap: 11px;
+    }
+    .tile-about:hover {
+      background: #e8e4d7;
+    }
+    .tile-about span {
+      font-size: 26px;
+    }
+    .tile-about em {
+      margin: 0;
+      font-size: 17px;
+    }
+  }
+  @media (max-width: 900px) {
+    .at-home .composition {
+      width: 90%;
+    }
+    .at-home .latest {
+      width: 90%;
+    }
+  }
+  @media (max-width: 760px) {
+    .at-home .wrap {
+      width: calc(100% - 40px);
+    }
+    .at-home {
+      --masthead-height: 84px;
+    }
+    .at-home header .wrap {
+      height: 84px;
+      padding: 0;
+    }
+    .at-home .brand {
+      font-size: clamp(36px, 10.3vw, 52px);
+    }
+    .at-home .mobile-menu {
+      display: none;
+    }
+    .at-home .mountains {
+      height: clamp(254px, calc(84px + 54vw), 420px);
+    }
+    .at-home .composition {
+      width: calc(100% - 40px);
+    }
+    .at-home .latest {
+      width: calc(100% - 40px);
+      margin-top: 29px;
+    }
+    .composition {
+      grid-template-columns: 1.12fr 1fr 0.9fr;
+      grid-template-rows: 77px 65px;
+      gap: 2px;
+      border-width: 2px;
+      margin-top: 16px;
+    }
+    .tile {
+      padding: 12px 13px;
+    }
+    .tile:hover {
+      box-shadow: none;
+    }
+    .tile-writing {
+      background: #d3dac7;
+    }
+    .tile-writing span {
+      font-size: 31px;
+      font-weight: 500;
+    }
+    .tile-writing em {
+      font-size: 16px;
+      margin-top: 5px;
+    }
+    .tile-audio {
+      background: #a9533b;
+      align-content: center;
+      gap: 7px;
+    }
+    .tile-audio span {
+      font-size: 27px;
+      font-weight: 500;
+    }
+    .tile-audio em {
+      font-size: 15px;
+      margin: 0;
+    }
+    .tile-now {
+      background: #ece6cd;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+    }
+    .tile-now span {
+      font-size: 22px;
+      font-weight: 500;
+    }
+    .tile-now em {
+      font-size: 12px;
+      margin-top: 3px;
+    }
+    .tile i {
+      top: 7px;
+      right: 7px;
+      font-size: 12px;
+    }
+    .stream-head {
+      padding-bottom: 10px;
+    }
+    .stream-head h2 {
+      font-size: 23px;
+      font-weight: 500;
+    }
+    .stream-head .more {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--tap-size);
+      font-size: 12px;
+    }
+    .recent-grid {
+      gap: 0;
+      margin-top: 0;
+    }
+    .recent-grid > a {
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .recent-grid small {
+      gap: 14px;
+      font-size: 11px;
+    }
+    .recent-grid small time {
+      flex-shrink: 0;
+      font-size: 11px;
+    }
+    .recent-grid h3 {
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.5;
+      margin: 6px 0;
+      text-wrap: balance;
+    }
+    .recent-grid p {
+      font-size: 14px;
+      line-height: 1.85;
+    }
+    .tile-about {
+      background: #f3f0e5;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+    }
+    .tile-about span {
+      font-size: 22px;
+      font-weight: 500;
+    }
+    .tile-about em {
+      font-size: 12px;
+      margin-top: 3px;
+    }
+  }
+  @media (max-width: 360px) {
+    .at-home .wrap {
+      width: calc(100% - 32px);
+    }
+    .at-home .composition {
+      width: calc(100% - 32px);
+    }
+    .at-home .latest {
+      width: calc(100% - 32px);
+    }
+    .at-home main.wrap {
+      width: 100%;
+    }
+    .composition {
+      grid-template-columns: 1.08fr 1fr 0.9fr;
+    }
+    .tile {
+      padding-inline: 10px;
+    }
+    .tile-writing span {
+      font-size: 28px;
+    }
+    .tile-audio span {
+      font-size: 25px;
+    }
+    .tile-now span {
+      font-size: 21px;
+    }
+    .tile-about span {
+      font-size: 21px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile {
+      transition: none;
+    }
+    .tile i {
+      transition: none;
+    }
+  }
+}

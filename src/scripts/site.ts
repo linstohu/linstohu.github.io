@@ -21,25 +21,6 @@ themeButton?.addEventListener('click', () => {
 });
 syncTheme();
 
-const header = document.querySelector('body > header');
-const menu = document.querySelector<HTMLButtonElement>('.mobile-menu');
-function setMenu(open: boolean) {
-  header?.setAttribute('data-menu-open', String(open));
-  menu?.setAttribute('aria-expanded', String(open));
-  menu?.setAttribute('aria-label', open ? '收起网站导航' : '展开网站导航');
-}
-menu?.addEventListener('click', () =>
-  setMenu(menu.getAttribute('aria-expanded') !== 'true'),
-);
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') setMenu(false);
-});
-document.addEventListener('click', (event) => {
-  if (!header?.contains(event.target as Node)) setMenu(false);
-});
-matchMedia('(min-width: 761px)').addEventListener('change', () =>
-  setMenu(false),
-);
 document.querySelector('[data-back-top]')?.addEventListener('click', () => {
   window.scrollTo({
     top: 0,
@@ -98,8 +79,6 @@ if (document.querySelector('[data-collection]'))
   import('./collection').then((module) => module.initCollection());
 if (document.querySelector('[data-audio-player]'))
   import('./audio').then((module) => module.initAudio());
-if (document.querySelector('.image-open'))
-  import('./images').then((module) => module.initImages());
 
 document.querySelectorAll<HTMLElement>('[data-home-art]').forEach((artwork) => {
   for (const event of ['contextmenu', 'dragstart', 'selectstart']) {

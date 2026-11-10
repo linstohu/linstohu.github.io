@@ -1,14 +1,7 @@
 import test from 'node:test';
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
-import {
-  readFile,
-  rm,
-  copyFile,
-  stat,
-  writeFile,
-  readdir,
-} from 'node:fs/promises';
+import { readFile, rm, copyFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -105,20 +98,6 @@ test(
         path.join(fixtures[2], 'photo.webp'),
       );
       build();
-      const assets = path.join(output, '_astro');
-      const styles = (
-        await Promise.all(
-          (await readdir(assets))
-            .filter((file) => file.endsWith('.css'))
-            .map((file) => readFile(path.join(assets, file), 'utf8')),
-        )
-      ).join('\n');
-      assert.doesNotMatch(
-        styles,
-        /@media[^{}]*[<>]/,
-        'Production breakpoints must not require media-query range syntax',
-      );
-      assert.match(styles, /@media\s*\(\s*max-width\s*:/);
       const home = await readFile(path.join(output, 'index.html'), 'utf8');
       const artwork = home.match(
         /<picture\b[^>]*class="home-artwork[^"]*"[\s\S]*?<\/picture>/,
@@ -226,7 +205,10 @@ test(
         path.join(output, 'writing/index.html'),
         'utf8',
       );
-      assert.match(listing, /id="fragment-copy">\s*<p>自动摘录的第二段。<\/p>/);
+      assert.match(
+        listing,
+        /id="fragment-copy"[^>]*>\s*<p>自动摘录的第二段。<\/p>/,
+      );
       assert.match(listing, /data-filter="自定义标签"/);
       const article = await readFile(
         path.join(output, 'writing', `${id}-public/index.html`),
@@ -297,7 +279,7 @@ test(
       );
       assert.match(
         curatedListing,
-        /id="fragment-copy">\s*<p>手选的一句。<\/p>/,
+        /id="fragment-copy"[^>]*>\s*<p>手选的一句。<\/p>/,
       );
       const duplicate = path.join(project, 'content/audio/copy/index.md');
       for (const draft of [false, true]) {

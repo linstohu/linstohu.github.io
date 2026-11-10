@@ -1,0 +1,44 @@
+---
+import '../../styles/components/dialog.css';
+---
+
+<div id="image-viewer" data-sw-dialog>
+  <dialog
+    id="article-image-dialog"
+    aria-label="图片大图"
+    data-sw-dialog-content
+  >
+    <button type="button" class="image-close" autofocus data-sw-dialog-close>
+      关闭 ×
+    </button>
+    <img alt="" />
+    <p class="image-caption"></p>
+  </dialog>
+</div>
+
+<script>
+  import { createDialog } from '@starwind-ui/runtime/dialog';
+
+  const root = document.querySelector<HTMLElement>('#image-viewer');
+  if (root) {
+    const dialog = createDialog(root);
+    const image = root.querySelector('img')!;
+    const caption = root.querySelector('.image-caption')!;
+    document
+      .querySelectorAll<HTMLButtonElement>('.image-open')
+      .forEach((button) => {
+        button.addEventListener('click', (event) => {
+          const source = button.querySelector('img');
+          if (!source) return;
+          image.src = source.currentSrc || source.src;
+          image.alt = source.alt;
+          caption.textContent =
+            button.closest('figure')?.querySelector('figcaption')
+              ?.textContent || source.alt;
+          // Safari does not focus a button on touch; the dialog restores this focus.
+          button.focus({ preventScroll: true });
+          dialog.setOpen(true, { event, trigger: button });
+        });
+      });
+  }
+</script>

@@ -1,0 +1,311 @@
+@layer theme, base, components, utilities;
+@layer components {
+  main[data-section='now'] .reader h2 {
+    padding-left: 14px;
+    border-left: 3px solid #b39a58;
+  }
+  .now-page {
+    width: min(var(--content-max), 100%);
+    margin: 30px auto 0;
+  }
+  .now-layout {
+    display: grid;
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 48px;
+    margin-top: 23px;
+  }
+  .month-stamp {
+    background: var(--panel);
+    padding: 18px 20px;
+  }
+  .month-stamp > span {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .month-stamp strong {
+    display: block;
+    font:
+      400 67px/1.25 Georgia,
+      serif;
+    letter-spacing: -0.04em;
+    margin: 5px 0 7px;
+  }
+  .month-stamp strong small {
+    margin-left: 7px;
+    font:
+      14px/1.6 'PingFang SC',
+      system-ui,
+      sans-serif;
+  }
+  .month-stamp time {
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+  .month-list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 21px;
+  }
+  .month-label {
+    font-size: 11px;
+    color: var(--muted);
+    padding-bottom: 8px;
+  }
+  .month-list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 0;
+    font-size: 13px;
+  }
+  .month-list a[aria-current='page'] {
+    color: var(--accent);
+  }
+  .month-list a[aria-current='page']::before {
+    content: none;
+  }
+  .month-list a small {
+    font-size: 10px;
+    font-weight: 400;
+  }
+  .month-list .all-months {
+    border-top: 1px solid var(--line);
+    margin-top: 6px;
+    padding-top: 12px;
+    font-size: 12px;
+  }
+  .snapshot-head {
+    padding: 2px 0 22px;
+  }
+  .snapshot-head h2 {
+    font-size: 35px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-top: 9px;
+    text-wrap: balance;
+  }
+  .now-notes > section {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr);
+    gap: 25px;
+    border-top: 1px solid var(--line);
+    padding: 23px 0;
+  }
+  .now-notes h3 {
+    font:
+      500 14px/1.95 'PingFang SC',
+      system-ui,
+      sans-serif;
+  }
+  .now-notes p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.95;
+  }
+  .snapshot-neighbors {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+    margin-top: 20px;
+  }
+  .snapshot-neighbors a {
+    max-width: 45%;
+    font-size: 12px;
+  }
+  .snapshot-neighbors a:last-child {
+    text-align: right;
+  }
+  .snapshot-neighbors small {
+    display: block;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .snapshot-year {
+    margin-top: 30px;
+  }
+  .snapshot-year > h2 {
+    font:
+      400 22px/1.6 Georgia,
+      serif;
+    margin-bottom: 12px;
+  }
+  .snapshot-cards {
+    border-top: 1px solid var(--line);
+  }
+  .snapshot-cards > a {
+    position: relative;
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--line);
+  }
+  .snapshot-cards > a:first-child {
+    padding-left: 0;
+  }
+  .snapshot-cards > a + a {
+    border-left: 1px solid var(--line);
+  }
+  .snapshot-cards time {
+    color: var(--accent);
+  }
+  .snapshot-cards h3 {
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+  .snapshot-cards p {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--muted);
+    margin: 12px 0 0;
+  }
+  .snapshot-cards > a > span {
+    position: absolute;
+    right: 14px;
+    top: 16px;
+    color: var(--muted);
+  }
+  @media (max-width: 760px) {
+    .now-layout {
+      grid-template-columns: 130px minmax(0, 1fr);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .snapshot-cards > a {
+      padding: 20px 0;
+    }
+    .snapshot-cards > a:first-child {
+      padding: 20px 0;
+    }
+    .snapshot-cards > a + a {
+      border-left: 0;
+    }
+    .now-page {
+      margin-top: 21px;
+    }
+    .now-aside {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .month-stamp {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+      padding: 0;
+      background: none;
+    }
+    .month-stamp > span {
+      font-size: 12px;
+    }
+    .month-stamp strong {
+      font-size: 27px;
+      line-height: 1.3;
+      margin: 0;
+    }
+    .month-stamp strong small {
+      font-size: 12px;
+      margin-left: 3px;
+    }
+    .month-stamp time {
+      margin-left: auto;
+      font-size: 11px;
+    }
+    .month-list {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .month-list .month-label {
+      display: none;
+    }
+    .month-list a {
+      flex-shrink: 0;
+      display: inline-flex;
+      min-height: var(--tap-size);
+      padding: 0 6px;
+      border-bottom: 1px solid transparent;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .month-list a small {
+      display: none;
+    }
+    .month-list a[aria-current='page'] {
+      border-bottom-color: var(--accent);
+    }
+    .month-list .all-months {
+      margin: 0 0 0 auto;
+      padding: 0 3px;
+      border-top: 0;
+      font-size: 11px;
+    }
+    .snapshot-head {
+      padding: 0 0 17px;
+    }
+    .snapshot-head h2 {
+      font-size: 28px;
+      margin-top: 8px;
+    }
+    .now-notes > section {
+      grid-template-columns: 1fr;
+      gap: 7px;
+      padding-block: 18px;
+    }
+    .now-notes h3 {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .now-notes p {
+      font-size: 17px;
+      line-height: 1.95;
+    }
+    .snapshot-neighbors {
+      margin-top: 17px;
+    }
+    .snapshot-neighbors a {
+      display: block;
+      min-height: var(--tap-size);
+      padding-top: 6px;
+    }
+    .snapshot-neighbors small {
+      font-size: 11px;
+    }
+    .snapshot-year {
+      margin-top: 23px;
+    }
+    .snapshot-cards h3 {
+      font-size: 22px;
+    }
+  }
+  @media (max-width: 600px) {
+    .now-aside {
+      grid-template-columns: 104px minmax(0, 1fr);
+    }
+    .month-list {
+      display: flex;
+    }
+    .month-label {
+      width: 100%;
+      padding-bottom: 3px;
+    }
+    .month-list a {
+      gap: 4px;
+    }
+    .month-list .all-months {
+      border: 0;
+    }
+  }
+}

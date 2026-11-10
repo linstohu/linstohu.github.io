@@ -1,7 +1,68 @@
 /* Shared reading styles for rendered Markdown, separate from page navigation. */
 .markdown-body {
   min-width: 0;
+  font-size: var(--markdown-font-size, 18px);
+  line-height: 1.95;
   overflow-wrap: anywhere;
+}
+.markdown-body :where(p) {
+  margin: 0 0 1.2em;
+  font-size: inherit;
+  line-height: inherit;
+  text-wrap: pretty;
+}
+/* Section headings carry the reading hierarchy; page titles stay in layouts. */
+.markdown-body :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.5;
+  text-wrap: balance;
+  scroll-margin-block-start: 96px;
+  break-after: avoid;
+}
+.markdown-body :where(h1) {
+  margin: 56px 0 24px;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 700;
+}
+.markdown-body :where(h2) {
+  margin: 52px 0 20px;
+  padding-block-end: 12px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.markdown-body :where(h3) {
+  margin: 36px 0 14px;
+  font-family: inherit;
+  font-size: 22px;
+}
+.markdown-body :where(h4) {
+  margin: 28px 0 10px;
+  font-family: inherit;
+  font-size: 19px;
+}
+.markdown-body :where(h5, h6) {
+  margin: 24px 0 10px;
+  font-family: inherit;
+  font-size: 17px;
+}
+.markdown-body :where(h6) {
+  font-size: 16px;
+  color: var(--muted);
+}
+.markdown-body :is(h1, h2, h3, h4, h5) + :is(h2, h3, h4, h5, h6) {
+  margin-block-start: 20px;
+}
+.markdown-body > :first-child {
+  margin-block-start: 0;
+}
+.markdown-body strong {
+  color: var(--ink);
+  font-weight: 650;
 }
 .markdown-body :where(a[href]) {
   color: var(--accent);
@@ -18,11 +79,6 @@
   outline-offset: 3px;
   text-decoration-thickness: 2px;
 }
-.markdown-body :where(h3, h4, h5, h6) {
-  margin: 1.6em 0 0.6em;
-  font-size: 1em;
-  line-height: 1.7;
-}
 .markdown-body :where(ul, ol) {
   margin-block: 1em 1.25em;
   padding-inline-start: 1.6em;
@@ -37,14 +93,22 @@
 .markdown-body :where(li > ul, li > ol) {
   margin-block: 0.4em;
 }
+.markdown-body li > p {
+  margin-block: 0.5em;
+}
+.markdown-body li > p:last-child {
+  margin-block-end: 0;
+}
 .markdown-body :where(li)::marker {
   color: var(--muted);
 }
 .markdown-body :where(blockquote) {
-  margin: 1.5em 0;
-  padding-inline-start: 1.1em;
-  border-inline-start: 2px solid var(--line);
-  color: var(--muted);
+  margin: 28px 0;
+  padding: 16px 24px;
+  border-inline-start: 2px solid var(--accent);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--serif);
 }
 .markdown-body blockquote > :first-child {
   margin-block-start: 0;
@@ -124,15 +188,140 @@
 .markdown-body :where(details[open] > summary) {
   margin-block-end: 12px;
 }
-.markdown-body :where([data-footnotes]) {
-  margin-block-start: 2.5em;
-  padding-block-start: 1em;
+.markdown-body sup:has(> [data-footnote-ref]) {
+  line-height: 0;
+}
+.markdown-body [data-footnote-ref] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  margin-inline: 0.1em;
+  border-radius: 3px;
+  font:
+    500 12px/1.4 ui-monospace,
+    'SFMono-Regular',
+    Menlo,
+    monospace;
+  text-decoration: none;
+  scroll-margin-block: 96px;
+}
+.markdown-body [data-footnote-ref]::before {
+  content: '[';
+}
+.markdown-body [data-footnote-ref]::after {
+  content: ']';
+}
+.markdown-body [data-footnote-ref]:hover,
+.markdown-body [data-footnote-ref]:target {
+  background: var(--tint);
+  color: var(--accent);
+  text-decoration: none;
+}
+.markdown-body [data-footnotes] {
+  margin-block-start: 48px;
+  padding-block-start: 24px;
   border-top: 1px solid var(--line);
   color: var(--muted);
-  font-size: 0.85em;
+  font-size: 14px;
+  line-height: 1.9;
 }
-.markdown-body [data-footnotes] p {
-  margin-block-end: 0.6em;
+.markdown-body [data-footnotes] > .footnotes-title {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  font: 500 18px/1.6 var(--serif);
+  letter-spacing: 0.04em;
+}
+.markdown-body [data-footnotes] > ol {
+  margin: 16px 0 0;
+  padding-inline-start: 2.25em;
+  line-height: inherit;
+}
+.markdown-body [data-footnotes] > ol > li {
+  margin: 0;
+  padding: 12px 10px 12px 8px;
+  border-radius: 3px;
+  scroll-margin-block-start: 96px;
+}
+.markdown-body [data-footnotes] > ol > li + li {
+  border-top: 1px solid var(--line);
+}
+.markdown-body [data-footnotes] > ol > li::marker {
+  content: '[' counter(list-item) ']';
+  color: var(--accent);
+  font:
+    12px/1.9 ui-monospace,
+    'SFMono-Regular',
+    Menlo,
+    monospace;
+}
+.markdown-body [data-footnotes] > ol > li:target {
+  background: var(--tint);
+  color: var(--ink);
+}
+.markdown-body [data-footnotes] > ol > li p {
+  margin: 0;
   font-size: inherit;
-  line-height: 1.85;
+  line-height: inherit;
+}
+.markdown-body [data-footnotes] > ol > li p + p {
+  margin-block-start: 8px;
+}
+.markdown-body [data-footnote-backref] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-inline-start: 8px;
+  font:
+    12px/1.6 'PingFang SC',
+    'Microsoft YaHei',
+    system-ui,
+    sans-serif;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.markdown-body [data-footnote-backref]:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+@media (pointer: coarse) {
+  .markdown-body [data-footnote-backref] {
+    min-height: var(--tap-size);
+  }
+}
+@media (max-width: 760px) {
+  .markdown-body {
+    font-size: var(--markdown-font-size, 17px);
+  }
+  .markdown-body :where(h1) {
+    margin-block: 44px 20px;
+    font-size: 26px;
+  }
+  .markdown-body :where(h2) {
+    margin-block: 42px 18px;
+    padding-block-end: 10px;
+    font-size: 24px;
+  }
+  .markdown-body :where(h3) {
+    margin-block: 30px 12px;
+    font-size: 20px;
+  }
+  .markdown-body :where(h4) {
+    margin-block-start: 24px;
+    font-size: 18px;
+  }
+  .markdown-body :where(blockquote) {
+    margin-block: 24px;
+    padding: 14px 18px;
+  }
+  .markdown-body [data-footnotes] {
+    margin-block-start: 36px;
+    padding-block-start: 20px;
+  }
+  .markdown-body [data-footnotes] > .footnotes-title {
+    font-size: 17px;
+  }
 }

@@ -24,9 +24,17 @@
 
 正文、列表和导航随 HTML 提供。浏览器脚本按页面增强分类筛选、全文搜索、播放和图片查看。列表筛选只更新结果区域，保留精选内容与筛选控件的位置。开发预览搜索标题与摘要，生产搜索使用 Pagefind 正文索引。详情页在索引中标记内容类型，栏目搜索及归档类型筛选在索引层限定范围；浏览器只读取匹配范围的结果。URL 搜索词在输入框出现时同步回填，后续异步脚本保留读者已经输入的内容。
 
+## 样式与交互组件
+
+Astro 负责页面、内容和静态 HTML，Tailwind CSS 4 负责通用布局与响应式变体。`src/styles/site.css` 是样式入口，声明 `theme → base → components → utilities` 的级联层；`tokens.css` 定义颜色、字体、阅读宽度和触摸尺寸，`base.css` 定义基础排版，页面与组件的视觉规则保存在对应的 `styles/pages/`、`styles/components/` 中，由使用它们的 Astro 组件导入。Markdown 排版独立维护。基础样式明确控制站点的默认外观，不加载 Tailwind Preflight。
+
+主要断点定义在 Tailwind 的 `@theme` 中：`md` 从 761px 开始，`lg` 从 901px 开始。浏览器交互从同一份 `--breakpoint-md` 读取阈值。页面还可按实际内容在 360px、600px、640px 调整局部尺寸。新增样式放到所属组件，先使用布局工具类和现有设计变量，在同一断点内修改既有规则。
+
+通用交互基于 Starwind Runtime 的无样式组件，封装在 `src/components/ui/`。`Disclosure` 统一导航与正文摘录的折叠状态、ARIA 关联和跨断点行为；导航保留原生 landmark。`ImageDialog` 使用 Dialog 管理弹窗关闭、焦点和滚动锁定，页面只负责填充图片与图注。`PageHeading` 统一栏目标题结构。内容查询、搜索和音频播放保留独立模块。浏览器支持基线跟随 Tailwind 4，交互在桌面 Chromium、Android 尺寸 Chromium 和 iPhone WebKit 中验证。
+
 ## 构建与交付
 
-仓库为单个 pnpm 包。生产 CSS 的兼容目标由 `astro.config.mjs` 的 `vite.build.cssTarget` 指定，保留较旧安卓内核能识别的 min/max 媒体查询语法；构建集成测试检查压缩后的实际 CSS，浏览器测试检查首页及列表页的手机布局。Node 主版本由 `.nvmrc` 指定，pnpm 版本与任务入口见 `package.json`，CI 按锁文件安装。`pnpm-workspace.yaml` 管理安装策略，包括为 `@astrojs/astro2tsx@0.1.3` 固定兼容的运行时依赖；升级该工具时应复核这项约束。
+仓库为单个 pnpm 包。构建集成测试检查生产内容和资源，浏览器测试检查响应式布局、组件交互、键盘焦点及无 JavaScript 时的内容可用性。Node 主版本由 `.nvmrc` 指定，pnpm 版本与任务入口见 `package.json`，CI 按锁文件安装。`pnpm-workspace.yaml` 管理安装策略，包括为 `@astrojs/astro2tsx@0.1.3` 固定兼容的运行时依赖；升级该工具时应复核这项约束。
 
 `.github/workflows/site.yml` 每次通过 `validate:static` 依次检查格式、运行测试、执行 Astro 类型检查和生产构建。仅内容和文档变更跳过浏览器步骤，其余变更、手动运行或缺少比较基准时安装 headless Chromium 与 WebKit 并运行交互测试，全部适用检查通过后才部署。集成测试在临时目录中构建独立内容，覆盖草稿可见性、重复地址、文章图片与摘录、节目从草稿到公开后的展示。Playwright 使用独立的临时内容构建测试站，使用 Chromium 与 iPhone 尺寸的 WebKit，检查真实的搜索索引、输入保留、筛选布局、键盘焦点与正文换行；测试产物与待部署的 `dist/` 分开。生产构建随后检查实际站点的站内链接、图片资源、锚点和订阅文件。
 

@@ -1,0 +1,15 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import '../../styles/components/page-heading.css';
+interface Props extends HTMLAttributes<'div'> {
+  title: string;
+  description?: string;
+}
+const { title, description, class: className, ...attributes } = Astro.props;
+---
+
+<div {...attributes} class:list={['collection-heading', className]}>
+  <h1>{title}</h1>
+  {description && <p>{description}</p>}
+  <slot />
+</div>

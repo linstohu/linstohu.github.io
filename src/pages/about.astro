@@ -1,4 +1,6 @@
 ---
+import PageHeading from '../components/ui/PageHeading.astro';
+import '../styles/pages/about.css';
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import Artwork from '../components/Artwork.astro';
@@ -11,16 +13,17 @@ const { Content } = await render(entry);
   title={entry.data.title}
   section="about"
   description={entry.data.description}
+  imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
   <section class="about-page">
-    <div class="collection-heading">
-      <h1>{entry.data.title}</h1>
-      {entry.data.description && <p>{entry.data.description}</p>}
-    </div>
+    <PageHeading
+      title={entry.data.title}
+      description={entry.data.description}
+    />
     {(entry.data.greeting ||
       entry.data.intro.length > 0 ||
       entry.data.image) && (
-      <div class="about-opening">
+      <div class="about-opening grid grid-cols-1 md:grid-cols-[1.2fr_1fr]">
         <div>
           {entry.data.greeting && <h2>{entry.data.greeting}</h2>}
           {entry.data.intro.map((text) => (
@@ -39,7 +42,7 @@ const { Content } = await render(entry);
       </div>
     )}
     {entry.body?.trim() && (
-      <div class="about-notes about-markdown markdown-body">
+      <div class="about-notes about-markdown markdown-body grid grid-cols-1 md:grid-cols-[210px_minmax(0,1fr)]">
         <Content />
       </div>
     )}

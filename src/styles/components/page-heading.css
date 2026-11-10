@@ -1,0 +1,33 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .collection-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    margin-bottom: 19px;
+  }
+  .collection-heading h1 {
+    font-size: 28px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .collection-heading > p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  @media (max-width: 760px) {
+    .collection-heading {
+      display: block;
+      margin-bottom: 18px;
+    }
+    .collection-heading h1 {
+      font-size: 26px;
+    }
+    .collection-heading > p {
+      font-size: 13px;
+      line-height: 1.8;
+      margin-top: 5px;
+    }
+  }
+}

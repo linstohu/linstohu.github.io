@@ -1,4 +1,6 @@
 ---
+import PageHeading from '../../components/ui/PageHeading.astro';
+import '../../styles/pages/now.css';
 import Base from '../../layouts/Base.astro';
 import { loadContent, address } from '../../lib/content';
 const { snapshots } = await loadContent();
@@ -9,17 +11,16 @@ const years = [
 
 <Base title="此刻归档" section="now">
   <section class="now-page">
-    <div class="collection-heading archive-heading">
-      <h1>此刻归档</h1>
+    <PageHeading title="此刻归档" class="archive-heading">
       <a class="more" href="/now/">
         回到当前快照 →
       </a>
-    </div>
+    </PageHeading>
     {years.length === 0 && <p class="empty-list">暂无历史快照。</p>}
     {years.map((year) => (
       <section class="snapshot-year">
         <h2>{year}</h2>
-        <div class="snapshot-cards">
+        <div class="snapshot-cards grid grid-cols-1 md:grid-cols-3">
           {snapshots
             .filter((entry) => entry.data.period.startsWith(year))
             .map((entry) => (

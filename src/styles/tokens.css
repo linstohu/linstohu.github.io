@@ -1,0 +1,25 @@
+:root {
+  --page-max: 1120px;
+  --content-max: 1040px;
+  --reading-max: 720px;
+  --tap-size: 44px;
+  --bg: #f7f5ef;
+  --ink: #28372f;
+  --muted: #686f65;
+  --line: #d4d6ca;
+  --accent: #a24e35;
+  --panel: #ececdf;
+  --tint: #e6e9de;
+  --serif: 'Songti SC', 'STSong', 'Noto Serif CJK SC', Georgia, serif;
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --bg: #202820;
+  --ink: #eeeade;
+  --muted: #b9c0b1;
+  --line: #475044;
+  --accent: #e6a285;
+  --panel: #2d382d;
+  --tint: #354132;
+  color-scheme: dark;
+}

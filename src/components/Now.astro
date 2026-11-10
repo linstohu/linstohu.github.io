@@ -1,4 +1,6 @@
 ---
+import PageHeading from './ui/PageHeading.astro';
+import '../styles/pages/now.css';
 import { loadContent, address, type Snapshot } from '../lib/content';
 interface Props {
   entry: Snapshot;
@@ -13,10 +15,7 @@ const month = Number(entry.data.period.slice(-2));
 ---
 
 <section class="now-page">
-  <div class="collection-heading">
-    <h1>此刻</h1>
-    <p>此时关注的事，按月留一份底稿。</p>
-  </div>
+  <PageHeading title="此刻" description="此时关注的事，按月留一份底稿。" />
   <div class="now-layout">
     <aside class="now-aside">
       <div class="month-stamp">

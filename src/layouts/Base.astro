@@ -1,15 +1,16 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import ImageDialog from '../components/ui/ImageDialog.astro';
 import { site } from '../lib/site';
 import '../styles/site.css';
-import '../styles/markdown.css';
 interface Props {
   title: string;
   section: string;
   description?: string;
   entryKey?: string;
   noindex?: boolean;
+  imageViewer?: boolean;
 }
 const {
   title,
@@ -17,6 +18,7 @@ const {
   description = site.description,
   entryKey,
   noindex = false,
+  imageViewer = false,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -78,13 +80,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
     <Footer />
-    <dialog id="article-image-dialog" aria-label="图片大图">
-      <button class="image-close" autofocus>
-        关闭 ×
-      </button>
-      <img alt="" />
-      <p class="image-caption"></p>
-    </dialog>
+    {imageViewer && <ImageDialog />}
     <script>
       import '../scripts/site.ts';
     </script>

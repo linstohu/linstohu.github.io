@@ -1,0 +1,49 @@
+@layer theme, base, components, utilities;
+@layer components {
+  #article-image-dialog {
+    position: fixed;
+    width: min(var(--page-max), calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    padding: 44px 16px 12px;
+  }
+  #article-image-dialog::backdrop {
+    background: rgb(17 26 21 / 82%);
+  }
+  #article-image-dialog img {
+    display: block;
+    width: 100%;
+    max-height: calc(100dvh - 145px);
+    object-fit: contain;
+  }
+  .image-close {
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+  #article-image-dialog .image-caption {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  @media (max-width: 760px) {
+    #article-image-dialog {
+      width: calc(100% - 24px);
+      max-height: calc(100dvh - 24px);
+      padding: 52px 12px 12px;
+    }
+    .image-close {
+      top: 3px;
+      min-height: var(--tap-size);
+      padding-inline: 12px;
+    }
+    #article-image-dialog img {
+      max-height: calc(100dvh - 155px);
+    }
+  }
+}

@@ -1,4 +1,6 @@
 ---
+import PageHeading from './ui/PageHeading.astro';
+import '../styles/pages/collections.css';
 import {
   loadContent,
   collectionTags,
@@ -13,6 +15,7 @@ import { durationLabel } from '../lib/duration';
 import { articleExcerpt } from '../lib/excerpt';
 import AudioCover from './AudioCover.astro';
 import Row from './Row.astro';
+import Disclosure from './ui/Disclosure.astro';
 interface Props {
   group: 'writing' | 'audio' | 'archive';
 }
@@ -62,10 +65,7 @@ const tags = [
   }
 >
   {isCollection ? (
-    <div class="collection-heading">
-      <h1>{label}</h1>
-      {subtitle && <p>{subtitle}</p>}
-    </div>
+    <PageHeading title={label} description={subtitle} />
   ) : (
     <div class="page">
       <span class="eyebrow">ARCHIVE</span>
@@ -75,7 +75,7 @@ const tags = [
   )}
   {article && (
     <section
-      class="collection-feature writing-feature"
+      class="collection-feature writing-feature grid grid-cols-1 md:grid-cols-[1.14fr_1fr]"
       data-feature
       aria-label="最新文章"
     >
@@ -98,25 +98,27 @@ const tags = [
           读这篇文章 →
         </a>
       </div>
-      <blockquote class="feature-fragment">
-        <span class="fragment-label">文中一段</span>
-        <button
-          class="fragment-toggle"
-          aria-expanded="false"
-          aria-controls="fragment-copy"
-        >
+      <Disclosure
+        as="blockquote"
+        class="feature-fragment"
+        id="fragment-copy"
+        panelClass="fragment-copy"
+        triggerClass="fragment-toggle"
+      >
+        <span slot="leading" class="fragment-label">
+          文中一段
+        </span>
+        <Fragment slot="trigger">
           <span>读一段正文</span>
-          <span aria-hidden="true">＋</span>
-        </button>
-        <div class="fragment-copy" id="fragment-copy">
-          <p>{excerpt}</p>
-          <cite>
-            <a href={address(article)}>
-              摘自「{article.data.excerptTitle || article.data.title}」 ↗
-            </a>
-          </cite>
-        </div>
-      </blockquote>
+          <span class="disclosure-glyph" aria-hidden="true"></span>
+        </Fragment>
+        <p>{excerpt}</p>
+        <cite>
+          <a href={address(article)}>
+            摘自「{article.data.excerptTitle || article.data.title}」 ↗
+          </a>
+        </cite>
+      </Disclosure>
     </section>
   )}
   {sound && (
@@ -177,7 +179,10 @@ const tags = [
   ) : (
     <section class="collection-browser" aria-label="查找内容">
       {group === 'audio' && (
-        <div class="audio-sources" aria-label="选择声音栏目">
+        <div
+          class="audio-sources grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]"
+          aria-label="选择声音栏目"
+        >
           {tags.map((tag) => {
             const item = series.find((entry) => entry.data.title === tag);
             const count = sounds.filter((entry) =>

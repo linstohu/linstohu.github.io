@@ -1,14 +1,4 @@
 export function initCollection() {
-  const fragment = document.querySelector<HTMLElement>('.feature-fragment');
-  fragment?.querySelector('button')?.addEventListener('click', (event) => {
-    const button = event.currentTarget as HTMLButtonElement;
-    const open = button.getAttribute('aria-expanded') !== 'true';
-    button.setAttribute('aria-expanded', String(open));
-    fragment.dataset.open = String(open);
-    const glyph = button.lastElementChild;
-    if (glyph) glyph.textContent = open ? '−' : '＋';
-  });
-
   interface SearchData {
     meta: Record<string, string>;
   }

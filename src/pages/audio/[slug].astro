@@ -1,4 +1,5 @@
 ---
+import '../../styles/pages/reading.css';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { loadContent, address, dateLabel, type Audio } from '../../lib/content';
@@ -37,6 +38,7 @@ const related = posts.filter((post) =>
   description={entry.data.description}
   entryKey={`audio:${entry.data.slug}`}
   noindex={entry.data.draft}
+  imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
   <article
     class="audio-detail"
@@ -141,7 +143,7 @@ const related = posts.filter((post) =>
       </div>
     </header>
     {entry.data.src && entry.data.chapters.length > 0 && (
-      <section class="audio-body-layout audio-chapters">
+      <section class="grid grid-cols-1 md:grid-cols-[184px_minmax(0,1fr)] audio-body-layout audio-chapters">
         <h2 class="audio-section-label">声音章节</h2>
         <div>
           {entry.data.chapters.map((chapter) => (
@@ -154,7 +156,7 @@ const related = posts.filter((post) =>
       </section>
     )}
     {entry.body?.trim() && (
-      <section class="audio-body-layout">
+      <section class="grid grid-cols-1 md:grid-cols-[184px_minmax(0,1fr)] audio-body-layout">
         <h2 class="audio-section-label">{show ? '这一期' : '录音手记'}</h2>
         <div class="audio-prose markdown-body">
           <Content />
@@ -163,7 +165,7 @@ const related = posts.filter((post) =>
     )}
 
     {related.length > 0 && (
-      <section class="audio-body-layout audio-related">
+      <section class="grid grid-cols-1 md:grid-cols-[184px_minmax(0,1fr)] audio-body-layout audio-related">
         <h2 class="audio-section-label">相关文字</h2>
         <div>
           {related.map((post) => (
@@ -173,7 +175,7 @@ const related = posts.filter((post) =>
       </section>
     )}
     {(older || newer) && (
-      <nav class="audio-neighbors" aria-label="继续收听">
+      <nav class="audio-neighbors grid grid-cols-2" aria-label="继续收听">
         {older ? (
           <a href={address(older)}>
             <span>

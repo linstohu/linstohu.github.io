@@ -1,0 +1,136 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .about-page {
+    width: min(var(--content-max), 100%);
+    margin: 30px auto 0;
+  }
+  .about-opening {
+    gap: 64px;
+    align-items: center;
+    padding: 18px 0 32px;
+  }
+  .about-opening h2 {
+    font-size: 37px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .about-opening p {
+    font-size: 16px;
+    line-height: 1.95;
+    margin: 12px 0 0;
+  }
+  .about-art {
+    margin: 0;
+  }
+  .about-art img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    object-position: 50% 35%;
+  }
+  .about-notes > section {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 32px;
+    border-top: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  .about-notes h2 {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.7;
+  }
+  .about-notes p {
+    max-width: 39em;
+    margin: 0 0 14px;
+    font-size: 16px;
+    line-height: 1.95;
+  }
+  .about-notes p:last-child {
+    margin-bottom: 0;
+  }
+  .about-markdown {
+    --markdown-font-size: 16px;
+    column-gap: 32px;
+  }
+  .about-markdown > h2 {
+    grid-column: 1;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.7;
+    margin: 0;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .about-markdown > p {
+    grid-column: 2;
+    margin: 0;
+    padding: 0 0 14px;
+    font-size: 16px;
+    line-height: 1.95;
+  }
+  .about-markdown > h2 + p {
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .about-markdown > p:has(+ h2) {
+    padding-bottom: 28px;
+  }
+  @media (max-width: 760px) {
+    .about-page {
+      margin-top: 21px;
+    }
+    .about-opening {
+      gap: 23px;
+      padding-top: 4px;
+      padding-bottom: 27px;
+    }
+    .about-opening h2 {
+      font-size: 29px;
+      font-weight: 500;
+      margin-bottom: 13px;
+    }
+    .about-opening p {
+      font-size: 16px;
+      line-height: 1.95;
+    }
+    .about-notes p {
+      font-size: 16px;
+      line-height: 1.95;
+    }
+    .about-art img {
+      aspect-ratio: 2.2;
+    }
+    .about-notes > section {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding-block: 23px;
+    }
+    .about-notes h2 {
+      font-size: 20px;
+    }
+    .about-notes .more {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--tap-size);
+    }
+    .about-markdown > h2 {
+      grid-column: 1;
+      padding-top: 23px;
+      margin-top: 9px;
+    }
+    .about-markdown > p {
+      grid-column: 1;
+      padding: 0 0 14px;
+    }
+    .about-markdown > h2 + p {
+      border-top: 0;
+      padding-top: 12px;
+    }
+  }
+}

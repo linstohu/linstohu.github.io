@@ -1,0 +1,308 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .site-foot .theme {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-height: 36px;
+    margin-top: 12px;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .site-foot {
+    margin-top: 52px;
+    padding: 30px 0 14px;
+    background: var(--panel);
+  }
+  .foot-grid {
+    gap: 24px;
+  }
+  .foot-brand {
+    font:
+      bold 29px Georgia,
+      serif;
+    letter-spacing: -1.5px;
+  }
+  .foot-grid p {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .foot-grid section a {
+    font-size: 13px;
+    display: block;
+    width: fit-content;
+    padding: 4px 0;
+  }
+  .foot-grid button {
+    font-size: 13px;
+    display: block;
+    width: fit-content;
+    padding: 4px 0;
+  }
+  .colophon {
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    padding-top: 13px;
+    margin-top: 23px;
+    font-size: 12px;
+  }
+  .foot-grid h2 {
+    font:
+      600 15px/1.5 'PingFang SC',
+      system-ui,
+      sans-serif;
+    margin-bottom: 8px;
+  }
+  .foot-area {
+    --footer-bg: #2e4439;
+    --quote-bg: #e9ece3;
+    --quote-ink: #596753;
+    --quote-source: #67745f;
+    --quote-rule: #98a38f;
+    margin-top: 72px;
+  }
+  :root[data-theme='dark'] .foot-area {
+    --footer-bg: #293b31;
+    --quote-bg: #3a4638;
+    --quote-ink: #c5cebc;
+    --quote-source: #b5c1ab;
+    --quote-rule: #87957d;
+  }
+  .quote-strip {
+    width: 100%;
+    background: var(--quote-bg);
+    color: var(--quote-ink);
+  }
+  .foot-quote {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: calc(100% - 64px);
+    margin: 0 auto;
+    padding: 4px 0;
+    text-align: center;
+  }
+  .foot-quote::before {
+    content: '';
+    flex: 1 1 24px;
+    min-width: 16px;
+    border-top: 1px dashed var(--quote-rule);
+    opacity: 0.38;
+  }
+  .foot-quote::after {
+    content: '';
+    flex: 1 1 24px;
+    min-width: 16px;
+    border-top: 1px dashed var(--quote-rule);
+    opacity: 0.38;
+  }
+  .quote-copy {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0 11px;
+    max-width: calc(100% - 60px);
+  }
+  .foot-quote p {
+    margin: 0;
+    font:
+      400 12px/1.7 'PingFang SC',
+      'Microsoft YaHei',
+      system-ui,
+      sans-serif;
+    letter-spacing: 0.025em;
+    text-wrap: pretty;
+  }
+  .foot-quote cite {
+    font-size: 10.5px;
+    line-height: 1.7;
+    font-style: normal;
+    color: var(--quote-source);
+  }
+  .foot-quote a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .foot-area .site-foot {
+    margin-top: 0;
+    background: var(--footer-bg);
+    color: #eeeede;
+  }
+  .foot-area .foot-grid p {
+    color: #bdc7b8;
+  }
+  .foot-area .foot-grid h2 {
+    color: #bdc7b8;
+  }
+  .foot-area .colophon {
+    color: #bdc7b8;
+    border-color: #536558;
+  }
+  .foot-area .theme {
+    border-color: #617465;
+  }
+  .foot-area a:hover {
+    color: #e8b89f;
+  }
+  .foot-area button:hover {
+    color: #e8b89f;
+  }
+  @media (min-width: 901px) {
+    .site-foot .theme {
+      border-color: #617465;
+    }
+    .site-foot {
+      margin-top: 72px;
+      padding: 43px 0 23px;
+      background: #2e4439;
+      color: #eeeede;
+    }
+    .foot-grid {
+      gap: 40px;
+    }
+    .foot-brand {
+      font-size: 40px;
+      font-weight: 500;
+      letter-spacing: -2px;
+    }
+    .foot-grid p {
+      margin-top: 14px;
+      color: #bdc7b8;
+      font-size: 13px;
+    }
+    .foot-grid h2 {
+      font-size: 13px;
+      font-weight: 500;
+      margin: 3px 0 17px;
+      color: #b9c5b6;
+    }
+    .foot-grid section a {
+      padding: 5px 0;
+      font-size: 13px;
+    }
+    .foot-grid button {
+      padding: 5px 0;
+      font-size: 13px;
+    }
+    .foot-grid a:hover {
+      color: #e8b89f;
+    }
+    .foot-grid button:hover {
+      color: #e8b89f;
+    }
+    .colophon {
+      border-color: #536558;
+      color: #b9c5b6;
+      margin-top: 36px;
+      padding-top: 18px;
+      font-size: 11px;
+    }
+  }
+  @media (max-width: 760px) {
+    .foot-area {
+      margin-top: 48px;
+    }
+    .foot-quote {
+      width: calc(100% - 32px);
+      gap: 9px;
+    }
+    .quote-copy {
+      max-width: calc(100% - 50px);
+    }
+    .foot-quote cite {
+      font-size: 11px;
+    }
+    .site-foot {
+      padding: 27px 0 calc(18px + env(safe-area-inset-bottom, 0px));
+    }
+    .foot-grid {
+      gap: 22px 24px;
+    }
+    .foot-grid > div:first-child {
+      grid-column: 1 / -1;
+    }
+    .foot-brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--tap-size);
+      font-size: 31px;
+      font-weight: 500;
+    }
+    .foot-grid p {
+      font-size: 12px;
+      line-height: 1.8;
+      margin: 6px 0 0;
+    }
+    .foot-grid h2 {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+    .foot-grid section a {
+      display: flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 44px;
+      min-height: var(--tap-size);
+      padding-block: 7px;
+      font-size: 13px;
+    }
+    .foot-grid section button {
+      display: flex;
+      align-items: center;
+      width: fit-content;
+      min-width: 44px;
+      min-height: var(--tap-size);
+      padding-block: 7px;
+      font-size: 13px;
+    }
+    .foot-grid > section:last-child {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 24px;
+      align-items: center;
+    }
+    .foot-grid > section:last-child h2 {
+      grid-column: 1 / -1;
+    }
+    .site-foot .theme {
+      min-height: var(--tap-size);
+      padding: 7px 12px;
+      margin-top: 0;
+      font-size: 12px;
+    }
+    .colophon {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 5px;
+      margin-top: 24px;
+      padding-top: 15px;
+      font-size: 11px;
+      line-height: 1.8;
+    }
+  }
+  @media (max-width: 640px) {
+    .site-foot {
+      margin-top: 30px;
+    }
+    .foot-grid a {
+      min-height: 32px;
+    }
+    .foot-grid button {
+      min-height: 32px;
+    }
+    .foot-quote {
+      padding-block: 4px;
+    }
+    .quote-copy {
+      gap: 0 8px;
+    }
+  }
+}

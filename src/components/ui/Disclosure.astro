@@ -1,0 +1,105 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  id: string;
+  as?: 'div' | 'blockquote';
+  panelAs?: 'div' | 'nav';
+  panelClass?: string;
+  panelLabel?: string;
+  triggerClass: string;
+  toggleLabel?: string;
+  dismissible?: boolean;
+}
+const {
+  id,
+  as: Root = 'div',
+  panelAs: Panel = 'div',
+  panelClass,
+  panelLabel,
+  triggerClass,
+  toggleLabel,
+  dismissible = false,
+  ...attributes
+} = Astro.props;
+---
+
+<Root
+  {...attributes}
+  data-disclosure
+  data-sw-collapsible
+  data-state="closed"
+  data-dismissible={dismissible || undefined}
+  data-toggle-label={toggleLabel}
+>
+  <slot name="leading" />
+  <button
+    type="button"
+    class={triggerClass}
+    data-sw-collapsible-trigger
+    aria-expanded="false"
+    aria-controls={id}
+    aria-label={toggleLabel && `展开${toggleLabel}`}
+  >
+    <slot name="trigger" />
+  </button>
+  <Panel
+    id={id}
+    class={panelClass}
+    aria-label={panelLabel}
+    data-sw-collapsible-panel
+  >
+    <slot />
+  </Panel>
+</Root>
+
+<script>
+  import { createCollapsible } from '@starwind-ui/runtime/collapsible';
+
+  // The same breakpoint drives the CSS variants and responsive disclosure state.
+  const desktop = matchMedia(
+    `(min-width: ${getComputedStyle(document.documentElement).getPropertyValue('--breakpoint-md').trim()})`,
+  );
+  document
+    .querySelectorAll<HTMLElement>('[data-disclosure]')
+    .forEach((root) => {
+      const trigger = root.querySelector<HTMLButtonElement>(
+        '[data-sw-collapsible-trigger]',
+      )!;
+      const panel = root.querySelector<HTMLElement>(
+        '[data-sw-collapsible-panel]',
+      )!;
+      const syncLabel = (open: boolean) => {
+        if (root.dataset.toggleLabel)
+          trigger.setAttribute(
+            'aria-label',
+            `${open ? '收起' : '展开'}${root.dataset.toggleLabel}`,
+          );
+      };
+      const disclosure = createCollapsible(root, {
+        defaultOpen: desktop.matches,
+        onOpenChange: syncLabel,
+      });
+      // Preserve the native navigation landmark instead of the generic region role.
+      if (panel.tagName === 'NAV') {
+        panel.removeAttribute('role');
+        panel.removeAttribute('aria-labelledby');
+      }
+      syncLabel(disclosure.getOpen());
+      desktop.addEventListener('change', () =>
+        disclosure.setOpen(desktop.matches),
+      );
+      if (!root.hasAttribute('data-dismissible')) return;
+      document.addEventListener('click', (event) => {
+        if (!desktop.matches && !root.contains(event.target as Node))
+          disclosure.close();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || desktop.matches || !disclosure.getOpen())
+          return;
+        const restoreFocus = panel.contains(document.activeElement);
+        disclosure.close();
+        if (restoreFocus) trigger.focus();
+      });
+    });
+</script>

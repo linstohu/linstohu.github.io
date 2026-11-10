@@ -1,0 +1,121 @@
+.filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.filters button,
+.pill {
+  min-height: 38px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  border-radius: 3px;
+  padding: 5px 14px;
+  font-size: 14px;
+}
+.filters button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 17px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.row small {
+  display: block;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.row strong {
+  font: 600 20px/1.5 var(--serif);
+}
+.row:hover {
+  background: var(--panel);
+}
+.arrow {
+  color: var(--muted);
+}
+.archive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px;
+  margin-top: 22px;
+  background: var(--panel);
+}
+.archive a {
+  display: inline-block;
+}
+.archive a[aria-current='page'] {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.archive-heading {
+  justify-content: space-between;
+}
+.search-notice {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 10px 0;
+}
+@media (min-width: 901px) {
+  .filters button {
+    padding: 8px 17px;
+  }
+  .row {
+    padding: 24px 12px;
+    gap: 22px;
+  }
+  .row strong {
+    font-weight: 500;
+    font-size: 24px;
+  }
+  .row small {
+    margin-bottom: 6px;
+  }
+  .archive {
+    padding: 14px;
+  }
+}
+@media (max-width: 760px) {
+  .archive-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .archive-heading h1 {
+    font-size: 25px;
+  }
+  .archive-heading .more {
+    font-size: 12px;
+    min-height: var(--tap-size);
+    display: inline-flex;
+    align-items: center;
+  }
+}
+@media (max-width: 640px) {
+  .filters button {
+    min-height: var(--tap-size);
+  }
+  .archive a {
+    min-height: var(--tap-size);
+    padding-top: 8px;
+  }
+}
+@media (max-width: 600px) {
+  .row {
+    grid-template-columns: 43px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-inline: 0;
+  }
+  .row strong {
+    font-size: 19px;
+  }
+}

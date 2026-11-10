@@ -1,5 +1,7 @@
 ---
+import '../styles/components/header.css';
 import { site } from '../lib/site';
+import Disclosure from './ui/Disclosure.astro';
 interface Props {
   section: string;
 }
@@ -15,8 +17,17 @@ const pages = [
 ---
 
 <header data-site-header data-home-art={section === 'home' || undefined}>
-  <div class="wrap">
+  <Disclosure
+    class="wrap"
+    id="primary-navigation"
+    panelAs="nav"
+    panelLabel="主导航"
+    triggerClass="mobile-menu"
+    toggleLabel="网站导航"
+    dismissible
+  >
     <Brand
+      slot="leading"
       class="brand"
       href={section === 'home' ? undefined : '/'}
       tabindex={section === 'home' ? -1 : undefined}
@@ -25,21 +36,14 @@ const pages = [
       <span class="greeting">{site.greeting}</span>{' '}
       <span class="name">{site.name}</span>
     </Brand>
-    <nav id="primary-navigation" aria-label="主导航">
-      {pages.map(([key, url, label]) => (
-        <a href={url} aria-current={section === key ? 'page' : undefined}>
-          {label}
-        </a>
-      ))}
-    </nav>
-    <button
-      class="mobile-menu"
-      aria-label="展开网站导航"
-      aria-expanded="false"
-      aria-controls="primary-navigation"
-    >
+    <Fragment slot="trigger">
       <span>导航</span>
       <span class="menu-glyph" aria-hidden="true"></span>
-    </button>
-  </div>
+    </Fragment>
+    {pages.map(([key, url, label]) => (
+      <a href={url} aria-current={section === key ? 'page' : undefined}>
+        {label}
+      </a>
+    ))}
+  </Disclosure>
 </header>
