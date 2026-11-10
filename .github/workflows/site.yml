@@ -24,7 +24,7 @@ jobs:
           install: false
           cache: true
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium webkit
       - run: pnpm run validate
       - uses: actions/upload-artifact@v4
         with:

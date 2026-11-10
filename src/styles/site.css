@@ -989,7 +989,7 @@ main[data-section='now'] .reader h2 {
   font-size: 18px;
   line-height: 1.95;
   margin: 0 0 17px;
-  text-wrap: pretty;
+  text-wrap: wrap;
 }
 .article-paper .article-body h2 {
   font:

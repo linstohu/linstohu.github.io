@@ -1,7 +1,14 @@
 import test from 'node:test';
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
-import { readFile, rm, copyFile, stat, writeFile } from 'node:fs/promises';
+import {
+  readFile,
+  rm,
+  copyFile,
+  stat,
+  writeFile,
+  readdir,
+} from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -98,6 +105,20 @@ test(
         path.join(fixtures[2], 'photo.webp'),
       );
       build();
+      const assets = path.join(output, '_astro');
+      const styles = (
+        await Promise.all(
+          (await readdir(assets))
+            .filter((file) => file.endsWith('.css'))
+            .map((file) => readFile(path.join(assets, file), 'utf8')),
+        )
+      ).join('\n');
+      assert.doesNotMatch(
+        styles,
+        /@media[^{}]*[<>]/,
+        'Production breakpoints must not require media-query range syntax',
+      );
+      assert.match(styles, /@media\s*\(\s*max-width\s*:/);
       const home = await readFile(path.join(output, 'index.html'), 'utf8');
       const artwork = home.match(
         /<picture\b[^>]*class="home-artwork[^"]*"[\s\S]*?<\/picture>/,

@@ -13,6 +13,12 @@ let server;
 process.once('SIGTERM', () => server?.kill('SIGTERM'));
 process.once('SIGINT', () => server?.kill('SIGINT'));
 try {
+  const articleBody = [
+    '正文中的共同检索词。',
+    '我们都知道算数学题、各门各科的考试费脑子，可是我们却把不快乐、精神郁闷归因于「心理」，我觉得命名不妥。',
+    '无论是技术还是艺术，无论是理性还是感性，无论是技战术能力的发挥还是情绪的宣泄，都事关头脑的使用。',
+    '于是，人生的最为核心的命题，就有且只有一个了：如何动脑。',
+  ].join('\n\n');
   for (const [index, slug] of ['first', 'second'].entries()) {
     const publishedAt = `2000-01-0${index + 1}T00:00:00+08:00`;
     await createDocument(
@@ -28,7 +34,7 @@ try {
         publishedAt,
         draft: false,
       },
-      '正文中的共同检索词。',
+      articleBody,
     );
     await createDocument(
       path.join(project.directory, `content/audio/${slug}/index.md`),

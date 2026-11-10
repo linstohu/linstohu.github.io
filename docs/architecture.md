@@ -26,9 +26,9 @@
 
 ## 构建与交付
 
-仓库为单个 pnpm 包。Node 主版本由 `.nvmrc` 指定，pnpm 版本与任务入口见 `package.json`，CI 按锁文件安装。`pnpm-workspace.yaml` 管理安装策略，包括为 `@astrojs/astro2tsx@0.1.3` 固定兼容的运行时依赖；升级该工具时应复核这项约束。
+仓库为单个 pnpm 包。生产 CSS 的兼容目标由 `astro.config.mjs` 的 `vite.build.cssTarget` 指定，保留较旧安卓内核能识别的 min/max 媒体查询语法；构建集成测试检查压缩后的实际 CSS，浏览器测试检查首页及列表页的手机布局。Node 主版本由 `.nvmrc` 指定，pnpm 版本与任务入口见 `package.json`，CI 按锁文件安装。`pnpm-workspace.yaml` 管理安装策略，包括为 `@astrojs/astro2tsx@0.1.3` 固定兼容的运行时依赖；升级该工具时应复核这项约束。
 
-`.github/workflows/site.yml` 依次检查格式、运行测试、执行 Astro 类型检查和生产构建。集成测试在临时目录中构建独立内容，覆盖草稿可见性、重复地址、文章图片与摘录、节目从草稿到公开后的展示。Playwright 使用独立的临时内容构建测试站，在桌面和手机尺寸下检查真实的搜索索引、输入保留、筛选布局与键盘焦点；测试产物与待部署的 `dist/` 分开。生产构建随后检查实际站点的站内链接、图片资源、锚点和订阅文件。
+`.github/workflows/site.yml` 依次检查格式、运行测试、执行 Astro 类型检查和生产构建。集成测试在临时目录中构建独立内容，覆盖草稿可见性、重复地址、文章图片与摘录、节目从草稿到公开后的展示。Playwright 使用独立的临时内容构建测试站，使用 Chromium 与 iPhone 尺寸的 WebKit，检查真实的搜索索引、输入保留、筛选布局、键盘焦点与正文换行；测试产物与待部署的 `dist/` 分开。生产构建随后检查实际站点的站内链接、图片资源、锚点和订阅文件。
 
 GitHub Actions 保存已校验的 `dist/`。部署凭据齐全时，分支构建通过 Wrangler 将同一份产物直接上传至 Pages。`main` 对应生产，其他分支对应预览，拉取请求仅运行校验。R2 媒体上传使用作者本地凭据，Pages 部署使用仓库的 Actions 凭据。
 

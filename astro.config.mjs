@@ -15,4 +15,10 @@ export default defineConfig({
   prerenderConflictBehavior: 'error',
   markdown: { processor: unified({ rehypePlugins: [rehypeFigures] }) },
   devToolbar: { enabled: false },
+  vite: {
+    build: {
+      // Preserve min/max media queries for older Android browser engines.
+      cssTarget: ['chrome87', 'safari14'],
+    },
+  },
 });

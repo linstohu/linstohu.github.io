@@ -21,7 +21,7 @@ Astro 静态个人网站，包含文字、声音、此刻及归档、关于页�
 
 Node.js 版本以 `.nvmrc` 为准，pnpm 版本以 `package.json` 的 `packageManager` 为准。依赖及安装策略由 `pnpm-lock.yaml` 和 `pnpm-workspace.yaml` 维护。
 
-首次安装使用 `pnpm install --frozen-lockfile`，随后运行 `pnpm exec playwright install chromium` 安装测试浏览器。
+首次安装使用 `pnpm install --frozen-lockfile`，随后运行 `pnpm exec playwright install chromium webkit` 安装测试浏览器。
 
 | 命令                                 | 用途                                            |
 | ------------------------------------ | ----------------------------------------------- |
