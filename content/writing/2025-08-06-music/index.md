@@ -8,4 +8,4 @@ updatedAt: "2025-10-07T23:51:00+08:00"
 draft: false
 ---
 
-网易云音乐：<a href="https://music.163.com/#/user/home?id=1995560350" target="_blank">我的个人主页</a>（需提前登录）
+网易云音乐：[我的个人主页](https://music.163.com/#/user/home?id=1995560350)（需提前登录）
