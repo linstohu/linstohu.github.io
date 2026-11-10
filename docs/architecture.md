@@ -20,7 +20,7 @@
 
 ## 页面与浏览器
 
-`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 输出共享布局和页面内容。Markdown 按受信任的作者文件渲染。文章目录中的相对图片经 Astro 优化，`src/lib/rehype-figures.mjs` 在 HTML 处理阶段添加图注与放大入口。`public/` 中的资源按原样发布。
+`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 输出共享布局和页面内容。Markdown 按受信任的作者文件渲染。文章目录中的相对图片经 Astro 优化，`src/lib/rehype-figures.mjs` 在 HTML 处理阶段添加图注与放大入口。`public/` 中的资源按原样发布；首页绘画由 `HomeArtwork.astro` 额外生成多尺寸 AVIF 与 WebP，随 HTML 内联小幅预览。优化图片使用 Astro 生成的内容指纹地址，匹配 `/_astro/*` 的一年不可变缓存策略。
 
 正文、列表和导航随 HTML 提供。浏览器脚本按页面增强分类筛选、全文搜索、播放和图片查看。列表筛选只更新结果区域，保留精选内容与筛选控件的位置。开发预览搜索标题与摘要，生产搜索使用 Pagefind 正文索引。
 

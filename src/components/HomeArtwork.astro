@@ -1,0 +1,68 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { resolve } from 'node:path';
+import sharp from 'sharp';
+
+interface Props {
+  src: string;
+}
+const { src } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/public/**/*.{avif,jpeg,jpg,png,webp}',
+);
+const source = await images[`/public${src}`]?.();
+const image = source?.default;
+const widths = image
+  ? [...new Set([480, 640, image.width])]
+      .filter((width) => width <= image.width)
+      .sort((a, b) => a - b)
+  : [];
+const [avif, webp, preview] = image
+  ? await Promise.all([
+      getImage({ src: image, widths, format: 'avif', quality: 65 }),
+      getImage({ src: image, widths, format: 'webp', quality: 85 }),
+      sharp(resolve('public', src.slice(1)))
+        .resize({ width: 64, withoutEnlargement: true })
+        .blur(1.2)
+        .webp({ quality: 60 })
+        .toBuffer(),
+    ])
+  : [];
+// The phone layout crops the painting to a taller frame than its native ratio.
+const sizes = '(max-width: 760px) calc(100vw + 160px), 100vw';
+---
+
+<picture
+  class="home-artwork"
+  style={
+    preview &&
+    `background-image: url("data:image/webp;base64,${preview.toString('base64')}")`
+  }
+>
+  {avif && (
+    <source type="image/avif" srcset={avif.srcSet.attribute} sizes={sizes} />
+  )}
+  <img
+    class="mountains"
+    data-home-art
+    draggable="false"
+    src={webp?.src ?? src}
+    srcset={webp?.srcSet.attribute}
+    sizes={webp && sizes}
+    width={image?.width ?? 900}
+    height={image?.height ?? 480}
+    alt=""
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+  />
+</picture>
+
+<style>
+  .home-artwork {
+    display: block;
+    background-size: cover;
+    background-position: 38% 0;
+  }
+</style>

@@ -41,6 +41,8 @@ pnpm run preview
 
 文字与声音页的副标题分别填写在 `content/settings/site.json` 的 `writingSubtitle` 和 `audioSubtitle`，留空即可隐藏。关于页可直接在 `content/pages/about.md` 的信息区下方写 Markdown 正文。
 
+首页绘画由 `homeImage` 指定，当前原图为 `public/images/ridgelines.webp`。替换原图后正常构建即可：本地 PNG、JPEG、WebP、AVIF 会自动生成多尺寸 AVIF/WebP 和内联预览，资源地址随内容更新，无需手工维护不同尺寸或修改缓存版本。外部图片地址按原样使用。
+
 固定地址与标题分离，改标题不会改链接。时间必须填写**带引号、带时区**的 ISO 字符串，例如 `2026-11-09T18:30:00+08:00`。分类按内容自动生成，前台不需要修改代码。正文使用标准 Markdown。文章可在信息区添加 `videos` 与 `appendix`，字段定义见 `src/lib/schemas.ts`。
 
 ## 写一篇文章

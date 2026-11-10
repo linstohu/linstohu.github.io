@@ -1,4 +1,5 @@
 import test from 'node:test';
+import sharp from 'sharp';
 import assert from 'node:assert/strict';
 import {
   mkdtemp,
@@ -18,7 +19,7 @@ import { writingDirectory } from '../src/lib/publication.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 test(
-  'production builds render article excerpts and the audio categories with published entries',
+  'production builds render public content, responsive artwork and audio categories',
   { timeout: 90000 },
   async () => {
     const id = 'qa-' + randomUUID().slice(0, 8);
@@ -140,6 +141,51 @@ test(
         path.join(fixtures[2], 'photo.webp'),
       );
       build();
+      const home = await readFile(path.join(output, 'index.html'), 'utf8');
+      const artwork = home.match(
+        /<picture\b[^>]*class="home-artwork[^"]*"[\s\S]*?<\/picture>/,
+      )?.[0];
+      assert.ok(
+        artwork,
+        'The homepage must include its artwork in the initial HTML',
+      );
+      const preview = artwork.match(
+        /data:image\/webp;base64,([A-Za-z0-9+/=]+)/,
+      )?.[1];
+      assert.ok(
+        preview,
+        'The artwork preview must be available without another request',
+      );
+      assert.ok(Buffer.from(preview, 'base64').byteLength < 1024);
+      assert.match(artwork, /<source[^>]*type="image\/avif"/);
+      assert.match(artwork, /<img[^>]*alt(?:="")?\s/);
+      assert.match(artwork, /loading="eager"/);
+      assert.match(artwork, /fetchpriority="high"/);
+      assert.doesNotMatch(artwork, /src="\/images\/ridgelines\.webp"/);
+      const originalBytes = (
+        await stat(path.join(project, 'public/images/ridgelines.webp'))
+      ).size;
+      const variants = [
+        ...new Set(artwork.match(/\/_astro\/[^"\s,]+\.(?:avif|webp)/g)),
+      ];
+      for (const format of ['avif', 'webp']) {
+        const dimensions = [];
+        for (const url of variants.filter((url) =>
+          url.endsWith(`.${format}`),
+        )) {
+          const file = path.join(output, url);
+          const metadata = await sharp(file).metadata();
+          dimensions.push(metadata.width);
+          assert.ok((await stat(file)).size < originalBytes);
+          assert.ok(
+            Math.abs(metadata.width! / metadata.height! - 900 / 480) < 0.01,
+          );
+        }
+        assert.deepEqual(
+          dimensions.sort((a, b) => a! - b!),
+          [480, 640, 900],
+        );
+      }
       await assert.rejects(
         stat(path.join(output, 'writing', `${id}-draft/index.html`)),
       );

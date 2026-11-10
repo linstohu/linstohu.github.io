@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import HomeArtwork from '../components/HomeArtwork.astro';
 import { site } from '../lib/site';
 import { loadContent, address, dateLabel, audioLabel } from '../lib/content';
 const { posts, sounds, snapshots, series } = await loadContent();
@@ -15,16 +16,7 @@ const tiles = [
 ---
 
 <Base title={site.title} section="home">
-  <img
-    class="mountains"
-    data-home-art
-    draggable="false"
-    src={site.homeImage}
-    width="900"
-    height="480"
-    alt=""
-    fetchpriority="high"
-  />
+  <HomeArtwork src={site.homeImage} />
   <section class="composition" aria-label="浏览栏目">
     {tiles.map(([path, title, en]) => (
       <a class={`tile tile-${path}`} href={`/${path}/`}>
