@@ -9,7 +9,8 @@
   margin: 0 0 1.2em;
   font-size: inherit;
   line-height: inherit;
-  text-wrap: pretty;
+  /* Natural wrapping keeps Chinese lines full in Safari. */
+  text-wrap: wrap;
 }
 /* Section headings carry the reading hierarchy; page titles stay in layouts. */
 .markdown-body :where(h1, h2, h3, h4, h5, h6) {
