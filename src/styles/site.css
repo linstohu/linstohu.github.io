@@ -984,10 +984,10 @@ main[data-section='now'] .reader h2 {
 }
 .article-body {
   margin-block-start: 1.375rem;
-}
-.article-paper .article-body p {
   font-size: 18px;
   line-height: 1.95;
+}
+.article-paper .article-body p {
   margin: 0 0 17px;
   text-wrap: wrap;
 }
@@ -1050,9 +1050,8 @@ main[data-section='now'] .reader h2 {
   .reader.article-paper {
     margin-top: 22px;
   }
-  .article-paper .article-body p {
+  .article-body {
     font-size: 17px;
-    line-height: 1.95;
   }
   .byline {
     column-gap: 12px;
@@ -2501,9 +2500,10 @@ main[data-section='now'] .reader h2 {
     column-gap: 13px;
     margin-top: 12px;
   }
-  .article-paper .article-body p {
+  .article-body {
     font-size: 17px;
-    line-height: 1.95;
+  }
+  .article-paper .article-body p {
     margin-bottom: 16px;
   }
   .article-paper .article-body h2 {
@@ -3172,10 +3172,6 @@ main[data-section='now'] .reader h2 {
 }
 .audio-prose > :first-child {
   margin-top: 0;
-}
-.audio-prose a {
-  text-decoration: underline;
-  text-underline-offset: 4px;
 }
 .audio-chapters .chapter {
   grid-template-columns: 58px minmax(0, 1fr);

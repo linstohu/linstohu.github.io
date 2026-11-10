@@ -46,7 +46,7 @@ const { Content } = await render(entry);
           {entry.data.draft && <span>草稿预览</span>}
         </div>
       </header>
-      <div class="article-body">
+      <div class="article-body markdown-body">
         <Content />
       </div>
       {entry.data.videos.map((video) => (

@@ -216,8 +216,9 @@ test(
         /data-pagefind-filter="type\[content\]" content="writing"/,
       );
       const body = article
-        .split('<div class="article-body">')[1]
-        .split('</article>')[0];
+        .split(/<div class="article-body(?:\s[^"]*)?">/)[1]
+        ?.split('</article>')[0];
+      assert.ok(body, 'The rendered article must contain its reading body');
       assert.equal(body.split('原文首段。').length - 1, 1);
       assert.match(article, /class="image-open"/);
       assert.match(article, /src="\/_astro\/[^"]+"/);

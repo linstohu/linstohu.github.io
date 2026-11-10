@@ -1,5 +1,6 @@
 import { execFileSync, spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { appendFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
   createTestProject,
@@ -18,6 +19,19 @@ try {
     '我们都知道算数学题、各门各科的考试费脑子，可是我们却把不快乐、精神郁闷归因于「心理」，我觉得命名不妥。',
     '无论是技术还是艺术，无论是理性还是感性，无论是技战术能力的发挥还是情绪的宣泄，都事关头脑的使用。',
     '于是，人生的最为核心的命题，就有且只有一个了：如何动脑。',
+    '网易云音乐：[我的个人主页](https://music.163.com/#/user/home?id=1995560350)（需提前登录）。也可以阅读[另一篇文字](/writing/second/)。',
+    '这段文字含有 `inline_code` 和一条很长的[参考链接](https://example.org/reading/reference)。',
+    '[https://example.org/' +
+      'long-reference-'.repeat(16) +
+      '](https://example.org/reading/reference)',
+    '> 引用里的长句应当自然换行，保持完整的阅读宽度，不把正文挤成狭窄的一列。',
+    '1. 第一条\n2. 第二条',
+    '| 项目 | 说明 |\n| --- | --- |\n| 链接 | https://example.org/' +
+      'long-cell-'.repeat(12) +
+      ' |',
+    '```text\n' + 'long_code_line_'.repeat(20) + '\n```',
+    '<details>\n<summary>展开补充说明</summary>\n\n补充说明中也可以使用[正文链接](https://example.org/detail)。\n\n</details>',
+    '正文中的注释[^reading-note]。\n\n[^reading-note]: 注释内的[来源](https://example.org/source)。',
   ].join('\n\n');
   for (const [index, slug] of ['first', 'second'].entries()) {
     const publishedAt = `2000-01-0${index + 1}T00:00:00+08:00`;
@@ -49,7 +63,7 @@ try {
         draft: false,
         listen: [{ platform: '外部平台', url: 'https://example.org/episode' }],
       },
-      '声音正文中的共同检索词。',
+      '声音正文中的共同检索词。\n\n[声音中的链接](https://example.org/audio)',
     );
   }
   await createDocument(
@@ -62,6 +76,10 @@ try {
       notes: [{ title: '正在做', text: '近况中的共同检索词。' }],
     },
     '',
+  );
+  await appendFile(
+    path.join(project.directory, 'content/pages/about.md'),
+    '\n\n## 延伸链接\n\n[关于页中的链接](https://example.org/about)\n',
   );
   project.build();
   execFileSync(
