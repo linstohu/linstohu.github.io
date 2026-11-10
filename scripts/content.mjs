@@ -10,6 +10,7 @@ import {
   timestamp,
   publishDocument,
   createDocument,
+  createWriting,
   reportError,
 } from './lib.mjs';
 const { values, positionals } = parseArgs({
@@ -33,7 +34,7 @@ if (values.help || !command) {
 新建外部栏目单集：pnpm run new audio episode-one --title "第一期" --series thirty-plus --platform "小宇宙" --listen-url "单集网页地址"
 新建此刻：pnpm run new now --period 2026-11 --title "十一月，慢一点"
 新建节目：pnpm run new series my-show --title "节目名称"
-发布内容：pnpm run publish:content writing/my-essay/index.md
+发布内容：pnpm run publish:content writing/2026-11-10-my-essay/index.md
          pnpm run publish:content now/2026-11.md
 默认保留草稿；首次发布设为当前时间，再次发布保留首次日期，可用 --date 显式指定。
 上传声音：pnpm run audio --help`);
@@ -43,9 +44,8 @@ if (values.help || !command) {
       const title = required(values.title, '--title "标题"');
       if (kind === 'writing') {
         const id = slug(name);
-        const file = path.join(root, 'content/writing', id, 'index.md');
-        await createDocument(
-          file,
+        const file = await createWriting(
+          path.join(root, 'content/writing'),
           {
             slug: id,
             title,
@@ -136,16 +136,16 @@ if (values.help || !command) {
         )
       )
         throw new Error(
-          '路径示例：writing/my-essay/index.md 或 now/2026-11.md',
+          '路径示例：writing/2026-11-10-my-essay/index.md 或 now/2026-11.md',
         );
       const file = path.join(root, 'content', relative);
-      const date = await publishDocument(
+      const result = await publishDocument(
         file,
         relative.split('/')[0],
         values.date,
       );
       console.log(
-        `已设为发布：content/${relative}\n发布时间：${date}\n提交推送前请运行 pnpm run validate。`,
+        `已设为发布：${path.relative(root, result.file)}\n发布时间：${result.publishedAt}\n提交推送前请运行 pnpm run validate。`,
       );
     } else throw new Error('不支持的操作。请使用 --help 查看用法。');
   } catch (error) {

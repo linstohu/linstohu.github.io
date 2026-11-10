@@ -10,7 +10,11 @@ import {
 
 export const collections = {
   writing: defineCollection({
-    loader: glob({ base: './content/writing', pattern: '**/index.md' }),
+    loader: glob({
+      base: './content/writing',
+      pattern: '**/index.md',
+      generateId: ({ entry }) => entry.replace(/\/index\.md$/, ''),
+    }),
     schema: writingSchema,
   }),
   audio: defineCollection({

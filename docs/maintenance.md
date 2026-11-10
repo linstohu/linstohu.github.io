@@ -29,15 +29,15 @@ pnpm run preview
 
 ## 内容位置
 
-| 内容     | 路径                                | 正式地址               |
-| -------- | ----------------------------------- | ---------------------- |
-| 文字     | `content/writing/固定标识/index.md` | `/writing/固定标识/`   |
-| 声音     | `content/audio/固定标识/index.md`   | `/audio/固定标识/`     |
-| 节目     | `content/series/节目标识.json`      | 声音页分类             |
-| 此刻     | `content/now/YYYY-MM.md`            | `/now/YYYY/MM/`        |
-| 关于     | `content/pages/about.md`            | `/about/`              |
-| 站点资料 | `content/settings/site.json`        | 全站                   |
-| 经典摘句 | `content/quotes/collection.json`    | 页脚上方，每次刷新随机 |
+| 内容     | 路径                                           | 正式地址               |
+| -------- | ---------------------------------------------- | ---------------------- |
+| 文字     | `content/writing/YYYY-MM-DD-固定标识/index.md` | `/writing/固定标识/`   |
+| 声音     | `content/audio/固定标识/index.md`              | `/audio/固定标识/`     |
+| 节目     | `content/series/节目标识.json`                 | 声音页分类             |
+| 此刻     | `content/now/YYYY-MM.md`                       | `/now/YYYY/MM/`        |
+| 关于     | `content/pages/about.md`                       | `/about/`              |
+| 站点资料 | `content/settings/site.json`                   | 全站                   |
+| 经典摘句 | `content/quotes/collection.json`               | 页脚上方，每次刷新随机 |
 
 文字与声音页的副标题分别填写在 `content/settings/site.json` 的 `writingSubtitle` 和 `audioSubtitle`，留空即可隐藏。关于页可直接在 `content/pages/about.md` 的信息区下方写 Markdown 正文。
 
@@ -48,6 +48,8 @@ pnpm run preview
 ```sh
 pnpm run new writing my-essay --title "文章标题" --category "随笔"
 ```
+
+目录按 `YYYY-MM-DD-slug` 命名，日期以 `publishedAt` 换算的北京时间为准。新草稿使用创建当天的日期。首次发布确定日期后，工具会连同配图一起调整目录，并输出新路径。
 
 用 VS Code 打开生成的 Markdown 文件，编辑标题、摘要和正文。`slug` 是固定地址，`description` 是首页及列表显示的一句话。文章详情直接从 Markdown 正文开始。要为文字页最新文章的「文中一段」指定摘录，在信息区填写 `featuredExcerpt`；留空时由站点自动选取。
 
@@ -60,12 +62,12 @@ Markdown 图片可以带说明：
 配图也可以和文章放在同一目录，用 `![说明](./photo.jpg "图片说明")` 引用；Astro 会生成带尺寸的优化图片，仍可点击放大。`public/images/` 适合保持原文件的公共图片。大媒体建议用下述 R2 上传工具。`pnpm run dev` 可预览草稿。准备好后：
 
 ```sh
-pnpm run publish:content writing/my-essay/index.md
+pnpm run publish:content writing/2026-11-10-my-essay/index.md
 pnpm run check
 pnpm run build
 ```
 
-`publish:content` 只更改本地内容，不会提交、推送。草稿首次发布时设为当前北京时间；已经发布的文章保留首次发布日期，更新 `updatedAt`。发布前按与构建相同的规则校验元数据，校验失败保持原文件不变，成功时原子替换文件并保留正文原始空白。可以用 `--date "2026-11-10T09:00:00+08:00"` 指定时间。未来内容只会在该时间之后的下一次构建上线，并非自动定时发布。
+`publish:content` 只更改本地内容，不会提交、推送。草稿首次发布时设为当前北京时间；已经发布的文章保留首次发布日期，更新 `updatedAt`。显式用 `--date` 修正发布日期时，文章目录也会同步调整。相对配图随整目录移动，文章 URL 和 `relatedWriting` 使用独立的 `slug`。发布前按与构建相同的规则校验元数据，校验失败保持原文件不变，成功时原子替换信息区并保留正文原始空白。同一篇文章的目录移动和元数据写回由工具协调，目标目录占用时拒绝覆盖。文章新建和发布通过集合内的 `.authoring.lock` 串行写入；异常退出后如提示锁仍存在，先确认相关命令已结束，再删除该锁文件重试。可以用 `--date "2026-11-10T09:00:00+08:00"` 指定时间。未来内容只会在该时间之后的下一次构建上线，并非自动定时发布。
 
 ## 发布声音
 

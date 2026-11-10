@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { createDocument } from '../scripts/lib.mjs';
+import { writingDirectory } from '../src/lib/publication.ts';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 test(
@@ -24,7 +25,18 @@ test(
     const project = await mkdtemp(path.join(root, '.test-build-'));
     const output = path.join(project, 'dist');
     const fixtures = ['draft', 'future', 'public'].map((type) =>
-      path.join(project, 'content/writing', `${id}-${type}`),
+      path.join(
+        project,
+        'content/writing',
+        writingDirectory(
+          `${id}-${type}`,
+          new Date(
+            type === 'future'
+              ? '2099-01-01T00:00:00+08:00'
+              : '2000-01-01T00:00:00+08:00',
+          ),
+        ),
+      ),
     );
     const recording = path.join(project, 'content/audio', id);
     function build() {

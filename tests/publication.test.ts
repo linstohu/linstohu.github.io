@@ -1,7 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { writingSchema, audioSchema, nowSchema } from '../src/lib/schemas.ts';
-import { isPublished, validateContentGraph } from '../src/lib/publication.ts';
+import {
+  isPublished,
+  validateContentGraph,
+  writingDirectory,
+} from '../src/lib/publication.ts';
 const post = {
   slug: 'an-essay',
   title: '文章',
@@ -85,7 +89,12 @@ test('snapshots need a real month and at least one note', () => {
 });
 test('duplicate permalinks and broken content references fail before deployment', () => {
   const graph = {
-    writing: [{ data: { slug: 'an-essay' } }],
+    writing: [
+      {
+        id: '2026-11-09-an-essay',
+        data: { slug: 'an-essay', publishedAt: new Date(post.publishedAt) },
+      },
+    ],
     audio: [],
     now: [],
     series: [],
@@ -173,5 +182,22 @@ test('platform episodes publish with listening links while recordings require pl
       chapters: [{ time: 0, title: '开场' }],
     }).success,
     false,
+  );
+});
+
+test('article directory validation follows the Shanghai date and metadata slug', () => {
+  const date = new Date('2026-11-09T18:00:00Z');
+  assert.equal(writingDirectory('test', date), '2026-11-10-test');
+  assert.throws(
+    () =>
+      validateContentGraph({
+        writing: [
+          { id: '2026-11-09-test', data: { slug: 'test', publishedAt: date } },
+        ],
+        audio: [],
+        now: [],
+        series: [],
+      }),
+    /目录.*2026-11-10-test/,
   );
 });
