@@ -119,13 +119,13 @@ test(
           path.join(fixtures[index], 'index.md'),
           data,
           kind === 'public'
-            ? '原文首段。\n\n自动摘录的第二段。\n\n![山景](./photo.png "测试图注")'
+            ? '原文首段。\n\n自动摘录的第二段。\n\n![山景](./photo.webp "测试图注")'
             : `正文 ${id}-${kind}`,
         );
       }
       await copyFile(
-        path.join(root, 'public/images/ridgelines.png'),
-        path.join(fixtures[2], 'photo.png'),
+        path.join(root, 'public/images/ridgelines.webp'),
+        path.join(fixtures[2], 'photo.webp'),
       );
       build();
       await assert.rejects(
