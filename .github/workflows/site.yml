@@ -24,8 +24,33 @@ jobs:
           install: false
           cache: true
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium webkit
-      - run: pnpm run validate
+      - name: Validate content and build the site
+        run: pnpm run validate:static
+      - name: Decide whether browser checks are needed
+        id: browsers
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        shell: bash
+        run: |
+          required=true
+          if [[ "$EVENT_NAME" != 'workflow_dispatch' && "$BASE_SHA" =~ ^[0-9a-f]{40}$ && ! "$BASE_SHA" =~ ^0+$ ]]; then
+            if git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$BASE_SHA"; then
+              # Content and documentation are covered by the static checks above.
+              # Unknown paths and unavailable history keep the full browser gate.
+              git diff --name-only -z "$BASE_SHA" HEAD -- . ':!content/**' ':!docs/**' ':!README.md' ':!CLAUDE.md' > "$RUNNER_TEMP/browser-changes"
+              if [[ ! -s "$RUNNER_TEMP/browser-changes" ]]; then
+                required=false
+              fi
+            fi
+          fi
+          echo "required=$required" >> "$GITHUB_OUTPUT"
+      - name: Install headless browsers for code changes
+        if: steps.browsers.outputs.required == 'true'
+        run: pnpm exec playwright install --with-deps --only-shell chromium webkit
+      - name: Check desktop, Android and iPhone browsers
+        if: steps.browsers.outputs.required == 'true'
+        run: pnpm run test:browser
       - uses: actions/upload-artifact@v4
         with:
           name: website

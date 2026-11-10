@@ -28,6 +28,7 @@ Node.js 版本以 `.nvmrc` 为准，pnpm 版本以 `package.json` 的 `packageMa
 | `pnpm run dev`                       | 编辑预览，包含草稿和未来内容；搜索标题与摘要    |
 | `pnpm run build`、`pnpm run preview` | 生成并预览生产站，包含 Pagefind 正文索引        |
 | `pnpm run validate`                  | 检查格式、Node 测试、类型、生产构建与浏览器交互 |
+| `pnpm run validate:static`           | 检查格式、Node 测试、类型与生产构建，无需浏览器 |
 | `pnpm run stop`                      | 关闭本站已登记的开发及构建预览服务              |
 
 完成改动后运行 `pnpm run validate`。界面改动还需核对桌面与移动布局、明暗主题、键盘操作及涉及的交互。开发服务与构建预览是独立进程，后台启动的服务使用 `pnpm run stop` 关闭。
@@ -47,6 +48,6 @@ Node.js 版本以 `.nvmrc` 为准，pnpm 版本以 `package.json` 的 `packageMa
 
 `pnpm run build` 生成静态页面和 Pagefind 索引，再检查站内链接、资源、锚点及订阅文件。完整搜索和公开内容检查使用生产构建预览。
 
-部署流程在 `.github/workflows/site.yml`：拉取请求运行校验；分支推送在配置齐全时上传同一份 `dist/`，`main` 对应 Cloudflare Pages 生产分支。
+部署流程在 `.github/workflows/site.yml`：每次运行静态校验；仅内容和文档变更跳过浏览器安装与测试，代码等其他变更、手动运行或缺少比较基准时执行完整浏览器检查。拉取请求运行校验；分支推送在配置齐全时上传同一份 `dist/`，`main` 对应 Cloudflare Pages 生产分支。
 
 R2 上传工具读取本地 `.env`，Pages 部署读取 GitHub Secrets。可提交的环境变量模板为 `.env.example`；站点公共配置和环境变量用途见[维护手册](docs/maintenance.md)。

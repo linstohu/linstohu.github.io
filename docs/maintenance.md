@@ -42,7 +42,7 @@ pnpm run preview
 
 文字与声音页的副标题分别填写在 `content/settings/site.json` 的 `writingSubtitle` 和 `audioSubtitle`，留空即可隐藏。关于页可直接在 `content/pages/about.md` 的信息区下方写 Markdown 正文。
 
-首页绘画由 `homeImage` 指定，当前原图为 `public/images/ridgelines.webp`。替换原图后正常构建即可：本地 PNG、JPEG、WebP、AVIF 会自动生成多尺寸 AVIF/WebP 和内联预览，资源地址随内容更新，无需手工维护不同尺寸或修改缓存版本。外部图片地址按原样使用。
+首页绘画由 `homeImage` 指定，关于页配图由 `content/pages/about.md` 的 `image` 指定，当前共用 `public/images/ridgelines.webp`。两页根据各自的显示宽度选择优化图片，并复用同一组缓存资源。替换原图后正常构建即可：本地 PNG、JPEG、WebP、AVIF 会自动生成多尺寸 AVIF/WebP 和内联预览，资源地址随内容更新，无需手工维护不同尺寸或修改缓存版本。外部图片地址按原样使用。
 
 固定地址与标题分离，改标题不会改链接。时间必须填写**带引号、带时区**的 ISO 字符串，例如 `2026-11-09T18:30:00+08:00`。分类按内容自动生成，前台不需要修改代码。正文使用标准 Markdown。文章可在信息区添加 `videos` 与 `appendix`，字段定义见 `src/lib/schemas.ts`。
 
@@ -148,7 +148,11 @@ R2 密钥仅用于作者本地上传，**不需要放入前端或部署工作流
 pnpm run validate
 ```
 
-依次执行代码格式检查、Node 内置测试、Astro 类型检查、完整构建和桌面/手机浏览器测试（包含 iPhone 尺寸的 WebKit）。浏览器测试单独运行 `pnpm run test:browser`，会自动构建隔离的测试站并在结束后删除，不改动作者内容或正式 `dist/`。`content/` 下的作者内容不设代码格式门槛，保留 Markdown 原始排版，内容结构由共享 schema 校验。CI 使用同一条命令及冻结锁文件；部署工具 Wrangler 也由该锁文件固定。依赖安装只允许明确列出的构建脚本，并要求新版本至少发布一天。
+依次执行代码格式检查、Node 内置测试、Astro 类型检查、完整构建和桌面/手机浏览器测试（包含 iPhone 尺寸的 WebKit）。`pnpm run validate:static` 执行前四项，无需安装浏览器。浏览器测试单独运行 `pnpm run test:browser`，会自动构建隔离的测试站并在结束后删除，不改动作者内容或正式 `dist/`。`content/` 下的作者内容不设代码格式门槛，保留 Markdown 原始排版，内容结构由共享 schema 校验。
+
+CI 每次运行 `validate:static`，仅修改 `content/`、`docs/`、`README.md` 或 `CLAUDE.md` 时跳过浏览器安装与交互测试。其余路径变更（包括页面、样式、脚本、公共图片、依赖和工作流）、新分支首次推送、无法读取比较基准，以及手动运行 Actions，都会保留全部浏览器检查；检查通过后才部署。CI 的 Chromium 只安装无界面测试需要的 headless shell，WebKit 仍覆盖 iPhone。操作系统依赖仅在需要浏览器检查时安装。
+
+CI 使用冻结锁文件；部署工具 Wrangler 也由该锁文件固定。依赖安装只允许明确列出的构建脚本，并要求新版本至少发布一天。
 
 测试覆盖草稿与定时内容边界、重复文字/声音地址、内容引用、录音与节目分类、章节时序、发布日期保留、正文空白、无覆盖新建、失败不写入及相对链接/锚点检查。浏览器测试覆盖脚本延迟期间的搜索编辑、栏目检索范围、筛选后的布局与键盘焦点，以及中文正文在不同宽度下的换行。内容模型与部署边界见[架构说明](architecture.md)。
 

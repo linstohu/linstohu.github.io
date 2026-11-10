@@ -164,6 +164,28 @@ test(
           [480, 640, 900],
         );
       }
+      const about = await readFile(
+        path.join(output, 'about/index.html'),
+        'utf8',
+      );
+      const aboutArtwork = about.match(
+        /<picture\b[^>]*class="about-artwork[^\"]*"[\s\S]*?<\/picture>/,
+      )?.[0];
+      assert.ok(aboutArtwork, 'The about page must use responsive artwork');
+      assert.match(aboutArtwork, /data:image\/webp;base64,/);
+      assert.match(aboutArtwork, /<source[^>]*type="image\/avif"/);
+      assert.match(aboutArtwork, /sizes="[^"]*480px"/);
+      assert.match(aboutArtwork, /fetchpriority="high"/);
+      assert.doesNotMatch(aboutArtwork, /src="\/images\/ridgelines\.webp"/);
+      assert.doesNotMatch(aboutArtwork, /data-home-art/);
+      const aboutVariants = [
+        ...new Set(aboutArtwork.match(/\/_astro\/[^"\s,]+\.(?:avif|webp)/g)),
+      ];
+      assert.deepEqual(
+        aboutVariants.sort(),
+        variants.sort(),
+        'Home and about must share the same cacheable image variants',
+      );
       await assert.rejects(
         stat(path.join(output, 'writing', `${id}-draft/index.html`)),
       );

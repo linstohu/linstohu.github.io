@@ -6,8 +6,10 @@ import sharp from 'sharp';
 
 interface Props {
   src: string;
+  alt?: string;
+  variant?: 'home' | 'about';
 }
-const { src } = Astro.props;
+const { src, alt = '', variant = 'home' } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/public/**/*.{avif,jpeg,jpg,png,webp}',
 );
@@ -30,11 +32,14 @@ const [avif, webp, preview] = image
     ])
   : [];
 // The phone layout crops the painting to a taller frame than its native ratio.
-const sizes = '(max-width: 760px) calc(100vw + 160px), 100vw';
+const sizes =
+  variant === 'home'
+    ? '(max-width: 760px) calc(100vw + 160px), 100vw'
+    : '(max-width: 760px) calc(100vw - 40px), (max-width: 900px) 40vw, 480px';
 ---
 
 <picture
-  class="home-artwork"
+  class={`${variant}-artwork`}
   style={
     preview &&
     `background-image: url("data:image/webp;base64,${preview.toString('base64')}")`
@@ -44,15 +49,15 @@ const sizes = '(max-width: 760px) calc(100vw + 160px), 100vw';
     <source type="image/avif" srcset={avif.srcSet.attribute} sizes={sizes} />
   )}
   <img
-    class="mountains"
-    data-home-art
+    class={variant === 'home' ? 'mountains' : undefined}
+    data-home-art={variant === 'home' || undefined}
     draggable="false"
     src={webp?.src ?? src}
     srcset={webp?.srcSet.attribute}
     sizes={webp && sizes}
     width={image?.width ?? 900}
     height={image?.height ?? 480}
-    alt=""
+    alt={alt}
     loading="eager"
     fetchpriority="high"
     decoding="async"
@@ -60,9 +65,12 @@ const sizes = '(max-width: 760px) calc(100vw + 160px), 100vw';
 </picture>
 
 <style>
-  .home-artwork {
+  picture {
     display: block;
     background-size: cover;
     background-position: 38% 0;
+  }
+  .about-artwork {
+    background-position: 50% 35%;
   }
 </style>

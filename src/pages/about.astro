@@ -1,6 +1,7 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Base from '../layouts/Base.astro';
+import Artwork from '../components/Artwork.astro';
 const entry = await getEntry('pages', 'about');
 if (!entry) throw new Error('缺少 content/pages/about.md');
 const { Content } = await render(entry);
@@ -28,10 +29,9 @@ const { Content } = await render(entry);
         </div>
         {entry.data.image && (
           <figure class="about-art">
-            <img
+            <Artwork
               src={entry.data.image}
-              width="900"
-              height="480"
+              variant="about"
               alt="本站的山景插画，赭色落日下层层青绿山脊延伸至远处。"
             />
           </figure>

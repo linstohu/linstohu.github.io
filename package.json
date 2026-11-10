@@ -23,7 +23,8 @@
     "format:check": "prettier --check .",
     "preinstall": "node scripts/check-package-manager.mjs",
     "test": "node --test tests/*.test.ts",
-    "validate": "pnpm format:check && pnpm test && pnpm check && pnpm build && pnpm test:browser",
+    "validate:static": "pnpm format:check && pnpm test && pnpm check && pnpm build",
+    "validate": "pnpm validate:static && pnpm test:browser",
     "publish:content": "node --env-file-if-exists=.env scripts/content.mjs publish",
     "stop": "astro dev stop && astro preview stop",
     "test:browser": "playwright test"
