@@ -34,6 +34,24 @@ test('ambiguous dates and whitespace-only metadata are rejected', () => {
     false,
   );
 });
+test('prompted articles allow omitted conversation metadata and validate supplied sources', () => {
+  const prompted = { ...post, category: 'prompted' };
+  assert.equal(writingSchema.parse(prompted).conversation, undefined);
+  const data = writingSchema.parse({
+    ...prompted,
+    conversation: { assistant: 'ChatGPT' },
+  });
+  assert.equal(data.conversation?.model, undefined);
+  assert.equal(data.conversation?.url, undefined);
+  for (const conversation of [
+    { assistant: ' ' },
+    { assistant: 'ChatGPT', url: 'javascript:alert(1)' },
+  ])
+    assert.equal(
+      writingSchema.safeParse({ ...prompted, conversation }).success,
+      false,
+    );
+});
 test('published real audio needs an address, enclosure metadata and ordered chapters', () => {
   const recording = {
     ...post,

@@ -56,7 +56,8 @@
     align-items: center;
     min-height: 28px;
   }
-  .article-path span {
+  .article-path span,
+  .article-path .article-category {
     border-left: 1px solid var(--line);
     padding-left: 16px;
   }
@@ -88,6 +89,18 @@
   }
   .byline > :first-child {
     color: var(--ink);
+  }
+  .article-source {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .article-source-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-size);
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .article-body {
     margin-block-start: 1.375rem;

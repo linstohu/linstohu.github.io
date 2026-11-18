@@ -267,6 +267,11 @@ const tags = [
               : '条记录'}
         </span>
       </div>
+      {group === 'writing' && tags.includes('prompted') && (
+        <p class="collection-note" data-category-note="prompted" hidden>
+          与 AI 的对话，以及由此展开的思考。
+        </p>
+      )}
       <p class="search-notice" hidden></p>
       <div id="rows">
         {entries.map((entry, index) => (

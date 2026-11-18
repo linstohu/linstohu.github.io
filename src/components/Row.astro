@@ -76,6 +76,9 @@ const searchText = [entry.data.title, description, label, ...tags]
 ) : (
   <a
     class:list={['row', { 'writing-row': variant === 'writing' }]}
+    data-category={
+      entry.collection === 'writing' ? entry.data.category : undefined
+    }
     href={address(entry)}
     data-entry-key={key}
     data-tags={JSON.stringify(tags)}

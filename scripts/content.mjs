@@ -27,11 +27,16 @@ const { values, positionals } = parseArgs({
     platform: { type: 'string' },
     'listen-url': { type: 'string' },
     episode: { type: 'string' },
+    assistant: { type: 'string' },
+    model: { type: 'string' },
+    'conversation-url': { type: 'string' },
   },
 });
 const [command, kind, name] = positionals;
 if (values.help || !command) {
   console.log(`新建文字：pnpm run new writing my-essay --title "文章标题" --category "技术"
+新建 AI 对话：pnpm run new prompted my-question --title "一个想弄明白的问题"
+            可选 --assistant "ChatGPT" --model "已知的模型名" --conversation-url "公开对话链接"
 新建外部栏目单集：pnpm run new audio episode-one --title "第一期" --series thirty-plus --platform "小宇宙" --listen-url "单集网页地址"
 新建此刻：pnpm run new now --period 2026-11 --title "十一月，慢一点"
 新建节目：pnpm run new series my-show --title "节目名称"
@@ -43,8 +48,12 @@ if (values.help || !command) {
   try {
     if (command === 'new') {
       const title = required(values.title, '--title "标题"');
-      if (kind === 'writing') {
+      if (kind === 'writing' || kind === 'prompted') {
         const id = slug(name);
+        const prompted = kind === 'prompted' || values.category === 'prompted';
+        const body = prompted
+          ? ''
+          : '## 从这里落笔\n\n正文支持 Markdown、图片、代码与链接。';
         const file = await createWriting(
           path.join(root, 'content/writing'),
           {
@@ -53,10 +62,24 @@ if (values.help || !command) {
             description: values.description || '请写一句内容摘要。',
             publishedAt: timestamp(),
             draft: true,
-            ...(values.category && { category: values.category }),
-            tags: [],
+            ...(prompted
+              ? {
+                  category: 'prompted',
+                }
+              : values.category && { category: values.category }),
+            ...((values.assistant ||
+              values.model ||
+              values['conversation-url']) && {
+              conversation: {
+                assistant: values.assistant || 'AI',
+                ...(values.model && { model: values.model }),
+                ...(values['conversation-url'] && {
+                  url: values['conversation-url'],
+                }),
+              },
+            }),
           },
-          '## 从这里落笔\n\n正文支持 Markdown、图片、代码与链接。',
+          body,
         );
         console.log(`已新建草稿：${path.relative(root, file)}`);
       } else if (kind === 'audio') {
@@ -127,7 +150,10 @@ if (values.help || !command) {
           flag: 'wx',
         });
         console.log(`已新建节目：${path.relative(root, file)}`);
-      } else throw new Error('内容类型请选择 writing、audio、now 或 series。');
+      } else
+        throw new Error(
+          '内容类型请选择 writing、prompted、audio、now 或 series。',
+        );
     } else if (command === 'publish') {
       const relative = required(kind, 'content 下的文件路径');
       if (

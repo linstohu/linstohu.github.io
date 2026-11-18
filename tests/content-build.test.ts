@@ -1,11 +1,18 @@
 import test from 'node:test';
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
-import { readFile, rm, copyFile, stat, writeFile } from 'node:fs/promises';
+import {
+  readFile,
+  rm,
+  copyFile,
+  stat,
+  writeFile,
+  readdir,
+} from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { createDocument } from '../scripts/lib.mjs';
+import { createDocument, readDocument } from '../scripts/lib.mjs';
 import { writingDirectory } from '../src/lib/publication.ts';
 import { createTestProject, repository as root } from './helpers/project.mjs';
 
@@ -72,6 +79,72 @@ test(
       const draftEpisode = await readFile(episodeFile, 'utf8');
       assert.match(draftEpisode, /draft: true/);
       assert.match(draftEpisode, /thirty-plus/);
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'new',
+          'prompted',
+          'a-question',
+          '--title',
+          '对话测试',
+          '--assistant',
+          'Claude',
+          '--model',
+          '测试模型',
+          '--conversation-url',
+          'https://example.org/conversation',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
+      const promptedBundle = (
+        await readdir(path.join(project, 'content/writing'))
+      ).find((name) => name.endsWith('-a-question'))!;
+      const promptedDraft = await readFile(
+        path.join(project, 'content/writing', promptedBundle, 'index.md'),
+        'utf8',
+      );
+      assert.match(promptedDraft, /draft: true/);
+      const promptedFile = path.join(
+        project,
+        'content/writing',
+        promptedBundle,
+        'index.md',
+      );
+      assert.equal((await readDocument(promptedFile)).body.trim(), '');
+      await writeFile(
+        promptedFile,
+        promptedDraft +
+          '\n**我：**\n\n一个还没想明白的问题。\n\n**AI：** *回答整理*\n\n## 一个解释\n\n> 保留下来的原话。\n\n自由编排的正文。\n\n---\n\n自己的笔记。\n',
+      );
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'new',
+          'writing',
+          'open-note',
+          '--category',
+          'prompted',
+          '--title',
+          '自由记录',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
+      const openBundle = (
+        await readdir(path.join(project, 'content/writing'))
+      ).find((name) => name.endsWith('-open-note'))!;
+      const openFile = path.join(
+        project,
+        'content/writing',
+        openBundle,
+        'index.md',
+      );
+      const openDraft = await readDocument(openFile);
+      assert.equal(openDraft.data.category, 'prompted');
+      assert.equal(openDraft.data.conversation, undefined);
+      assert.equal(openDraft.body.trim(), '');
+      await writeFile(openFile, openDraft.raw + '\n今天只记下一句话。\n');
       for (const [index, kind] of ['draft', 'future', 'public'].entries()) {
         const data = {
           slug: `${id}-${kind}`,
@@ -205,6 +278,7 @@ test(
         path.join(output, 'writing/index.html'),
         'utf8',
       );
+      assert.doesNotMatch(listing, /对话测试|data-filter="prompted"/);
       assert.match(
         listing,
         /id="fragment-copy"[^>]*>\s*<p>自动摘录的第二段。<\/p>/,
@@ -241,7 +315,29 @@ test(
         { cwd: project, stdio: 'pipe' },
       );
       const postFile = path.join(fixtures[2], 'index.md');
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'publish',
+          `writing/${promptedBundle}/index.md`,
+          '--date',
+          '1999-12-31T09:00:00+08:00',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
       const post = await readFile(postFile, 'utf8');
+      execFileSync(
+        process.execPath,
+        [
+          path.join(project, 'scripts/content.mjs'),
+          'publish',
+          `writing/${openBundle}/index.md`,
+          '--date',
+          '1999-12-30T09:00:00+08:00',
+        ],
+        { cwd: project, stdio: 'pipe' },
+      );
       await writeFile(
         postFile,
         post.replace(/^---/, '---\nfeaturedExcerpt: "手选的一句。"').trimEnd() +
@@ -277,6 +373,40 @@ test(
         path.join(output, 'writing/index.html'),
         'utf8',
       );
+      assert.match(curatedListing, /data-filter="prompted"/);
+      const conversationPage = await readFile(
+        path.join(output, 'writing/a-question/index.html'),
+        'utf8',
+      );
+      assert.match(conversationPage, /class="article-source"/);
+      assert.match(conversationPage, /Claude/);
+      assert.match(conversationPage, /测试模型/);
+      assert.match(
+        conversationPage,
+        /href="https:\/\/example.org\/conversation"/,
+      );
+      assert.match(conversationPage, /data-speaker="user" aria-label="我"/);
+      assert.match(
+        conversationPage,
+        /data-speaker="assistant" aria-label="Claude · 回答整理"/,
+      );
+      assert.match(conversationPage, /<h2[^>]*>一个解释<\/h2>/);
+      assert.match(conversationPage, /<blockquote>\s*<p>/);
+      assert.match(conversationPage, /自由编排的正文。/);
+      const openPage = await readFile(
+        path.join(output, 'writing/open-note/index.html'),
+        'utf8',
+      );
+      assert.match(openPage, /今天只记下一句话。/);
+      assert.doesNotMatch(
+        openPage,
+        /与 AI 对话|class="article-source"|class="dialogue-turn"|我的提问|我的思考与收获/,
+      );
+      for (const file of ['rss.xml', 'sitemap.xml', 'archive/index.html'])
+        assert.match(
+          await readFile(path.join(output, file), 'utf8'),
+          /\/writing\/a-question\//,
+        );
       assert.match(
         curatedListing,
         /id="fragment-copy"[^>]*>\s*<p>手选的一句。<\/p>/,

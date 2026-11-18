@@ -31,6 +31,17 @@
   .writing-row small {
     margin-bottom: 3px;
   }
+  .collection-note {
+    max-width: 44em;
+    margin-block: 18px 4px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .writing-row[data-category='prompted'] small {
+    display: block;
+    color: var(--accent);
+  }
   .writing-row strong {
     font-size: 23px;
     font-weight: 500;

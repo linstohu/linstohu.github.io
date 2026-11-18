@@ -1,5 +1,6 @@
 ---
 import '../../styles/pages/reading.css';
+import '../../styles/components/dialogue.css';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { site } from '../../lib/site';
@@ -16,6 +17,14 @@ interface Props {
 }
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const prompted = entry.data.category === 'prompted';
+const titleWords = prompted
+  ? [
+      ...new Intl.Segmenter('zh-CN', { granularity: 'word' }).segment(
+        entry.data.title,
+      ),
+    ]
+  : undefined;
 ---
 
 <Base
@@ -26,7 +35,7 @@ const { Content } = await render(entry);
   noindex={entry.data.draft}
   imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
-  <div class="reading-page">
+  <div class:list={['reading-page', { 'dialogue-page': prompted }]}>
     <article
       class="reader article-paper"
       aria-labelledby="article-title"
@@ -34,17 +43,60 @@ const { Content } = await render(entry);
     >
       <div class="article-path" data-pagefind-ignore>
         <a href="/writing/">← 文字</a>
-        {entry.data.category && <span>{entry.data.category}</span>}
+        {prompted ? (
+          <a class="article-category" href="/writing/?tag=prompted">
+            prompted
+          </a>
+        ) : (
+          entry.data.category && <span>{entry.data.category}</span>
+        )}
       </div>
       <header class="article-head">
-        <h1 id="article-title" data-pagefind-meta="title">
-          {entry.data.title}
+        {prompted && (
+          <span class="dialogue-orbits" aria-hidden="true">
+            <span class="orbit-warm"></span>
+            <span class="orbit-cool"></span>
+          </span>
+        )}
+        <h1
+          id="article-title"
+          data-pagefind-meta="title"
+          aria-label={titleWords && entry.data.title}
+        >
+          {titleWords
+            ? titleWords.map((word, index) => (
+                <>
+                  {word.isWordLike && titleWords[index - 1]?.isWordLike && (
+                    <wbr />
+                  )}
+                  {word.segment}
+                </>
+              ))
+            : entry.data.title}
         </h1>
         <div class="byline" data-pagefind-ignore>
           <span>{site.author}</span>
+          {prompted && entry.data.conversation && (
+            <span class="article-source">
+              与 {entry.data.conversation.assistant} 对话
+              {entry.data.conversation.model && (
+                <> · {entry.data.conversation.model}</>
+              )}
+            </span>
+          )}
           <time datetime={entry.data.publishedAt.toISOString()}>
             {dateLabel(entry.data.publishedAt)}
           </time>
+          {prompted && entry.data.conversation?.url && (
+            <a
+              class="article-source-link"
+              href={entry.data.conversation.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              原对话 ↗
+            </a>
+          )}
           {entry.data.draft && <span>草稿预览</span>}
         </div>
       </header>
@@ -87,7 +139,9 @@ const { Content } = await render(entry);
       )}
     </article>
     <nav class="article-end" aria-label="文章末尾导航">
-      <a href="/writing/">← 返回文字列表</a>
+      <a href={prompted ? '/writing/?tag=prompted' : '/writing/'}>
+        ← 返回{prompted ? ' prompted' : '文字列表'}
+      </a>
     </nav>
   </div>
 </Base>

@@ -70,6 +70,10 @@ export function initCollection() {
           'aria-pressed',
           String(button.dataset.filter === selected),
         );
+      for (const note of collection!.querySelectorAll<HTMLElement>(
+        '[data-category-note]',
+      ))
+        note.hidden = note.dataset.categoryNote !== selected;
       let keys: Set<string> | undefined;
       if (notice) notice.hidden = true;
       if (query && !import.meta.env.DEV) {

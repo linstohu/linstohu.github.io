@@ -31,6 +31,13 @@ export const writingSchema = z.object({
   updatedAt: timestampSchema.optional(),
   featuredExcerpt: text.optional(),
   excerptTitle: text.optional(),
+  conversation: z
+    .object({
+      assistant: text,
+      model: text.optional(),
+      url: httpUrl.optional(),
+    })
+    .optional(),
   videos: z
     .array(
       z.object({
