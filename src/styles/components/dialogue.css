@@ -181,7 +181,7 @@
   }
 
   .dialogue-turn {
-    --avatar-size: 1.85rem;
+    --avatar-size: 1.625rem;
     display: grid;
     grid-template-columns: var(--avatar-size) minmax(0, 1fr);
     align-items: center;
@@ -271,18 +271,23 @@
     color: var(--bg);
   }
   .dialogue-avatar svg {
-    width: 62%;
-    height: 62%;
+    width: 68%;
+    height: 68%;
+  }
+  [data-speaker='assistant'] > .dialogue-avatar {
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--dialogue-sky-violet) 45%, var(--bg));
+    color: var(--dialogue-cool);
   }
   .dialogue-label {
     display: flex;
     grid-area: 1 / 2;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
     gap: 0.25rem 0.5rem;
     min-width: 0;
     color: var(--dialogue-cool);
-    font: 600 0.875rem/1.5 var(--dialogue-sans);
+    font: 550 0.8125rem/1.5 var(--dialogue-sans);
   }
   .dialogue-caption {
     color: var(--muted);
@@ -292,7 +297,7 @@
     grid-column: 1 / -1;
     min-width: 0;
     color: var(--dialogue-ai-ink);
-    font: 400 1.09375rem/1.87 var(--dialogue-sans);
+    font: 400 1.09375rem/1.85 var(--dialogue-sans);
   }
   .dialogue-turn[data-speaker='user'] {
     --avatar-size: 1.5rem;
@@ -343,6 +348,38 @@
   .markdown-body .dialogue-content :is(h3, h4, h5, h6) {
     font-size: 1.09em;
   }
+  .markdown-body [data-speaker='assistant'] .dialogue-content {
+    p {
+      text-wrap: pretty;
+    }
+    :is(h1, h2, h3, h4, h5, h6) {
+      color: var(--dialogue-ai-ink);
+      font-weight: 600;
+      text-wrap: balance;
+    }
+    :is(h1, h2) {
+      font-weight: 650;
+      line-height: 1.4;
+    }
+    h1 {
+      font-size: 1.6em;
+    }
+    h2 {
+      font-size: clamp(1.3125rem, 1.1em + 0.5vw, 1.34em);
+    }
+    h3 {
+      font-size: clamp(1.1875rem, 1.05em + 0.25vw, 1.15em);
+    }
+    h4 {
+      font-size: 1.06em;
+    }
+    :is(h5, h6) {
+      font-size: 1em;
+    }
+    h6 {
+      font-weight: 500;
+    }
+  }
   .markdown-body .dialogue-content p {
     margin-block-end: 0.85em;
   }
@@ -375,7 +412,7 @@
     --rail-width: clamp(1.35rem, 3vw, 2.25rem);
     position: relative;
     padding: 1rem 0 1.15rem clamp(1rem, 2.5vw, 1.75rem);
-    row-gap: 0.6rem;
+    row-gap: 0.65rem;
   }
   .dialogue-turn[data-speaker='assistant']::before,
   .reply-trace {
