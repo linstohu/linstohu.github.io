@@ -28,7 +28,6 @@ const {
   {...attributes}
   data-disclosure
   data-sw-collapsible
-  data-state="closed"
   data-dismissible={dismissible || undefined}
   data-toggle-label={toggleLabel}
 >
@@ -37,9 +36,9 @@ const {
     type="button"
     class={triggerClass}
     data-sw-collapsible-trigger
-    aria-expanded="false"
+    aria-expanded="true"
     aria-controls={id}
-    aria-label={toggleLabel && `展开${toggleLabel}`}
+    aria-label={toggleLabel}
   >
     <slot name="trigger" />
   </button>

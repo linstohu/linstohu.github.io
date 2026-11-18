@@ -189,9 +189,6 @@
   .fragment-copy {
     display: contents;
   }
-  .no-js .fragment-toggle {
-    display: none;
-  }
   @media (max-width: 760px) {
     .feature-meta {
       gap: 6px 12px;
@@ -228,7 +225,7 @@
     .feature-fragment .fragment-label {
       display: none;
     }
-    .fragment-toggle {
+    :where([data-disclosure][data-state]) > .fragment-toggle {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -244,9 +241,6 @@
       font-weight: 300;
     }
     .fragment-copy {
-      display: none;
-    }
-    .feature-fragment[data-state='open'] .fragment-copy {
       display: block;
       padding-bottom: 15px;
     }
@@ -326,9 +320,6 @@
     .collection-index .writing-row p {
       font-size: 14px;
       line-height: 1.85;
-    }
-    .no-js .fragment-copy {
-      display: block;
     }
   }
   @media (max-width: 640px) {

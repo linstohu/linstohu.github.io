@@ -26,7 +26,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="no-js" data-theme="light">
+<html lang="zh-CN" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -70,7 +70,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       href="/audio/rss.xml"
     />
     <script is:inline>
-      document.documentElement.classList.replace('no-js', 'js');
       try {
         const choice = localStorage.getItem('linsto-theme');
         document.documentElement.dataset.theme =

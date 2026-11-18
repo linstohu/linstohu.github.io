@@ -326,3 +326,33 @@
     font-size: 17px;
   }
 }
+
+.markdown-body :where(img) {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+.markdown-body .article-figure {
+  margin: 26px 0;
+}
+.markdown-body .image-open {
+  display: block;
+  padding: 0;
+  width: 100%;
+  cursor: zoom-in;
+}
+.markdown-body .article-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.markdown-body .article-figure figcaption {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  margin-top: 9px;
+}
+@media (max-width: 640px) {
+  .markdown-body .article-figure {
+    margin-block: 22px;
+  }
+}

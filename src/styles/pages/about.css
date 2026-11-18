@@ -67,6 +67,10 @@
     border-bottom: 0;
     padding-bottom: 0;
   }
+  .about-markdown > .article-figure {
+    grid-column: 2;
+    min-width: 0;
+  }
   .about-markdown > p {
     grid-column: 2;
     margin: 0;
@@ -123,6 +127,9 @@
       grid-column: 1;
       padding-top: 23px;
       margin-top: 9px;
+    }
+    .about-markdown > .article-figure {
+      grid-column: 1;
     }
     .about-markdown > p {
       grid-column: 1;

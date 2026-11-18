@@ -54,9 +54,6 @@
   .mobile-menu {
     display: none;
   }
-  .no-js .mobile-menu {
-    display: none;
-  }
   @media (max-width: 760px) {
     nav {
       gap: 12px;
@@ -71,7 +68,7 @@
       font-size: 25px;
       order: 0;
     }
-    .mobile-menu {
+    :where([data-disclosure][data-state]) > .mobile-menu {
       order: 2;
       display: inline-flex;
       align-items: center;
@@ -89,15 +86,12 @@
       border-block: 1px solid currentColor;
     }
     header nav {
-      display: none;
-      order: 3;
-      width: 100%;
-      padding: 0 0 8px;
-    }
-    header [data-state='open'] > nav {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 0;
+      order: 3;
+      width: 100%;
+      padding: 0 0 8px;
     }
     header nav a {
       display: flex;
@@ -113,10 +107,6 @@
     }
     header nav a[aria-current='page']::before {
       display: none;
-    }
-    .no-js header nav {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
     }
   }
   @media (max-width: 600px) {

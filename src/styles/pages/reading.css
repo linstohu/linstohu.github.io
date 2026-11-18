@@ -1,12 +1,5 @@
 @layer theme, base, components, utilities;
 @layer components {
-  .player {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
-  }
   .reader {
     max-width: 680px;
     margin: 40px auto;
@@ -22,20 +15,6 @@
     background: var(--tint);
     border-left: 3px solid var(--accent);
     margin: 25px 0;
-  }
-  .player input {
-    min-width: 85px;
-    flex: 1;
-    accent-color: var(--accent);
-  }
-  #play {
-    background: var(--ink);
-    color: var(--bg);
-  }
-  .reader .chapter {
-    width: 100%;
-    text-align: left;
-    grid-template-columns: 60px 1fr;
   }
   .reader.article-paper {
     max-width: var(--reading-max);
@@ -120,26 +99,6 @@
     font-size: 12px;
     color: var(--muted);
   }
-  .article-figure {
-    margin: 26px 0;
-  }
-  .image-open {
-    display: block;
-    padding: 0;
-    width: 100%;
-    cursor: zoom-in;
-  }
-  .article-figure img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .article-figure figcaption {
-    color: var(--muted);
-    font-size: 12px;
-    line-height: 1.8;
-    margin-top: 9px;
-  }
   .article-paper .video-recommendation {
     margin-top: 32px;
     padding-top: 19px;
@@ -217,9 +176,6 @@
     .reader aside {
       padding: 25px;
     }
-    .reader .chapter {
-      padding-block: 16px;
-    }
   }
   @media (max-width: 760px) {
     .reading-page .article-paper {
@@ -254,39 +210,6 @@
       padding: 16px;
       margin-block: 23px;
     }
-    .player {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 9px 12px;
-    }
-    #play {
-      grid-column: 1;
-      grid-row: 1;
-      min-height: var(--tap-size);
-      padding-inline: 15px;
-      font-size: 14px;
-    }
-    .player output {
-      grid-column: 2;
-      grid-row: 1;
-      justify-self: end;
-      font-size: 12px;
-    }
-    .player input {
-      grid-column: 1 / -1;
-      grid-row: 2;
-      width: 100%;
-      min-width: 0;
-      min-height: var(--tap-size);
-      margin: 0;
-    }
-    .reader .chapter {
-      grid-template-columns: 52px minmax(0, 1fr);
-      gap: 10px;
-      min-height: 48px;
-      padding-block: 12px;
-      font-size: 15px;
-    }
     .video-link {
       width: 100%;
       min-height: var(--tap-size);
@@ -312,9 +235,6 @@
     }
   }
   @media (max-width: 640px) {
-    .article-figure {
-      margin-block: 22px;
-    }
     .video-link {
       gap: 12px;
     }
