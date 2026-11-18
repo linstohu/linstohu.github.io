@@ -65,6 +65,7 @@ export const audioSchema = z
         'audio/wav',
         'audio/flac',
         'audio/webm',
+        'video/webm',
         'audio/aac',
       ])
       .optional(),

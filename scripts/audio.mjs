@@ -1,16 +1,15 @@
 import { parseArgs } from 'node:util';
-import { parseFile } from 'music-metadata';
 import { randomUUID } from 'node:crypto';
 import { audioSchema } from '../src/lib/schemas.ts';
 import path from 'node:path';
 import { readFile } from 'node:fs/promises';
-import { describeMedia, uploadMedia } from './media.mjs';
+import { withMediaSnapshot, uploadMedia } from './media.mjs';
 import {
   root,
   slug,
   required,
   timestamp,
-  mustNotExist,
+  withNewAudio,
   createDocument,
   reportError,
 } from './lib.mjs';
@@ -30,7 +29,7 @@ const { values } = parseArgs({
 if (values.help)
   console.log(`独立录音：pnpm run audio --file "/path/to/voice.m4a" --slug autumn --title "秋日手记" --description "一句话介绍"
 播客单集：在以上参数后追加 --kind podcast --series my-show --episode 42
-本地检查：追加 --dry-run（不上传、不写文件）
+本地检查：追加 --dry-run（仅预览元数据）
 上传成功后生成声音草稿，自动填写时长、大小、文件类型和公共地址。编辑文字稿后再运行 pnpm run publish:content。`);
 else
   try {
@@ -50,8 +49,6 @@ else
       draft: true,
     };
     audioSchema.parse(data);
-    const target = path.join(root, 'content/audio', id, 'index.md');
-    await mustNotExist(target);
     if (values.series) {
       const series = slug(values.series);
       await readFile(
@@ -59,60 +56,49 @@ else
         'utf8',
       );
     }
-    const info = await describeMedia(values.file);
-    if (
-      ![
-        'audio/mpeg',
-        'audio/mp4',
-        'audio/ogg',
-        'audio/wav',
-        'audio/flac',
-        'video/webm',
-      ].includes(info.mime)
-    )
-      throw new Error('请提供 MP3、M4A、OGG、OPUS、WAV、FLAC 或 WEBM 音频。');
-    const metadata = await parseFile(info.absolute, { duration: true });
-    const duration = metadata.format.duration;
-    if (!Number.isFinite(duration) || duration <= 0)
-      throw new Error('无法读取音频时长，请先检查源文件。');
-    const mime = info.mime === 'video/webm' ? 'audio/webm' : info.mime;
-    if (values['dry-run'])
-      console.log(
-        JSON.stringify(
-          {
-            title,
-            slug: id,
-            kind,
-            duration,
-            bytes: info.bytes,
-            mime,
-            key: info.key,
+    const dryRun = values['dry-run'] ?? false;
+    await withNewAudio(
+      path.join(root, 'content/audio'),
+      id,
+      (target) =>
+        withMediaSnapshot(
+          values.file,
+          async (info) => {
+            const { duration, bytes, mime, key } = info;
+            if (dryRun) {
+              console.log(
+                JSON.stringify(
+                  { title, slug: id, kind, duration, bytes, mime, key },
+                  null,
+                  2,
+                ),
+              );
+              return;
+            }
+            const src = await uploadMedia(info);
+            console.log(`音频已上传：${src}`);
+            await createDocument(
+              target,
+              {
+                ...data,
+                duration: Math.round(duration * 1000) / 1000 || duration,
+                src,
+                bytes,
+                mime,
+                chapters: [],
+              },
+              kind === 'podcast'
+                ? '## 这一期\n\n写下单集笔记或文字稿。'
+                : '写下这段录音的缘起或文字稿。',
+            );
+            console.log(
+              `音频已上传，草稿已生成：${path.relative(root, target)}\n检查正文后，再执行 pnpm run publish:content audio/${id}/index.md`,
+            );
           },
-          null,
-          2,
+          { forAudio: true },
         ),
-      );
-    else {
-      const src = await uploadMedia({ ...info, mime });
-      console.log(`音频已上传：${src}`);
-      await createDocument(
-        target,
-        {
-          ...data,
-          duration: Math.round(duration * 1000) / 1000,
-          src,
-          bytes: info.bytes,
-          mime,
-          chapters: [],
-        },
-        kind === 'podcast'
-          ? '## 这一期\n\n写下单集笔记或文字稿。'
-          : '写下这段录音的缘起或文字稿。',
-      );
-      console.log(
-        `音频已上传，草稿已生成：${path.relative(root, target)}\n检查正文后，再执行 pnpm run publish:content audio/${id}/index.md`,
-      );
-    }
+      { dryRun },
+    );
   } catch (error) {
     reportError(error);
   }

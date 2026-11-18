@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { createTestProject } from './helpers/project.mjs';
 import {
   mkdtemp,
   readFile,
@@ -15,6 +17,7 @@ import {
   createWriting,
   readDocument,
   publishDocument,
+  withNewAudio,
 } from '../scripts/lib.mjs';
 
 async function fixture(run: (file: string) => Promise<void>) {
@@ -168,3 +171,166 @@ test('concurrent draft creation cannot create two bundles for the same slug', as
     assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
     assert.equal((await readdir(directory)).length, 1);
   }));
+
+test('publication preserves YAML comments on fields, nested metadata and the original Markdown body', async () =>
+  fixture(async (file) => {
+    await createDocument(file, data, '');
+    const header = [
+      '---',
+      '# 作者备注',
+      'slug: test',
+      'title: 测试',
+      'description: 摘要',
+      'draft: true # 待发布',
+      'publishedAt: "2026-11-01T09:00:00+08:00" # 首发时间',
+      'tags:',
+      '  # 分类说明',
+      '  - 随笔',
+      '---',
+      '',
+    ].join('\r\n');
+    const body = '\r\n正文  \r\n\r\n';
+    await writeFile(file, header + body);
+    const output = await publishDocument(file, 'writing', data.publishedAt);
+    await publishDocument(output.file, 'writing');
+    const result = await readDocument(output.file);
+    for (const comment of [
+      '# 作者备注',
+      '# 待发布',
+      '# 首发时间',
+      '# 分类说明',
+    ])
+      assert.ok(result.raw.includes(comment));
+    assert.ok(result.raw.startsWith('---\r\n'));
+    assert.deepEqual(result.data.tags, ['随笔']);
+    assert.equal(result.body, body);
+    assert.equal(result.data.draft, false);
+    assert.ok(result.data.updatedAt);
+  }));
+
+test('audio and monthly publications lock each entry through its update', async (t) => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'linsto-scheduled-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  const future = '2099-01-01T00:00:00+08:00';
+  for (const kind of ['audio', 'now']) {
+    const file = path.join(
+      dir,
+      kind,
+      kind === 'now' ? '2026-11.md' : 'episode/index.md',
+    );
+    const entry =
+      kind === 'now'
+        ? {
+            ...data,
+            period: '2026-11',
+            notes: [{ title: '近况', text: '正文' }],
+          }
+        : {
+            ...data,
+            kind: 'podcast',
+            uid: 'episode',
+            series: 'show',
+            listen: [{ platform: '站点', url: 'https://example.org/episode' }],
+          };
+    await createDocument(file, entry, '');
+    const lock = path.join(
+      path.dirname(file),
+      '.' + path.basename(file) + '.authoring.lock',
+    );
+    await writeFile(lock, 'writer');
+    await assert.rejects(publishDocument(file, kind, future), /写入正在进行/);
+    assert.equal((await readDocument(file)).data.draft, true);
+    await rm(lock);
+    await Promise.all([
+      publishDocument(file, kind, future),
+      publishDocument(file, kind),
+    ]);
+    assert.equal((await readDocument(file)).data.publishedAt, future);
+    await publishDocument(file, kind);
+    assert.equal((await readDocument(file)).data.publishedAt, future);
+  }
+});
+
+test('both audio CLIs reject a slug used by an imported entry before uploading; invalid series never reach disk', async (t) => {
+  const project = await createTestProject();
+  t.after(project.dispose);
+  const existing = path.join(
+    project.directory,
+    'content/audio/imported/episode/index.md',
+  );
+  await createDocument(
+    existing,
+    {
+      ...data,
+      kind: 'podcast',
+      uid: 'episode',
+      series: 'thirty-plus',
+      slug: 'occupied',
+    },
+    '',
+  );
+  const run = (script: string, args: string[]) =>
+    spawnSync(process.execPath, ['scripts/' + script + '.mjs', ...args], {
+      cwd: project.directory,
+      encoding: 'utf8',
+    });
+  const standard = ['--title', '节目', '--description', '简介'];
+  const external = run('content', [
+    'new',
+    'audio',
+    'occupied',
+    ...standard,
+    '--series',
+    'thirty-plus',
+    '--platform',
+    '站点',
+    '--listen-url',
+    'https://example.org/episode',
+  ]);
+  const upload = run('audio', [
+    '--slug',
+    'occupied',
+    ...standard,
+    '--file',
+    'not-needed.webm',
+  ]);
+  for (const result of [external, upload]) {
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /声音 slug 已存在：occupied/);
+  }
+  await assert.rejects(
+    stat(path.join(project.directory, 'content/audio/occupied/index.md')),
+    { code: 'ENOENT' },
+  );
+  const series = run('content', [
+    'new',
+    'series',
+    'new-show',
+    '--title',
+    '节目',
+    '--description',
+    '   ',
+  ]);
+  assert.equal(series.status, 1);
+  const json = path.join(project.directory, 'content/series/new-show.json');
+  await assert.rejects(stat(json), { code: 'ENOENT' });
+  assert.equal(
+    run('content', ['new', 'series', 'new-show', ...standard]).status,
+    0,
+  );
+  assert.equal(JSON.parse(await readFile(json, 'utf8')).description, '简介');
+});
+
+test('audio writers reserve the same slug before invoking an upload', async (t) => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'linsto-audio-slug-'));
+  t.after(() => rm(dir, { recursive: true, force: true }));
+  let writes = 0;
+  const write = () =>
+    withNewAudio(dir, 'episode', async (file) => {
+      writes++;
+      await createDocument(file, { slug: 'episode' }, '');
+    });
+  const results = await Promise.allSettled([write(), write()]);
+  assert.equal(results.filter((r) => r.status === 'fulfilled').length, 1);
+  assert.equal(writes, 1);
+});

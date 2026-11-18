@@ -27,8 +27,9 @@ CLAUDE.local.md
 # macOS metadata
 .DS_Store
 
-# Serialize article creation and publication
+# Authoring locks for collection, slug and per-file writes
 /content/writing/.authoring.lock
+/content/**/.*.authoring.lock
 
 # Browser test reports and failure traces
 /test-results/

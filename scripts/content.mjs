@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { audioSchema } from '../src/lib/schemas.ts';
+import { audioSchema, seriesSchema } from '../src/lib/schemas.ts';
 import { writeFile, readFile, mkdir } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
 import {
@@ -11,6 +11,7 @@ import {
   publishDocument,
   createDocument,
   createWriting,
+  withNewAudio,
   reportError,
 } from './lib.mjs';
 const { values, positionals } = parseArgs({
@@ -83,8 +84,11 @@ if (values.help || !command) {
           draft: true,
         };
         audioSchema.parse(data);
-        const file = path.join(root, 'content/audio', id, 'index.md');
-        await createDocument(file, data, '');
+        const file = await withNewAudio(
+          path.join(root, 'content/audio'),
+          id,
+          (target) => createDocument(target, data, ''),
+        );
         console.log(`已新建单集草稿：${path.relative(root, file)}`);
       } else if (kind === 'now') {
         const period = values.period || timestamp().slice(0, 7);
@@ -112,20 +116,16 @@ if (values.help || !command) {
       } else if (kind === 'series') {
         const id = slug(name);
         const file = path.join(root, 'content/series', id + '.json');
+        const data = {
+          title,
+          description: values.description ?? '一句话介绍这档节目。',
+          coverTitle: [title],
+        };
+        seriesSchema.parse(data);
         await mkdir(path.dirname(file), { recursive: true });
-        await writeFile(
-          file,
-          JSON.stringify(
-            {
-              title,
-              description: values.description || '一句话介绍这档节目。',
-              coverTitle: [title],
-            },
-            null,
-            2,
-          ) + '\n',
-          { flag: 'wx' },
-        );
+        await writeFile(file, JSON.stringify(data, null, 2) + '\n', {
+          flag: 'wx',
+        });
         console.log(`已新建节目：${path.relative(root, file)}`);
       } else throw new Error('内容类型请选择 writing、audio、now 或 series。');
     } else if (command === 'publish') {
