@@ -3,7 +3,13 @@ import '../styles/pages/home.css';
 import Base from '../layouts/Base.astro';
 import Artwork from '../components/Artwork.astro';
 import { site } from '../lib/site';
-import { loadContent, address, dateLabel, audioLabel } from '../lib/content';
+import {
+  loadContent,
+  entryDescription,
+  address,
+  dateLabel,
+  audioLabel,
+} from '../lib/content';
 const { posts, sounds, snapshots, series } = await loadContent();
 const recent = [posts[0], sounds[0], snapshots[0]].filter(
   (entry) => entry !== undefined,
@@ -49,11 +55,7 @@ const tiles = [
               </time>
             </small>
             <h3>{entry.data.title}</h3>
-            <p>
-              {entry.collection === 'now'
-                ? entry.data.notes[0]?.text
-                : entry.data.description}
-            </p>
+            <p>{entryDescription(entry)}</p>
           </a>
         ))}
       </div>

@@ -5,7 +5,11 @@ import { loadContent } from '../../lib/content';
 const { snapshots } = await loadContent();
 ---
 
-<Base title="此刻" section="now">
+<Base
+  title="此刻"
+  section="now"
+  imageViewer={snapshots[0]?.rendered?.html.includes('image-open')}
+>
   {snapshots[0] ? (
     <Now entry={snapshots[0]} />
   ) : (

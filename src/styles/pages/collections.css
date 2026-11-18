@@ -1,5 +1,11 @@
 @layer theme, base, components, utilities;
 @layer components {
+  .archive-collection .row {
+    grid-template-columns: max-content minmax(0, 1fr) auto;
+  }
+  .archive-collection .row time {
+    white-space: nowrap;
+  }
   .index-controls {
     display: flex;
     align-items: center;

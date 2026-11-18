@@ -4,6 +4,7 @@ import { writingSchema, audioSchema, nowSchema } from '../src/lib/schemas.ts';
 import {
   isPublished,
   validateContentGraph,
+  validateSnapshotContent,
   writingDirectory,
 } from '../src/lib/publication.ts';
 const post = {
@@ -96,7 +97,7 @@ test('published real audio needs an address, enclosure metadata and ordered chap
     false,
   );
 });
-test('snapshots need a real month and at least one note', () => {
+test('snapshots accept Markdown or legacy notes and require content to publish', () => {
   assert.equal(
     nowSchema.safeParse({
       ...post,
@@ -105,10 +106,15 @@ test('snapshots need a real month and at least one note', () => {
     }).success,
     false,
   );
-  assert.equal(
-    nowSchema.safeParse({ ...post, period: '2026-11', notes: [] }).success,
-    false,
+  const snapshot = nowSchema.parse({ ...post, period: '2026-11' });
+  assert.deepEqual(snapshot.notes, []);
+  assert.doesNotThrow(() =>
+    validateSnapshotContent(snapshot.notes, '月度正文'),
   );
+  assert.doesNotThrow(() =>
+    validateSnapshotContent([{ title: '近况', text: '正文' }]),
+  );
+  assert.throws(() => validateSnapshotContent(snapshot.notes, '  '), /快照/);
 });
 test('duplicate permalinks and broken content references fail before deployment', () => {
   const graph = {
@@ -134,7 +140,12 @@ test('duplicate permalinks and broken content references fail before deployment'
     () =>
       validateContentGraph({
         ...graph,
-        now: [{ id: '2026-10', data: { period: '2026-11' } }],
+        now: [
+          {
+            id: '2026-10',
+            data: { period: '2026-11', notes: [], draft: true },
+          },
+        ],
       }),
     /文件名/,
   );
@@ -165,6 +176,33 @@ test('duplicate permalinks and broken content references fail before deployment'
       }),
     /文章/,
   );
+});
+
+test('audio permalinks and feed IDs are unique across published entries and drafts', () => {
+  const first = {
+    slug: 'first',
+    uid: 'feed-id',
+    relatedWriting: [],
+    draft: false,
+  };
+  const graph = { writing: [], now: [], series: [] };
+  for (const draft of [false, true]) {
+    const duplicate = (slug: string, uid: string) => {
+      const second = { ...first, slug, uid, draft };
+      return validateContentGraph({
+        ...graph,
+        audio: [{ data: first }, { data: second }],
+      });
+    };
+    assert.throws(
+      () => duplicate(first.slug, 'second-id'),
+      /重复的声音地址：first/,
+    );
+    assert.throws(
+      () => duplicate('second', first.uid),
+      /重复的声音订阅标识：feed-id/,
+    );
+  }
 });
 
 test('platform episodes publish with listening links while recordings require playable media', () => {

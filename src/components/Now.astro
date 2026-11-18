@@ -1,12 +1,19 @@
 ---
+import { render } from 'astro:content';
 import PageHeading from './ui/PageHeading.astro';
 import '../styles/pages/now.css';
-import { loadContent, address, type Snapshot } from '../lib/content';
+import {
+  loadContent,
+  address,
+  searchMetadata,
+  type Snapshot,
+} from '../lib/content';
 interface Props {
   entry: Snapshot;
   indexed?: boolean;
 }
 const { entry, indexed = false } = Astro.props;
+const { Content } = await render(entry);
 const { snapshots } = await loadContent();
 const index = snapshots.findIndex((item) => item.id === entry.id);
 const older = snapshots[index + 1],
@@ -52,17 +59,16 @@ const month = Number(entry.data.period.slice(-2));
       </nav>
     </aside>
     <div class="now-content" data-pagefind-body={indexed || undefined}>
-      <div class="snapshot-head">
+      <div
+        class="snapshot-head"
+        data-pagefind-index-attrs="data-search-text"
+        data-search-text={searchMetadata(entry)}
+      >
         <span class="eyebrow">{index === 0 ? '当前快照' : '历史快照'}</span>
         <h2 data-pagefind-meta="title">{entry.data.title}</h2>
       </div>
-      <div class="now-notes">
-        {entry.data.notes.map((note) => (
-          <section>
-            <h3>{note.title}</h3>
-            <p>{note.text}</p>
-          </section>
-        ))}
+      <div class="snapshot-body markdown-body">
+        <Content />
       </div>
       <nav class="snapshot-neighbors" aria-label="相邻月份">
         {older ? (

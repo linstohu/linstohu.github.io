@@ -49,7 +49,7 @@ test('clearing URL search before initialization stays cleared', async ({
 });
 
 for (const route of ['/audio/', '/archive/?tag=声音']) {
-  test(`search only loads audio result fragments on ${route}`, async ({
+  test(`search identifies audio rows without loading result fragments on ${route}`, async ({
     page,
   }) => {
     const fragments = new Set<string>();
@@ -68,7 +68,7 @@ for (const route of ['/audio/', '/archive/?tag=声音']) {
       .locator('#rows [data-entry-key]:visible')
       .all())
       await expect(row).toHaveAttribute('data-entry-key', /^audio:/);
-    expect(fragments.size).toBe(2);
+    expect(fragments.size).toBe(0);
   });
 }
 

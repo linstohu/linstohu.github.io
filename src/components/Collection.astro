@@ -4,6 +4,7 @@ import '../styles/pages/collections.css';
 import {
   loadContent,
   collectionTags,
+  entryKey,
   address,
   dateLabel,
   audioLabel,
@@ -43,26 +44,17 @@ const show = sound
 const label = group === 'writing' ? '文字' : '声音';
 const subtitle =
   group === 'writing' ? site.writingSubtitle : site.audioSubtitle;
-const tags = [
-  ...new Set(
-    entries.flatMap((entry) =>
-      collectionTags(entry, series, group === 'archive'),
-    ),
-  ),
-];
+const tagCounts = new Map<string, number>();
+for (const entry of entries)
+  for (const tag of new Set(collectionTags(entry, group === 'archive')))
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
 ---
 
 <section
   class:list={[{ 'collection-index': isCollection }, `${group}-collection`]}
   data-collection={entries.length > 0 || undefined}
   data-group={group}
-  data-latest={
-    isCollection && latest
-      ? latest.collection +
-        ':' +
-        (latest.collection === 'now' ? latest.data.period : latest.data.slug)
-      : ''
-  }
+  data-latest={isCollection && latest ? entryKey(latest) : ''}
 >
   {isCollection ? (
     <PageHeading title={label} description={subtitle} />
@@ -183,20 +175,20 @@ const tags = [
           class="audio-sources grid grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(min(100%,260px),1fr))]"
           aria-label="选择声音栏目"
         >
-          {tags.map((tag) => {
-            const item = series.find((entry) => entry.data.title === tag);
-            const count = sounds.filter((entry) =>
-              collectionTags(entry, series, false).includes(tag),
-            ).length;
+          {Array.from(tagCounts, ([tag, count]) => {
+            const item = series.find((entry) => entry.id === tag);
             return (
               <div class="audio-source-card">
                 <button
                   class="audio-source"
                   data-filter={tag}
+                  data-legacy-tags={JSON.stringify(
+                    item ? [item.data.title] : ['声音手记', '独立录音'],
+                  )}
                   aria-pressed="false"
                 >
                   <span class="eyebrow">{item ? '栏目' : '独立录音'}</span>
-                  <strong>{tag}</strong>
+                  <strong>{item?.data.title ?? '声音手记'}</strong>
                   <span class="source-description">
                     {item?.data.description ||
                       '独白、现场，以及随手留下的声音。'}
@@ -249,12 +241,12 @@ const tags = [
       </div>
       <div class="index-controls">
         <div class="filters" aria-label="分类筛选">
-          {['全部', ...(group === 'audio' ? [] : tags)].map((tag) => (
+          {['', ...(group === 'audio' ? [] : tagCounts.keys())].map((tag) => (
             <button
               data-filter={tag}
-              aria-pressed={tag === '全部' ? 'true' : 'false'}
+              aria-pressed={tag === '' ? 'true' : 'false'}
             >
-              {tag}
+              {tag || '全部'}
             </button>
           ))}
         </div>
@@ -267,7 +259,7 @@ const tags = [
               : '条记录'}
         </span>
       </div>
-      {group === 'writing' && tags.includes('prompted') && (
+      {group === 'writing' && tagCounts.has('prompted') && (
         <p class="collection-note" data-category-note="prompted" hidden>
           与 AI 的对话，以及由此展开的思考。
         </p>

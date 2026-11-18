@@ -4,7 +4,14 @@ import '../../styles/components/dialogue.css';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { site } from '../../lib/site';
-import { loadContent, dateLabel, type Writing } from '../../lib/content';
+import {
+  loadContent,
+  collectionTags,
+  entryKey,
+  searchMetadata,
+  dateLabel,
+  type Writing,
+} from '../../lib/content';
 export async function getStaticPaths() {
   const { posts } = await loadContent();
   return posts.map((entry) => ({
@@ -31,7 +38,8 @@ const titleWords = prompted
   title={entry.data.title}
   section="writing"
   description={entry.data.description}
-  entryKey={`writing:${entry.data.slug}`}
+  entryKey={entryKey(entry)}
+  filterTags={collectionTags(entry)}
   noindex={entry.data.draft}
   imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
@@ -51,7 +59,11 @@ const titleWords = prompted
           entry.data.category && <span>{entry.data.category}</span>
         )}
       </div>
-      <header class="article-head">
+      <header
+        class="article-head"
+        data-pagefind-index-attrs="data-search-text"
+        data-search-text={searchMetadata(entry)}
+      >
         {prompted && (
           <span class="dialogue-orbits" aria-hidden="true">
             <span class="orbit-warm"></span>

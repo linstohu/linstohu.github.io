@@ -9,6 +9,7 @@ interface Props {
   section: string;
   description?: string;
   entryKey?: string;
+  filterTags?: string[];
   noindex?: boolean;
   imageViewer?: boolean;
 }
@@ -17,6 +18,7 @@ const {
   section,
   description = site.description,
   entryKey,
+  filterTags = [],
   noindex = false,
   imageViewer = false,
 } = Astro.props;
@@ -44,8 +46,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     {entryKey && (
       <>
-        <meta data-pagefind-meta="entry_key[content]" content={entryKey} />
+        <meta
+          data-pagefind-meta="entry_key[content]"
+          data-pagefind-filter="entry_key[content]"
+          content={entryKey}
+        />
         <meta data-pagefind-filter="type[content]" content={section} />
+        {filterTags.map((tag) => (
+          <meta data-pagefind-filter="tag[content]" content={tag} />
+        ))}
       </>
     )}
     <link

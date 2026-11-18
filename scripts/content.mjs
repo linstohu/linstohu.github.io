@@ -125,13 +125,6 @@ if (values.help || !command) {
             title,
             publishedAt: timestamp(),
             draft: true,
-            notes: [
-              { title: '正在做', text: '写下这段时间关注的一件事。' },
-              {
-                title: '正在读',
-                text: '留一本书、一句话，或一个还在想的问题。',
-              },
-            ],
           },
           '',
         );

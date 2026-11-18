@@ -1,10 +1,20 @@
 ---
-import '../../styles/pages/reading.css';
+import '../../styles/components/audio-cover.css';
+import '../../styles/pages/audio.css';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { loadContent, address, dateLabel, type Audio } from '../../lib/content';
+import {
+  loadContent,
+  collectionTags,
+  entryKey,
+  searchMetadata,
+  address,
+  dateLabel,
+  type Audio,
+} from '../../lib/content';
 import Row from '../../components/Row.astro';
 import { durationLabel } from '../../lib/duration';
+import EpisodeNumber from '../../components/EpisodeNumber.astro';
 import AudioCover from '../../components/AudioCover.astro';
 export async function getStaticPaths() {
   const { sounds } = await loadContent();
@@ -36,7 +46,8 @@ const related = posts.filter((post) =>
   title={entry.data.title}
   section="audio"
   description={entry.data.description}
-  entryKey={`audio:${entry.data.slug}`}
+  entryKey={entryKey(entry)}
+  filterTags={collectionTags(entry)}
   noindex={entry.data.draft}
   imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
@@ -48,7 +59,11 @@ const related = posts.filter((post) =>
     <a class="audio-return" href="/audio/">
       ← 声音
     </a>
-    <header class="audio-hero">
+    <header
+      class="audio-hero"
+      data-pagefind-index-attrs="data-search-text"
+      data-search-text={searchMetadata(entry, show?.data.title)}
+    >
       <div
         class:list={[
           'show-cover',
@@ -61,9 +76,7 @@ const related = posts.filter((post) =>
       </div>
       <div class="audio-hero-copy">
         <div class="audio-kicker">
-          {entry.data.episode && (
-            <span class="episode-number">EP.{entry.data.episode}</span>
-          )}
+          {entry.data.episode && <EpisodeNumber episode={entry.data.episode} />}
           <span>{show?.data.title || '声音手记'}</span>
           {entry.data.draft && <span>草稿预览</span>}
         </div>

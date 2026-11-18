@@ -2,14 +2,14 @@ interface Publication {
   draft: boolean;
   publishedAt: Date;
 }
+const writingDay = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Shanghai',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
 export function writingDirectory(slug: string, publishedAt: Date): string {
-  const day = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Asia/Shanghai',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(publishedAt);
-  return `${day}-${slug}`;
+  return `${writingDay.format(publishedAt)}-${slug}`;
 }
 export function isPublished(
   data: Publication,
@@ -29,9 +29,17 @@ interface AudioReference {
     relatedWriting: string[];
   };
 }
+export function validateSnapshotContent(
+  notes: readonly unknown[],
+  body?: string,
+) {
+  if (!notes.length && !body?.trim())
+    throw new Error('发布快照需要填写 Markdown 正文或 notes。');
+}
 interface SnapshotReference {
   id: string;
-  data: { period: string };
+  body?: string;
+  data: { period: string; draft: boolean; notes: unknown[] };
 }
 interface ContentGraph {
   writing: WritingReference[];
@@ -77,11 +85,14 @@ export function validateContentGraph({
       );
   }
   const shows = new Set(series.map((entry) => entry.id));
-  for (const entry of now)
+  for (const entry of now) {
     if (entry.id !== entry.data.period)
       throw new Error(
         `快照文件名与 period 不符：${entry.id} / ${entry.data.period}`,
       );
+    if (!entry.data.draft)
+      validateSnapshotContent(entry.data.notes, entry.body);
+  }
   for (const entry of audio) {
     if (entry.data.series && !shows.has(entry.data.series))
       throw new Error(

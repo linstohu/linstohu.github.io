@@ -266,7 +266,7 @@ test(
         /class="cover-title">\s*声音\s*<br\s*\/?>\s*手记\s*<\/span>/,
       );
       assert.doesNotMatch(audioListing, /老大不小/);
-      assert.match(audioListing, /data-filter="声音手记"/);
+      assert.match(audioListing, /data-filter="kind:recording"/);
       assert.ok(audioListing.includes(`href="/audio/${id}/"`));
       const recordingPage = await readFile(
         path.join(output, 'audio', id, 'index.html'),
@@ -348,9 +348,9 @@ test(
         path.join(output, 'audio/index.html'),
         'utf8',
       );
-      assert.match(podcastListing, /data-filter="老大不小"/);
+      assert.match(podcastListing, /data-filter="thirty-plus"/);
       assert.match(podcastListing, /href="\/audio\/episode\/"/);
-      assert.match(podcastListing, /data-filter="声音手记"/);
+      assert.match(podcastListing, /data-filter="kind:recording"/);
       const externalPage = await readFile(
         path.join(output, 'audio/episode/index.html'),
         'utf8',

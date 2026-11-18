@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import { existsSync } from 'node:fs';
 
 import { unified } from '@astrojs/markdown-remark';
+import remarkSnapshotNotes from './src/lib/remark-snapshot-notes.mjs';
 import rehypeFigures from './src/lib/rehype-figures.mjs';
 import rehypeDialogue from './src/lib/rehype-dialogue.mjs';
 import { site } from './src/lib/site.ts';
@@ -17,6 +18,7 @@ export default defineConfig({
   prerenderConflictBehavior: 'error',
   markdown: {
     processor: unified({
+      remarkPlugins: [remarkSnapshotNotes],
       rehypePlugins: [rehypeFigures, [rehypeDialogue, { userName: site.name }]],
       remarkRehype: {
         footnoteLabel: '注释与出处',

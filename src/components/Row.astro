@@ -1,9 +1,12 @@
 ---
+import EpisodeNumber from './EpisodeNumber.astro';
 import {
   address,
   collectionTags,
   dateLabel,
   audioLabel,
+  entryKey,
+  searchMetadata,
   type Writing,
   type Audio,
   type Snapshot,
@@ -12,7 +15,7 @@ import type { CollectionEntry } from 'astro:content';
 interface Props {
   entry: Writing | Audio | Snapshot;
   series: CollectionEntry<'series'>[];
-  variant?: string;
+  variant?: 'generic' | 'writing' | 'audio' | 'archive';
   initiallyHidden?: boolean;
 }
 const {
@@ -27,16 +30,13 @@ const label =
     : entry.collection === 'now'
       ? '月份快照'
       : entry.data.category;
-const key =
-  entry.collection +
-  ':' +
-  (entry.collection === 'now' ? entry.data.period : entry.data.slug);
-const description =
-  entry.collection === 'now'
-    ? entry.data.notes[0]?.text
-    : entry.data.description;
-const tags = collectionTags(entry, series, variant === 'archive');
-const searchText = [entry.data.title, description, label, ...tags]
+const key = entryKey(entry);
+const tags = collectionTags(entry, variant === 'archive');
+const showTitle =
+  entry.collection === 'audio'
+    ? series.find((item) => item.id === entry.data.series)?.data.title
+    : undefined;
+const searchText = [entry.data.title, searchMetadata(entry, showTitle), ...tags]
   .join(' ')
   .toLowerCase();
 ---
@@ -52,22 +52,14 @@ const searchText = [entry.data.title, description, label, ...tags]
   >
     <div class="episode-copy">
       <div class="episode-meta">
-        {entry.data.episode && (
-          <span class="episode-number" aria-label={`第${entry.data.episode}期`}>
-            EP.{entry.data.episode}
-          </span>
-        )}
-        <span class="episode-series">
-          {entry.data.series
-            ? series.find((item) => item.id === entry.data.series)?.data.title
-            : '声音手记'}
-        </span>
+        {entry.data.episode && <EpisodeNumber episode={entry.data.episode} />}
+        <span class="episode-series">{showTitle ?? '声音手记'}</span>
         <time datetime={entry.data.publishedAt.toISOString()}>
           {dateLabel(entry.data.publishedAt)}
         </time>
       </div>
       <h3>{entry.data.title}</h3>
-      <p>{description}</p>
+      <p>{entry.data.description}</p>
     </div>
     <span class="episode-row-action" aria-hidden="true">
       ↗
@@ -86,7 +78,7 @@ const searchText = [entry.data.title, description, label, ...tags]
     hidden={initiallyHidden}
   >
     <time datetime={entry.data.publishedAt.toISOString()}>
-      {variant === 'writing'
+      {variant === 'writing' || variant === 'archive'
         ? dateLabel(entry.data.publishedAt)
         : dateLabel(entry.data.publishedAt).slice(5)}
     </time>
@@ -98,7 +90,9 @@ const searchText = [entry.data.title, description, label, ...tags]
             (label ? ' / ' + label : '')}
       </small>
       <strong>{entry.data.title}</strong>
-      {variant === 'writing' && <p>{description}</p>}
+      {variant === 'writing' && entry.collection === 'writing' && (
+        <p>{entry.data.description}</p>
+      )}
     </span>
     <span class="arrow" aria-hidden="true">
       ↗

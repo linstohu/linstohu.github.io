@@ -1,0 +1,85 @@
+@layer theme, base, components, utilities;
+@layer components {
+  .show-cover {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    aspect-ratio: 1;
+    padding: 22px 26px;
+    overflow: hidden;
+    background: #ad573e;
+    color: #f6efda;
+  }
+  .show-cover:hover {
+    color: #f6efda;
+  }
+  .show-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 0 77%;
+    background: #bec8ac;
+  }
+  .cover-title {
+    position: relative;
+    z-index: 1;
+    font: 500 49px/1.2 var(--serif);
+    letter-spacing: 0.09em;
+  }
+  .cover-caption {
+    position: relative;
+    z-index: 1;
+    font-size: 10px;
+    margin-top: 17px;
+    letter-spacing: 0.13em;
+  }
+  .cover-disc {
+    position: absolute;
+    right: -33px;
+    bottom: 13px;
+    width: 100px;
+    height: 100px;
+    border: 1px solid #5e705c;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 7px #bec8ac,
+      0 0 0 8px #7e8d71;
+  }
+  .recording-cover {
+    background: #56705c;
+  }
+  .recording-cover::before {
+    background: #d5d8ba;
+  }
+  @media (max-width: 760px) {
+    .show-cover {
+      padding: 14px;
+    }
+    .cover-title {
+      font-size: 26px;
+    }
+    .cover-caption {
+      font-size: 6px;
+      letter-spacing: 0.02em;
+      margin-top: 9px;
+    }
+    .cover-disc {
+      width: 52px;
+      height: 52px;
+      right: -21px;
+      bottom: 5px;
+    }
+    .show-cover .cover-caption {
+      display: none;
+    }
+  }
+  @media (max-width: 360px) {
+    .show-cover {
+      padding: 10px;
+    }
+    .cover-title {
+      font-size: 23px;
+    }
+  }
+}

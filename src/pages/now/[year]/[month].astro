@@ -1,7 +1,7 @@
 ---
 import Base from '../../../layouts/Base.astro';
 import Now from '../../../components/Now.astro';
-import { loadContent, type Snapshot } from '../../../lib/content';
+import { entryKey, loadContent, type Snapshot } from '../../../lib/content';
 export async function getStaticPaths() {
   const { snapshots } = await loadContent();
   return snapshots.map((entry) => ({
@@ -21,8 +21,9 @@ const { entry } = Astro.props;
 <Base
   title={entry.data.title}
   section="now"
-  entryKey={`now:${entry.data.period}`}
+  entryKey={entryKey(entry)}
   noindex={entry.data.draft}
+  imageViewer={entry.rendered?.html.includes('image-open')}
 >
   <Now entry={entry} indexed />
 </Base>

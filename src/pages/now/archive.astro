@@ -2,7 +2,7 @@
 import PageHeading from '../../components/ui/PageHeading.astro';
 import '../../styles/pages/now.css';
 import Base from '../../layouts/Base.astro';
-import { loadContent, address } from '../../lib/content';
+import { loadContent, address, entryDescription } from '../../lib/content';
 const { snapshots } = await loadContent();
 const years = [
   ...new Set(snapshots.map((entry) => entry.data.period.slice(0, 4))),
@@ -29,7 +29,7 @@ const years = [
                   {Number(entry.data.period.slice(-2))} 月
                 </time>
                 <h3>{entry.data.title}</h3>
-                <p>{entry.data.notes[0]?.text}</p>
+                <p>{entryDescription(entry)}</p>
                 <span aria-hidden="true">↗</span>
               </a>
             ))}

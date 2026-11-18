@@ -1,5 +1,12 @@
 import { parseFragment, type DefaultTreeAdapterTypes } from 'parse5';
 
+const proseContainers = new Set([
+  'dialogue-turn',
+  'dialogue-content',
+  'snapshot-note',
+  'snapshot-note-body',
+]);
+
 function textOf(node: DefaultTreeAdapterTypes.Node): string {
   if ('value' in node) return node.value;
   if (node.nodeName === 'br') return ' ';
@@ -9,14 +16,16 @@ function textOf(node: DefaultTreeAdapterTypes.Node): string {
 export function articleExcerpt(html: string, description: string): string {
   const prose: DefaultTreeAdapterTypes.Node[] = [];
   function collect(node: DefaultTreeAdapterTypes.Node) {
-    if (node.nodeName === 'p') prose.push(node);
+    if (node.nodeName === 'p' || (!description && node.nodeName === 'li'))
+      prose.push(node);
     else if (
       node.nodeName === '#document-fragment' ||
+      (!description && ['ul', 'ol', 'blockquote'].includes(node.nodeName)) ||
       ('attrs' in node &&
         node.attrs.some(
           (attr) =>
             attr.name === 'class' &&
-            /\bdialogue-(turn|content)\b/.test(attr.value),
+            attr.value.split(/\s+/).some((name) => proseContainers.has(name)),
         ))
     ) {
       if ('childNodes' in node) node.childNodes.forEach(collect);
@@ -29,6 +38,7 @@ export function articleExcerpt(html: string, description: string): string {
   const summary = description.replace(/\s+/g, '').replace(/…$/, '');
   const passage =
     paragraphs.find((paragraph) => {
+      if (!summary) return true;
       const text = paragraph.replace(/\s+/g, '');
       return !summary.includes(text) && !text.startsWith(summary);
     }) ??

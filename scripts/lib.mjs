@@ -15,7 +15,10 @@ import path from 'node:path';
 import { parseDocument, stringify } from 'yaml';
 import { randomUUID } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
-import { writingDirectory } from '../src/lib/publication.ts';
+import {
+  writingDirectory,
+  validateSnapshotContent,
+} from '../src/lib/publication.ts';
 import { editorialSchemas, timestampSchema } from '../src/lib/schemas.ts';
 export const root = fileURLToPath(new URL('../', import.meta.url));
 export const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -186,8 +189,11 @@ async function updatePublication(file, kind, requestedDate) {
   const header = frontmatter
     .toString({ defaultKeyType: 'PLAIN', defaultStringType: 'QUOTE_DOUBLE' })
     .replaceAll('\n', eol);
-  if (kind === 'now' && path.basename(file, '.md') !== parsed.period)
-    throw new Error('月份与文件名不符。');
+  if (kind === 'now') {
+    if (path.basename(file, '.md') !== parsed.period)
+      throw new Error('月份与文件名不符。');
+    validateSnapshotContent(parsed.notes, body);
+  }
   const originalDirectory = path.dirname(file);
   const destination =
     kind === 'writing'

@@ -131,7 +131,7 @@ export const audioSchema = z
 export const nowSchema = z.object({
   ...common,
   period: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
-  notes: z.array(z.object({ title: text, text })).min(1),
+  notes: z.array(z.object({ title: text, text })).default([]),
 });
 export const seriesSchema = z.object({
   title: text,
