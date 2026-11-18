@@ -103,6 +103,13 @@ describe('monthly snapshots and collection search', () => {
   });
 
   it('matches indexed writing metadata and scopes shared body terms without fetching result fragments', async (t) => {
+    const sections = elements(
+      await project.page('writing/conversation'),
+      'details',
+    ).filter((el) => attr(el, 'class') === 'reply-section');
+    assert.equal(sections.length, 2);
+    assert.ok(sections.every((section) => attr(section, 'open') === undefined));
+    assert.match(textOf(sections[1]), /leafmargin/);
     const { index, fragments } = await openSearch(t, project.output);
     await index.filters();
     const cases = [
@@ -113,6 +120,7 @@ describe('monthly snapshots and collection search', () => {
         'orchardtag',
         'Rowan',
         'sharedorchard',
+        'leafmargin',
       ].map((q) => [q, 'writing', 'prompted', 'writing:conversation']),
       ['sharedorchard', 'audio', 'recording', 'audio:recording'],
       ['sharedorchard', 'audio', 'kind:recording', 'audio:field-note'],

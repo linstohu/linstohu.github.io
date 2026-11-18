@@ -11,31 +11,28 @@ publishedAt: "1999-12-31T09:00:00+08:00"
 draft: false
 ---
 
-这是一次与 AI 的对话，回答经过整理。
+从一次工作中的失误，聊到下次可以怎么做。
 
 **我：**
 
-promptedneedles：遇到问题以后，我的第一反应常常是先找责任人，哪怕是自己做错了，也会继续想是谁引发了我做错。这种思维习惯究竟应该如何改变？
+遇到问题以后，我的第一反应常常是先找责任人，哪怕是自己做错了，也会继续想是谁引发了我做错。怎样才能改变这种习惯？
 
 **AI：**
 
+先把发生的事写下来，再看当时自己能决定什么。
+
 ## 换一个思考顺序
 
-AI 提供了一个值得考虑的角度，先看看自己可以做什么。
+比如，同事给你的数据少了一列，而你直接用了它。数据确实有问题。你也可以回想，自己是在哪一步发现不对的，当时手里还有哪些信息。
 
-长回答中也需要记得是谁在说话。可以先描述发生了什么，再检查自己当时有哪些选择。思考的时候不急着给出结论，留下观察的余地。
-
-长回答中也需要记得是谁在说话。可以先描述发生了什么，再检查自己当时有哪些选择。思考的时候不急着给出结论，留下观察的余地。
-
-长回答中也需要记得是谁在说话。可以先描述发生了什么，再检查自己当时有哪些选择。思考的时候不急着给出结论，留下观察的余地。
-
-长回答中也需要记得是谁在说话。可以先描述发生了什么，再检查自己当时有哪些选择。思考的时候不急着给出结论，留下观察的余地。
+把这两部分都写下来以后，再往前走一步。下一次遇到相似情况，可以在哪个环节停下来查一下？
 
 > 引用仍然是引用，不会变成新的发言。
 
 ```md
 **我：**
-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-
+promptedneedles
+long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-
 ```
 
 | 部分 | 说明 |
@@ -46,13 +43,46 @@ long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-
 
 对话还可以继续，不必急着写出结论。
 
+### 先从哪里观察？
+
+留意下一次想要责怪别人的时刻。
+
 **我：**
 
-那我先观察下一次的反应。
+如果确实是对方先做错了呢？
+
+我一承认自己也有问题，就担心别人的那部分责任会被抹去。
 
 **AI：**
 
-可以从一件具体的小事开始。
+可以把两件事分开说。先说对方提供的信息哪里有误，再说自己依据这份信息做了什么决定。两句话都成立。
+
+> 「这列数据需要你重新核对。我也会在发出报告前，再看一次原表。」
+
+1. 当时发生了什么？
+2. 哪条信息有误？
+3. 我什么时候拿到它？
+4. 当时还能查到什么？
+5. 我做了哪个决定？
+6. 谁可以补充事实？
+7. 现在能补救什么？
+8. 下次先核对哪一步？
+
+**我：**
+
+当下很生气，怎么让自己先停一下？
+
+**AI：**
+
+给自己一句说得出口的缓冲：「我想先把事情弄清楚，稍后再回你。」短暂离开争执，你就有机会决定下一句要说什么。
+
+**我：**
+
+那第一步呢？
+
+**AI：**
+
+只记下最近的一件小事。写两行，一行是当时发生了什么，另一行是你接下来可以做什么。
 
 ---
 

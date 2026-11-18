@@ -1,8 +1,10 @@
 import { parseFragment, type DefaultTreeAdapterTypes } from 'parse5';
 
 const proseContainers = new Set([
+  'dialogue-round',
   'dialogue-turn',
   'dialogue-content',
+  'reply-section',
   'snapshot-note',
   'snapshot-note-body',
 ]);

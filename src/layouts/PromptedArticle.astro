@@ -1,0 +1,72 @@
+---
+import WritingArticle from './WritingArticle.astro';
+import DialogueIndex from '../components/DialogueIndex.astro';
+import type { Writing } from '../lib/content';
+import '../styles/components/dialogue.css';
+interface Props {
+  entry: Writing;
+  rounds: { id: string; title: string }[];
+}
+const { entry, rounds } = Astro.props;
+const { conversation } = entry.data;
+const words = [
+  ...new Intl.Segmenter('zh-CN', { granularity: 'word' }).segment(
+    entry.data.title,
+  ),
+];
+---
+
+<WritingArticle
+  entry={entry}
+  class="dialogue-page"
+  categoryHref="/writing/?tag=prompted"
+  backLabel="返回 prompted"
+>
+  <Fragment slot="title">
+    <span class="dialogue-orbits" aria-hidden="true">
+      <span class="orbit-warm"></span>
+      <span class="orbit-cool"></span>
+    </span>
+    <h1
+      id="article-title"
+      data-pagefind-meta="title"
+      aria-label={entry.data.title}
+    >
+      {words.map((word, index) => (
+        <>
+          {word.isWordLike && words[index - 1]?.isWordLike && <wbr />}
+          {word.segment}
+        </>
+      ))}
+    </h1>
+  </Fragment>
+  <Fragment slot="source">
+    {conversation && (
+      <span class="article-source">
+        与 {conversation.assistant} 对话
+        {conversation.model && <> · {conversation.model}</>}
+      </span>
+    )}
+  </Fragment>
+  <Fragment slot="source-link">
+    {conversation?.url && (
+      <a
+        class="article-source-link"
+        href={conversation.url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        原对话 ↗
+      </a>
+    )}
+  </Fragment>
+  <div class:list={{ 'dialogue-reading': rounds.length > 1 }}>
+    {rounds.length > 1 && <DialogueIndex rounds={rounds} />}
+    <div class="article-body markdown-body">
+      <slot />
+    </div>
+  </div>
+</WritingArticle>
+<script>
+  import '../scripts/dialogue';
+</script>

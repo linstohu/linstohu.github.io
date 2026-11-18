@@ -29,9 +29,13 @@ test('prompted filtering, full-text search and return navigation stay connected'
     'ChatGPT',
     '我',
     'ChatGPT',
+    '我',
+    'ChatGPT',
+    '我',
+    'ChatGPT',
   ]);
   await expect(page.locator('.dialogue-caption')).toHaveCount(0);
-  await expect(page.locator('.dialogue-avatar')).toHaveCount(4);
+  await expect(page.locator('.dialogue-avatar')).toHaveCount(8);
   await expect(
     page.locator('[data-speaker="user"] > .dialogue-avatar').first(),
   ).toHaveText('R');
@@ -105,6 +109,10 @@ test('dialogue separates speakers and keeps rich answers readable across themes 
   page,
 }) => {
   await page.goto('/writing/a-question/');
+  await page
+    .getByRole('button', { name: '展开本条回答的全部小节' })
+    .first()
+    .click();
   for (const width of [320, 375, 760, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ['light', 'dark']) {
@@ -136,10 +144,8 @@ test('dialogue separates speakers and keeps rich answers readable across themes 
           orbits.x >= title.x + title.width,
       ).toBe(true);
       const question = page.locator('[data-speaker="user"]').first();
-      await expect(question).not.toHaveCSS(
-        'background-color',
-        'rgba(0, 0, 0, 0)',
-      );
+      await expect(question).toHaveCSS('border-inline-end-width', '2px');
+      await expect(question).toHaveCSS('border-top-width', '0px');
       const answer = page.locator('[data-speaker="assistant"]').first();
       await expect(answer).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
       const questionBounds = (await question.boundingBox())!;
@@ -217,6 +223,162 @@ test('dialogue separates speakers and keeps rich answers readable across themes 
   }
 });
 
+test('readers can skim an answer, open a subsection by keyboard and follow its heading link', async ({
+  page,
+}) => {
+  await page.goto('/writing/a-question/');
+  const answer = page.locator('[data-speaker="assistant"]').first();
+  const sections = answer.locator('details.reply-section');
+  await expect(sections).toHaveCount(3);
+  await expect(answer.locator('details[open]')).toHaveCount(0);
+  await expect(
+    answer.getByText('先把发生的事写下来，再看当时自己能决定什么。'),
+  ).toBeVisible();
+  const second = sections.nth(1);
+  await second.locator(':scope > summary').press('Enter');
+  await expect(second).toHaveAttribute('open', '');
+  await expect(sections.first()).not.toHaveAttribute('open', '');
+  const child = sections.nth(2);
+  const childHeading = child.locator('summary h3');
+  const fragment =
+    '#' + encodeURIComponent((await childHeading.getAttribute('id'))!);
+  await child.locator('summary').press('Space');
+  await expect(child.getByText('留意下一次想要责怪别人的时刻。')).toBeVisible();
+
+  await answer.getByRole('button', { name: '展开本条回答的全部小节' }).click();
+  await expect(answer.locator('details[open]')).toHaveCount(3);
+  await answer.getByRole('button', { name: '收起本条回答的全部小节' }).click();
+  await expect(answer.locator('details[open]')).toHaveCount(0);
+  await page.goto('/writing/a-question/' + fragment);
+  await expect(second).toHaveAttribute('open', '');
+  await expect(child).toHaveAttribute('open', '');
+  await expect(childHeading).toBeInViewport();
+  await expect(sections.first()).not.toHaveAttribute('open', '');
+
+  const list = page
+    .getByRole('group', { name: '第 2 轮对话' })
+    .locator('details.reply-section');
+  await expect(list.locator('summary')).toHaveText('清单（8 项）');
+  await expect(list.locator('ol')).toBeHidden();
+  await list.locator('summary').press('Enter');
+  await expect(list.locator('li').last()).toBeVisible();
+  await expect(list.locator('li')).toHaveCount(8);
+});
+
+test('the open reply outline advances with reading and stays still with reduced motion', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 650 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/writing/a-question/');
+  const answer = page.locator('[data-speaker="assistant"]').first();
+  await expect(answer.locator('.reply-trace')).toBeHidden();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await answer.getByRole('button', { name: '展开本条回答的全部小节' }).click();
+  const path = answer.locator('.reply-trace path');
+  await expect(path).toHaveAttribute('d', /^M /);
+  async function scrollToProgress(progress: number) {
+    await answer.evaluate((element, position) => {
+      const rect = element.getBoundingClientRect();
+      window.scrollTo(
+        0,
+        scrollY + rect.top + rect.height * position - innerHeight * 0.72,
+      );
+    }, progress);
+  }
+  const offset = () =>
+    path.evaluate((node) =>
+      parseFloat(getComputedStyle(node).strokeDashoffset),
+    );
+  await scrollToProgress(0.15);
+  await expect.poll(offset).toBeGreaterThan(0.75);
+  await scrollToProgress(0.65);
+  await expect.poll(offset).toBeLessThan(0.45);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(answer.locator('.reply-trace')).toBeHidden();
+  expect(
+    await answer.evaluate(
+      (node) => getComputedStyle(node, '::before').borderLeftWidth,
+    ),
+  ).toBe('1px');
+});
+
+test('the question index follows the reader and supports keyboard jumps and direct links', async ({
+  page,
+}) => {
+  await page.goto('/writing/a-question/#dialogue:2');
+  const nav = page.getByRole('navigation', { name: '对话目录' });
+  const summary = nav.locator('summary');
+  const links = nav.locator('ol a');
+  const third = page.getByRole('group', { name: '第 3 轮对话' });
+  const compact = await page.evaluate(
+    () => matchMedia('(width < 64rem)').matches,
+  );
+  await expect(links.nth(1)).toHaveAttribute('aria-current', 'location');
+  if (compact) {
+    await summary.click();
+    await links.nth(2).click();
+    await expect(page).toHaveURL(/#dialogue:3$/);
+    await expect(links.nth(2)).toHaveAttribute('aria-current', 'location');
+    await expect(links.nth(2)).toBeHidden();
+    await page.goBack();
+    await expect(page).toHaveURL(/#dialogue:2$/);
+    await expect(links.nth(1)).toHaveAttribute('aria-current', 'location');
+    await summary.click();
+    await links.nth(1).click();
+    await expect(links.nth(1)).toBeHidden();
+    await expect(page).toHaveURL(/#dialogue:2$/);
+    await summary.press('Enter');
+    await expect(links.nth(2)).toBeVisible();
+  }
+  await page
+    .getByRole('group', { name: '第 2 轮对话' })
+    .locator('[data-speaker="assistant"] p')
+    .first()
+    .click();
+  await expect(page).toHaveURL(/#dialogue:2$/);
+  if (compact) {
+    await expect(links.first()).toBeHidden();
+    await summary.press('Enter');
+    await links.last().press('Tab');
+    await expect(links.first()).toBeHidden();
+    await expect(nav.locator(':focus')).toHaveCount(0);
+    await summary.press('Enter');
+    await links.nth(2).press('Escape');
+    await expect(summary).toBeFocused();
+    await expect(links.nth(2)).toBeHidden();
+    await summary.press('Enter');
+  } else await expect(links.nth(2)).toBeVisible();
+  await links.nth(2).press('Enter');
+  await expect(page).toHaveURL(/#dialogue:3$/);
+  await expect(third).toBeFocused();
+  await expect(third).toBeInViewport();
+  const focusedQuestion = third.locator('[data-speaker="user"]');
+  await expect(focusedQuestion).toHaveCSS('outline-style', 'none');
+  await expect(focusedQuestion.locator('.dialogue-avatar')).toHaveCSS(
+    'outline-style',
+    'solid',
+  );
+  await expect(links.nth(2)).toHaveAttribute('aria-current', 'location');
+  if (compact) {
+    await expect(links.nth(2)).toBeHidden();
+    const bar = (await summary.boundingBox())!;
+    expect((await third.boundingBox())!.y).toBeGreaterThanOrEqual(
+      bar.y + bar.height - 1,
+    );
+  }
+  await page
+    .getByRole('group', { name: '第 1 轮对话' })
+    .evaluate((node) => node.scrollIntoView());
+  await expect(links.first()).toHaveAttribute('aria-current', 'location');
+  await expect(page).toHaveURL(/#dialogue:3$/);
+  await page.goBack();
+  await expect(page).toHaveURL(/#dialogue:2$/);
+  await page.setViewportSize({ width: 1440, height: 1400 });
+  await page.goto('/writing/a-question/#dialogue:4');
+  await expect(links.last()).toHaveAttribute('aria-current', 'location');
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
   test('readers can return to the writing list and reopen a conversation', async ({
@@ -225,16 +387,32 @@ test.describe('without JavaScript', () => {
     await page.setViewportSize({ width: 375, height: 900 });
     await page.goto('/writing/a-question/');
     await expect(page.locator('[data-speaker="user"]').first()).toContainText(
-      'promptedneedles',
+      '怎样才能改变这种习惯？',
     );
     await expect(page.locator('.article-body h2')).toHaveCount(2);
-    await expect(page.locator('.dialogue-turn')).toHaveCount(4);
+    await expect(page.locator('.dialogue-turn')).toHaveCount(8);
+    const firstReply = page.locator('[data-speaker="assistant"]').first();
+    await expect(firstReply.locator('.reply-toggle')).toBeHidden();
+    await firstReply
+      .locator('details.reply-section summary')
+      .first()
+      .press('Enter');
+    await expect(firstReply.locator('table')).toBeVisible();
+    const index = page.getByRole('navigation', { name: '对话目录' });
+    await index.locator('summary').press('Enter');
+    await index
+      .getByRole('link', { name: '当下很生气，怎么让自己先停一下？' })
+      .click();
+    await expect(page).toHaveURL(/#dialogue:3$/);
+    await expect(
+      page.getByRole('group', { name: '第 3 轮对话' }),
+    ).toBeInViewport();
     await expect(page.locator('.article-body > p').last()).toHaveText(
       '这是对话后的笔记。',
     );
     await expect(
-      page.getByRole('heading', { name: '还想继续追问', exact: true }),
-    ).toBeAttached();
+      firstReply.locator('summary').getByText('还想继续追问', { exact: true }),
+    ).toBeVisible();
     await expect(
       page
         .locator('.article-path')
@@ -263,5 +441,8 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('.article-body h2')).toHaveCount(0);
     await expect(page.locator('.dialogue-turn')).toHaveCount(0);
     await expect(page.locator('.dialogue-orbits')).toBeHidden();
+    await expect(
+      page.getByRole('navigation', { name: '对话目录' }),
+    ).toHaveCount(0);
   });
 });

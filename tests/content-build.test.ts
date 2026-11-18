@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import { readFile, stat } from 'node:fs/promises';
+import { cp, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { after, before, describe, it, test } from 'node:test';
 import sharp from 'sharp';
 import parseSrcset from '@prettier/parse-srcset';
 import { writeEditorialDrafts } from './fixtures/editorial.mjs';
 import { attr, elements, textOf } from './helpers/html.ts';
-import { createTestProject } from './helpers/project.mjs';
+import { createTestProject, fixtures } from './helpers/project.mjs';
 import { audioItems } from './helpers/rss.mjs';
 import { createDocument } from '../scripts/lib.mjs';
 
@@ -182,11 +182,16 @@ describe('publishing and rebuilding the same site', () => {
     assert.equal(textOf(elements(turns[1], 'h2')[0]), '一个解释');
     assert.match(textOf(elements(turns[1], 'blockquote')[0]), /保留下来的原话/);
     assert.match(textOf(turns[1]), /自由编排的正文/);
-    const free = await site.page('writing/open-note');
-    assert.match(free, /今天只记下一句话。/);
-    assert.doesNotMatch(
-      free,
-      /class="article-source"|data-speaker=|我的提问|我的思考与收获/,
+    const [free] = elements(await site.page('writing/open-note'), 'article');
+    assert.match(textOf(free), /今天只记下一句话。/);
+    assert.doesNotMatch(textOf(free), /我的提问|我的思考与收获/);
+    assert.ok(
+      !elements(free, 'span').some(
+        (el) => attr(el, 'class') === 'article-source',
+      ),
+    );
+    assert.ok(
+      !elements(free, 'section').some((el) => attr(el, 'data-speaker')),
     );
     assert.match(await site.page('writing'), /data-filter="prompted"/);
   });
@@ -284,5 +289,37 @@ test('a conflicting draft fails a real production build', async (t) => {
     site.build,
     (error: Error & { stdout?: string; stderr?: string }) =>
       (error.message + error.stdout + error.stderr).includes('重复的声音地址'),
+  );
+});
+
+test('a renderer upgrade refreshes the question index of an unchanged article', async (t) => {
+  const site = await createTestProject();
+  t.after(site.dispose);
+  const directory = 'writing/1999-12-31-a-question';
+  await cp(
+    path.join(fixtures, 'browser/content', directory),
+    site.content(directory),
+    { recursive: true },
+  );
+  const plugin = path.join(site.directory, 'src/lib/rehype-dialogue.mjs');
+  const current = await readFile(plugin);
+  await writeFile(plugin, 'export default function rehypeDialogue() {}');
+  site.build();
+  assert.doesNotMatch(await site.page('writing/a-question'), /id="dialogue:1"/);
+
+  await writeFile(plugin, current);
+  site.build();
+  const html = await site.page('writing/a-question');
+  const index = elements(html, 'nav').find(
+    (nav) => attr(nav, 'aria-label') === '对话目录',
+  );
+  assert.ok(index);
+  const targets = elements(html, 'div').filter(
+    (block) => attr(block, 'class') === 'dialogue-round',
+  );
+  assert.equal(targets.length, 4);
+  assert.deepEqual(
+    elements(index, 'a').map((link) => attr(link, 'href')),
+    targets.map((target) => '#' + attr(target, 'id')),
   );
 });

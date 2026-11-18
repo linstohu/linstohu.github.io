@@ -1,0 +1,291 @@
+---
+interface Props {
+  rounds: { id: string; title: string }[];
+}
+const { rounds } = Astro.props;
+---
+
+<nav class="dialogue-index" aria-label="对话目录" data-pagefind-ignore>
+  <details>
+    <summary>
+      <span class="index-title">对话目录</span>
+      <span class="index-context" aria-hidden="true"></span>
+      <span class="index-position">{rounds.length} 轮</span>
+    </summary>
+    <ol role="list">
+      {rounds.map(({ id, title }, index) => (
+        <li>
+          <a href={'#' + id} aria-label={`第 ${index + 1} 轮，${title}`}>
+            <span class="index-number" aria-hidden="true">
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <span class="index-question">{title}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </details>
+</nav>
+
+<style>
+  @layer components {
+    .dialogue-index {
+      display: block;
+      color: var(--muted);
+      font: 400 0.8125rem/1.55 var(--dialogue-sans);
+    }
+    details {
+      padding: 0;
+      border: 0;
+    }
+    summary {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      min-height: var(--tap-size);
+      padding: 0.35rem 0;
+      color: var(--ink);
+      border-block: 1px solid var(--line);
+      list-style: none;
+    }
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    summary::after {
+      content: '';
+      width: 0.42rem;
+      height: 0.42rem;
+      flex: none;
+      margin: 0 0.25rem 0.16rem 0;
+      border: solid currentColor;
+      border-width: 0 1px 1px 0;
+      transform: rotate(45deg);
+    }
+    details[open] summary::after {
+      transform: rotate(225deg);
+      margin-block: 0.16rem 0;
+    }
+    .index-title {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .index-position,
+    .index-number {
+      color: var(--muted);
+      font:
+        400 0.75rem/1.5 ui-monospace,
+        Menlo,
+        monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .index-position {
+      margin-inline-start: auto;
+      white-space: nowrap;
+    }
+    .index-context {
+      overflow: hidden;
+      color: var(--muted);
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    details[open] .index-context {
+      display: none;
+    }
+    ol {
+      margin: 0;
+      padding: 0.45rem 0;
+      list-style: none;
+    }
+    a {
+      display: grid;
+      grid-template-columns: 2ch minmax(0, 1fr);
+      align-items: baseline;
+      gap: 0.65rem;
+      padding: 0.55rem 0.65rem;
+      border-inline-start: 2px solid transparent;
+      color: var(--muted);
+      font-size: inherit;
+      overflow-wrap: anywhere;
+    }
+    a:hover,
+    a:focus-visible {
+      color: var(--ink);
+    }
+    a[aria-current='location'] {
+      border-color: var(--dialogue-cool);
+      color: var(--dialogue-ai-ink);
+      background: color-mix(
+        in srgb,
+        var(--dialogue-sky-violet) 16%,
+        transparent
+      );
+    }
+    a[aria-current='location'] .index-number {
+      color: var(--dialogue-cool);
+    }
+    @media (min-width: 64rem) {
+      .dialogue-index {
+        position: sticky;
+        top: 1.5rem;
+        grid-column: 2;
+        grid-row: 1;
+        align-self: start;
+      }
+      .index-context {
+        display: none;
+      }
+      ol {
+        max-height: calc(100vh - 6rem);
+        overflow: auto;
+      }
+    }
+    @media (width < 64rem) {
+      .dialogue-index {
+        margin-block-end: 1.5rem;
+        background: var(--bg);
+      }
+      .dialogue-index[data-ready] {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+      .dialogue-index[data-ready] ol {
+        position: absolute;
+        inset: 100% 0 auto;
+        max-height: 50svh;
+        overflow: auto;
+        overscroll-behavior: contain;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg);
+      }
+      li a {
+        min-height: var(--tap-size);
+        align-content: center;
+      }
+      details[open] {
+        border-bottom: 1px solid var(--line);
+      }
+    }
+    @media print {
+      .dialogue-index {
+        display: none;
+      }
+    }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.dialogue-index');
+  if (nav) {
+    const details = nav.querySelector('details')!;
+    const summary = details.querySelector('summary')!;
+    const position = summary.querySelector('.index-position')!;
+    const context = summary.querySelector('.index-context')!;
+    const list = nav.querySelector('ol')!;
+    const links = [...list.querySelectorAll('a')];
+    const rounds = links.map((link) =>
+      document.getElementById(link.hash.slice(1))!,
+    );
+    const sidebar = matchMedia('(min-width: 64rem)');
+    let active = -1;
+    let pending = false;
+
+    function revealCurrentLink() {
+      if (!details.open || active < 0) return;
+      const item = links[active].getBoundingClientRect();
+      const panel = list.getBoundingClientRect();
+      if (item.top < panel.top) list.scrollTop += item.top - panel.top;
+      else if (item.bottom > panel.bottom)
+        list.scrollTop += item.bottom - panel.bottom;
+    }
+    function updatePosition() {
+      pending = false;
+      // Find the last question above the reading line, even inside a very long reply.
+      const line = sidebar.matches ? 32 : summary.offsetHeight + 16;
+      let start = 0;
+      let end = rounds.length;
+      while (start < end) {
+        const middle = Math.floor((start + end) / 2);
+        if (rounds[middle].getBoundingClientRect().top <= line)
+          start = middle + 1;
+        else end = middle;
+      }
+      let current = Math.max(0, start - 1);
+      // Near the footer a short final round may never reach the reading line.
+      if (
+        Math.ceil(scrollY + innerHeight) >=
+        document.documentElement.scrollHeight
+      ) {
+        const target = links.findIndex((link) => link.hash === location.hash);
+        if (target >= current) current = target;
+        else if (scrollY > 0) current = rounds.length - 1;
+      }
+      if (current === active) return;
+      links[active]?.removeAttribute('aria-current');
+      active = current;
+      links[active].setAttribute('aria-current', 'location');
+      context.textContent =
+        links[active].querySelector('.index-question')!.textContent;
+      position.textContent = `${active + 1} / ${rounds.length}`;
+      summary.setAttribute(
+        'aria-label',
+        `对话目录，第 ${active + 1} 轮，共 ${rounds.length} 轮`,
+      );
+      revealCurrentLink();
+    }
+    function schedule() {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(updatePosition);
+    }
+    function layout() {
+      details.open = sidebar.matches;
+      schedule();
+    }
+    layout();
+    nav.dataset.ready = '';
+    sidebar.addEventListener('change', layout);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    window.addEventListener('pageshow', schedule);
+    window.addEventListener('hashchange', schedule);
+    document.addEventListener('toggle', schedule, true);
+    details.addEventListener('toggle', revealCurrentLink);
+    const dismissOutside = (event: Event) => {
+      if (
+        !sidebar.matches &&
+        details.open &&
+        !details.contains(event.target as Node)
+      )
+        details.open = false;
+    };
+    document.addEventListener('click', dismissOutside);
+    document.addEventListener('focusin', dismissOutside);
+    const isRoundActivation = (event: MouseEvent) =>
+      !sidebar.matches &&
+      event.button === 0 &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      event.target instanceof Element &&
+      event.target.closest('a[href]');
+    list.addEventListener('mousedown', (event) => {
+      // Safari can move focus to the article and scroll before a menu link receives its click.
+      if (isRoundActivation(event)) event.preventDefault();
+    });
+    list.addEventListener('click', (event) => {
+      if (!isRoundActivation(event)) return;
+      // WebKit needs the link to stay rendered until its default navigation runs.
+      requestAnimationFrame(() => {
+        if (!sidebar.matches) details.open = false;
+      });
+    });
+    details.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && details.open) {
+        details.open = false;
+        summary.focus();
+      }
+    });
+  }
+</script>

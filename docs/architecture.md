@@ -35,7 +35,7 @@ Astro 从 `content/` 加载五个集合。文字、声音和「此刻」按条�
 
 ## 页面与浏览器
 
-`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 把导航、列表和正文写入 HTML。Markdown 在构建时转换。Rehype 插件为独占一段的图片生成放大入口，将图片标题用作图注。在 `prompted` 类文章中，插件根据独立成段的说话者标记，将后续正文按对话轮次分组。[Markdown 配置](../astro.config.mjs)
+`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 把导航、列表和正文写入 HTML。Markdown 在构建时转换。Rehype 插件为独占一段的图片生成放大入口，将图片标题用作图注。`prompted` 文章使用独立的 [PromptedArticle 布局](../src/layouts/PromptedArticle.astro)。Rehype 根据说话者标记分轮，并按 AI 回答的标题层级生成原生 `details`。[Markdown 配置](../astro.config.mjs)
 
 全站样式集中在 `src/styles/`。Tailwind 提供布局工具类和断点，`tokens.css` 定义颜色、字体与阅读宽度，`markdown.css` 管理正文排版。页面和组件各自导入局部样式。折叠控件和图片弹窗由共享的 Astro 组件封装 Starwind Runtime。[样式入口](../src/styles/site.css) · [交互组件](../src/components/ui/)
 

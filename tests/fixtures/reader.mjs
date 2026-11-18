@@ -85,7 +85,18 @@ export async function writeReaderEntries(project) {
           conversation: { assistant: 'ChatGPT', model: 'orchardmodel' },
         }),
       },
-      'sharedorchard 是正文中的检索词。',
+      id === 'conversation'
+        ? [
+            '**我：**',
+            '怎样辨认果树？',
+            '**AI：**',
+            '先看叶子。',
+            '## 叶形',
+            'sharedorchard 是小节里的检索词。',
+            '### 叶缘',
+            'leafmargin 是子小节里的检索词。',
+          ].join('\n\n')
+        : 'sharedorchard 是正文中的检索词。',
     );
   }
   for (const id of ['recording', 'autumn']) {

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import { parseFragment } from 'parse5';
+import { attr, elements, textOf } from './helpers/html.ts';
 import rehypeDialogue from '../src/lib/rehype-dialogue.mjs';
 import { articleExcerpt } from '../src/lib/excerpt.ts';
 
@@ -34,18 +35,23 @@ test('dialogue preserves multiple turns, rich Markdown and notes outside the con
     ].join('\n\n'),
     { frontmatter },
   );
-  const elements = parseFragment(code).childNodes.filter(
+  const topLevel = parseFragment(code).childNodes.filter(
     (node) => 'tagName' in node,
   );
   assert.deepEqual(
-    elements.map((node) => node.tagName),
-    ['p', 'section', 'section', 'hr', 'p', 'section', 'section'],
+    topLevel.map((node) => node.tagName),
+    ['p', 'div', 'hr', 'p', 'div'],
   );
-  const turns = elements.filter((node) => node.tagName === 'section');
+  const rounds = topLevel.filter(
+    (node) => attr(node, 'class') === 'dialogue-round',
+  );
   assert.deepEqual(
-    turns.map(
-      (node) => node.attrs.find((attr) => attr.name === 'data-speaker')?.value,
-    ),
+    rounds.map((node) => attr(node, 'id')),
+    ['dialogue:1', 'dialogue:2'],
+  );
+  const turns = rounds.flatMap((round) => elements(round, 'section'));
+  assert.deepEqual(
+    turns.map((node) => attr(node, 'data-speaker')),
     ['user', 'assistant', 'user', 'assistant'],
   );
   assert.match(code, /aria-label="ChatGPT · 回答整理"/);
@@ -105,10 +111,185 @@ test('document footnotes remain outside the last speaker, including an empty ass
     const last = topLevel.at(-1)!;
     assert.ok(last.attrs.some((attr) => attr.name === 'data-footnotes'));
     assert.equal(
-      topLevel.filter((node) =>
-        node.attrs.some((attr) => attr.name === 'data-speaker'),
+      elements(topLevel[0], 'section').filter((node) =>
+        attr(node, 'data-speaker'),
       ).length,
       answer ? 2 : 1,
     );
   }
+});
+
+test('each question owns the replies that follow it and has a linkable title taken from the question', async () => {
+  const { code, metadata } = await processor.render(
+    [
+      '**AI：**',
+      '一句开场白。',
+      '**我：**',
+      '先说背景。**你的建议**是什么？',
+      '**AI：**',
+      '一个选项。',
+      '**AI：**',
+      '还有一个。',
+      '**我：**',
+      '我再想想。',
+      '**我：**',
+      '先说背景。你的建议是什么？',
+      '---',
+      '一段手记。',
+      '**AI：**',
+      '单独的补充。',
+    ].join('\n\n'),
+    { frontmatter },
+  );
+  assert.deepEqual(metadata.frontmatter.dialogueRounds, [
+    { id: 'dialogue:1', title: '你的建议是什么？' },
+    { id: 'dialogue:2', title: '我再想想。' },
+    { id: 'dialogue:3', title: '你的建议是什么？' },
+  ]);
+  const groups = elements(code, 'div').filter(
+    (node) => attr(node, 'role') === 'group',
+  );
+  assert.deepEqual(
+    groups.map((group) =>
+      elements(group, 'section').map((el) => attr(el, 'data-speaker')),
+    ),
+    [['user', 'assistant', 'assistant'], ['user'], ['user']],
+  );
+  assert.equal(elements(code, 'section').length, 7);
+  assert.doesNotMatch(code, /dialogue-recall/);
+  assert.equal(
+    articleExcerpt(code, '一句开场白。'),
+    '先说背景。你的建议是什么？',
+  );
+});
+
+test('a single exchange links back to its question without adding a round divider', async () => {
+  const { code } = await processor.render(
+    '**我：**\n\n只问一次。\n\n**AI：**\n\n回答。',
+    { frontmatter },
+  );
+  assert.doesNotMatch(code, /dialogue-round-label/);
+  const link = elements(code, 'a')[0];
+  assert.equal(attr(link, 'href'), '#dialogue:1');
+  assert.equal(attr(link, 'data-pagefind-ignore'), '');
+});
+
+test('assistant sections preserve the heading hierarchy, rich content, preamble and original anchors', async () => {
+  const { code } = await processor.render(
+    [
+      '**我：**',
+      '## 我的提问',
+      '我想先听结论。',
+      '**AI：**',
+      '先说结论。',
+      '## 一个角度',
+      '原来的内容。',
+      '### 再具体一些',
+      '> 保留这个引用。',
+      '#### 一个例子',
+      '- 保留这份清单',
+      '## 另一个角度',
+      '后面的内容。',
+    ].join('\n\n'),
+    { frontmatter },
+  );
+  const [user, answer] = elements(code, 'section');
+  assert.equal(elements(user, 'details').length, 0);
+  const sections = elements(answer, 'details');
+  assert.deepEqual(
+    sections.map((section) => textOf(elements(section, 'summary')[0])),
+    ['一个角度', '再具体一些', '一个例子', '另一个角度'],
+  );
+  assert.deepEqual(
+    sections.map((section) => elements(section, 'details').length),
+    [2, 1, 0, 0],
+  );
+  assert.ok(sections.every((section) => attr(section, 'open') === undefined));
+  assert.ok(
+    elements(answer, 'h3').some((node) => attr(node, 'id') === '再具体一些'),
+  );
+  assert.equal(elements(sections[1], 'blockquote').length, 1);
+  assert.equal(textOf(elements(sections[2], 'li')[0]), '保留这份清单');
+  assert.match(code, /<p>先说结论。<\/p>\s*<details/);
+});
+test('a long unheaded reply keeps the opening paragraph and short replies read uninterrupted', async () => {
+  const lead = '从一句话开始。';
+  const rest = '把当时发生的事情写清楚。'.repeat(35);
+  const { code } = await processor.render(
+    [
+      '**AI：**',
+      lead,
+      rest,
+      '**我：**',
+      '我明白了。',
+      '**AI：**',
+      '## 下一步',
+      '试一次。',
+    ].join('\n\n'),
+    { frontmatter },
+  );
+  const sections = elements(code, 'details');
+  assert.equal(sections.length, 1);
+  assert.equal(textOf(elements(sections[0], 'summary')[0]), '后续回答');
+  assert.equal(textOf(elements(sections[0], 'p')[0]), rest);
+  assert.equal(
+    articleExcerpt(code, lead),
+    articleExcerpt('<p>' + rest + '</p>', ''),
+  );
+});
+
+test('long lists, tables and code fold intact with useful labels between the original paragraphs', async () => {
+  const list = Array.from(
+    { length: 8 },
+    (_, i) => `${i + 3}. 第 ${i + 1} 项`,
+  ).join('\n');
+  const table =
+    '| 项目 | 说明 |\n| --- | --- |\n' + '| 一项 | 详情 |\n'.repeat(9);
+  const program = Array.from({ length: 12 }, (_, i) => `line ${i + 1}`).join(
+    '\n',
+  );
+  const { code } = await processor.render(
+    [
+      '**我：**',
+      list,
+      '**AI：**',
+      '先说结论。',
+      list,
+      '下面是数据。',
+      table,
+      '最后看代码。',
+      '```text\n' + program + '\n```',
+      '以上是这些材料的用途。',
+      '**我：**',
+      '有简版吗？',
+      '**AI：**',
+      '- 一\n- 二',
+      '**我：**',
+      '长代码对应什么标题？',
+      '**AI：**',
+      '## 完整代码',
+      '```text\n' + program + '\n```',
+    ].join('\n\n'),
+    { frontmatter },
+  );
+  const [user, answer, , short, , headed] = elements(code, 'section');
+  assert.equal(elements(user, 'details').length, 0);
+  const folds = elements(answer, 'details');
+  assert.deepEqual(
+    folds.map((el) => textOf(elements(el, 'summary')[0])),
+    ['清单（8 项）', '表格（9 行）', '代码（12 行）'],
+  );
+  assert.ok(folds.every((el) => attr(el, 'open') === undefined));
+  assert.equal(attr(elements(folds[0], 'ol')[0], 'start'), '3');
+  assert.equal(elements(folds[0], 'li').length, 8);
+  assert.equal(elements(elements(folds[1], 'tbody')[0], 'tr').length, 9);
+  assert.equal(textOf(elements(folds[2], 'code')[0]).trimEnd(), program);
+  assert.deepEqual(elements(answer, 'p').map(textOf), [
+    '先说结论。',
+    '下面是数据。',
+    '最后看代码。',
+    '以上是这些材料的用途。',
+  ]);
+  assert.equal(elements(short, 'details').length, 0);
+  assert.deepEqual(elements(headed, 'summary').map(textOf), ['完整代码']);
 });

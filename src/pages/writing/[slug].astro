@@ -1,15 +1,12 @@
 ---
-import '../../styles/pages/reading.css';
-import '../../styles/components/dialogue.css';
 import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import { site } from '../../lib/site';
+import PromptedArticle from '../../layouts/PromptedArticle.astro';
+import WritingArticle from '../../layouts/WritingArticle.astro';
 import {
   loadContent,
   collectionTags,
   entryKey,
-  searchMetadata,
-  dateLabel,
   type Writing,
 } from '../../lib/content';
 export async function getStaticPaths() {
@@ -23,15 +20,7 @@ interface Props {
   entry: Writing;
 }
 const { entry } = Astro.props;
-const { Content } = await render(entry);
-const prompted = entry.data.category === 'prompted';
-const titleWords = prompted
-  ? [
-      ...new Intl.Segmenter('zh-CN', { granularity: 'word' }).segment(
-        entry.data.title,
-      ),
-    ]
-  : undefined;
+const { Content, remarkPluginFrontmatter } = await render(entry);
 ---
 
 <Base
@@ -43,117 +32,18 @@ const titleWords = prompted
   noindex={entry.data.draft}
   imageViewer={entry.rendered?.html.includes('image-open') ?? false}
 >
-  <div class:list={['reading-page', { 'dialogue-page': prompted }]}>
-    <article
-      class="reader article-paper"
-      aria-labelledby="article-title"
-      data-pagefind-body
+  {entry.data.category === 'prompted' ? (
+    <PromptedArticle
+      entry={entry}
+      rounds={remarkPluginFrontmatter.dialogueRounds ?? []}
     >
-      <div class="article-path" data-pagefind-ignore>
-        <a href="/writing/">← 文字</a>
-        {prompted ? (
-          <a class="article-category" href="/writing/?tag=prompted">
-            prompted
-          </a>
-        ) : (
-          entry.data.category && <span>{entry.data.category}</span>
-        )}
-      </div>
-      <header
-        class="article-head"
-        data-pagefind-index-attrs="data-search-text"
-        data-search-text={searchMetadata(entry)}
-      >
-        {prompted && (
-          <span class="dialogue-orbits" aria-hidden="true">
-            <span class="orbit-warm"></span>
-            <span class="orbit-cool"></span>
-          </span>
-        )}
-        <h1
-          id="article-title"
-          data-pagefind-meta="title"
-          aria-label={titleWords && entry.data.title}
-        >
-          {titleWords
-            ? titleWords.map((word, index) => (
-                <>
-                  {word.isWordLike && titleWords[index - 1]?.isWordLike && (
-                    <wbr />
-                  )}
-                  {word.segment}
-                </>
-              ))
-            : entry.data.title}
-        </h1>
-        <div class="byline" data-pagefind-ignore>
-          <span>{site.author}</span>
-          {prompted && entry.data.conversation && (
-            <span class="article-source">
-              与 {entry.data.conversation.assistant} 对话
-              {entry.data.conversation.model && (
-                <> · {entry.data.conversation.model}</>
-              )}
-            </span>
-          )}
-          <time datetime={entry.data.publishedAt.toISOString()}>
-            {dateLabel(entry.data.publishedAt)}
-          </time>
-          {prompted && entry.data.conversation?.url && (
-            <a
-              class="article-source-link"
-              href={entry.data.conversation.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              原对话 ↗
-            </a>
-          )}
-          {entry.data.draft && <span>草稿预览</span>}
-        </div>
-      </header>
+      <Content />
+    </PromptedArticle>
+  ) : (
+    <WritingArticle entry={entry}>
       <div class="article-body markdown-body">
         <Content />
       </div>
-      {entry.data.videos.map((video) => (
-        <section class="video-recommendation">
-          <h2>延伸观看</h2>
-          <a
-            class="video-link"
-            href={video.url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span class="video-symbol" aria-hidden="true">
-              ▷
-            </span>
-            <span>
-              <strong>{video.title}</strong>
-              <small>
-                {video.creator}
-                <br />
-                站外视频 ↗
-              </small>
-            </span>
-          </a>
-          {video.description && <p>{video.description}</p>}
-        </section>
-      ))}
-      {entry.data.appendix && (
-        <details class="article-appendix">
-          <summary>{entry.data.appendix.title}</summary>
-          <ul>
-            {entry.data.appendix.notes.map((note) => (
-              <li>{note}</li>
-            ))}
-          </ul>
-        </details>
-      )}
-    </article>
-    <nav class="article-end" aria-label="文章末尾导航">
-      <a href={prompted ? '/writing/?tag=prompted' : '/writing/'}>
-        ← 返回{prompted ? ' prompted' : '文字列表'}
-      </a>
-    </nav>
-  </div>
+    </WritingArticle>
+  )}
 </Base>
