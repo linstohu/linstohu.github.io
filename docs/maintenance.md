@@ -118,9 +118,14 @@ pnpm run audio --file ./voice.m4a --slug autumn \
 | `pnpm run test:browser`    | 桌面、Android 与 iPhone 尺寸的浏览器用例              |
 | `pnpm run validate`        | 以上两组检查                                          |
 
-首次运行浏览器用例前执行 `pnpm exec playwright install chromium webkit`。CI 每次运行静态校验。仅改 `content/`、`docs/`、`README.md` 或 `CLAUDE.md` 时跳过浏览器用例。手动运行或缺少比较基准时执行全部检查。
+本地首次运行浏览器用例前执行 `pnpm exec playwright install chromium webkit`。
 
-GitHub Actions 将校验后的 `dist/` 保存为 `website` 产物。配置好 Pages 后，`main` 分支部署到生产，其他分支推送生成预览，PR 只做校验。部署配置缺失时仍可下载 `website`。[工作流](../.github/workflows/site.yml)
+| Actions 触发条件                                       | 执行的检查                                                                                   |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 仅修改 `content/`、`docs/`、`README.md` 或 `CLAUDE.md` | 检查格式，构建生产站和搜索索引，校验链接、资源与订阅文件                                     |
+| 其他改动、手动运行或无法比较变更                       | 一组检查格式、运行 Node 测试和类型检查，另一组同时运行浏览器测试。两组通过后构建并校验生产站 |
+
+CI 按 `package.json` 中的 `@playwright/test` 版本选择预装浏览器及系统依赖的官方镜像。所有检查通过后，`website` 任务保存 `dist/` 产物。配置好 Pages 后，同一份产物用于部署，`main` 分支对应生产，其他分支对应预览。PR 只做校验，部署配置缺失时仍可下载产物。[工作流](../.github/workflows/site.yml)
 
 ### Cloudflare Pages 配置
 

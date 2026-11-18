@@ -9,53 +9,104 @@ permissions:
 concurrency:
   group: site-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+
 jobs:
-  website:
+  changes:
+    name: Identify changes
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    env:
-      ASTRO_TELEMETRY_DISABLED: 1
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.scope.outputs.full }}
+      playwright: ${{ steps.scope.outputs.playwright }}
     steps:
       - uses: actions/checkout@v6
-      - name: Set up the pinned package manager and Node.js
-        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
-          runtime: node@24
-          install: false
-          cache: true
-      - run: pnpm install --frozen-lockfile
-      - name: Validate content and build the site
-        run: pnpm run validate:static
-      - name: Decide whether browser checks are needed
-        id: browsers
+          fetch-depth: 2
+          sparse-checkout: /package.json
+          sparse-checkout-cone-mode: false
+      - name: Select checks and browser image
+        id: scope
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         shell: bash
         run: |
-          required=true
-          if [[ "$EVENT_NAME" != 'workflow_dispatch' && "$BASE_SHA" =~ ^[0-9a-f]{40}$ && ! "$BASE_SHA" =~ ^0+$ ]]; then
-            if git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 origin "$BASE_SHA"; then
-              # Content and documentation are covered by the static checks above.
-              # Unknown paths and unavailable history keep the full browser gate.
-              git diff --name-only -z "$BASE_SHA" HEAD -- . ':!content/**' ':!docs/**' ':!README.md' ':!CLAUDE.md' > "$RUNNER_TEMP/browser-changes"
-              if [[ ! -s "$RUNNER_TEMP/browser-changes" ]]; then
-                required=false
-              fi
-            fi
+          full=true
+          if [[ "$EVENT_NAME" != workflow_dispatch && "$BASE_SHA" =~ ^[0-9a-f]{40}$ && ! "$BASE_SHA" =~ ^0+$ ]] &&
+             { git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null || git fetch --no-tags --depth=1 --filter=blob:none origin "$BASE_SHA"; } &&
+             git diff --quiet --no-renames "$BASE_SHA" HEAD -- . ':!content/**' ':!docs/**' ':!README.md' ':!CLAUDE.md'; then
+            full=false
           fi
-          echo "required=$required" >> "$GITHUB_OUTPUT"
-      - name: Install headless browsers for code changes
-        if: steps.browsers.outputs.required == 'true'
-        run: pnpm exec playwright install --with-deps --only-shell chromium webkit
+          echo "full=$full" >> "$GITHUB_OUTPUT"
+          if [[ "$full" == true ]]; then
+            version=$(jq -er '.devDependencies["@playwright/test"] | select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))' package.json)
+            echo "playwright=$version" >> "$GITHUB_OUTPUT"
+          fi
+
+  checks:
+    name: Check formatting, Node tests and types
+    needs: changes
+    if: needs.changes.outputs.full == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - &setup
+        name: Install Node.js and project dependencies
+        uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
+        with:
+          node-version-file: .nvmrc
+          require-lockfile: true
+          cache: true
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm check
+
+  browsers:
+    name: Test reading in Chromium and WebKit
+    needs: changes
+    if: needs.changes.outputs.full == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.changes.outputs.playwright }}-noble
+      options: --shm-size=1g
+    steps:
+      - uses: actions/checkout@v6
+      - *setup
       - name: Check desktop, Android and iPhone browsers
-        if: steps.browsers.outputs.required == 'true'
         run: pnpm run test:browser
+
+  website:
+    needs: [changes, checks, browsers]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Require the checks selected for this change
+        env:
+          SCOPE: ${{ needs.changes.result }}/${{ needs.changes.outputs.full }}
+          RESULTS: ${{ needs.checks.result }}/${{ needs.browsers.result }}
+        run: |
+          case "$SCOPE/$RESULTS" in
+            success/true/success/success|success/false/skipped/skipped) ;;
+            *) echo "::error::Required checks did not pass ($SCOPE/$RESULTS)"; exit 1 ;;
+          esac
+      - uses: actions/checkout@v6
+      - *setup
+      - name: Check formatting for content and documentation changes
+        if: needs.changes.outputs.full == 'false'
+        run: pnpm format:check
+      - name: Build and verify the production site
+        run: pnpm build
       - uses: actions/upload-artifact@v4
         with:
           name: website
           path: dist
           include-hidden-files: true
+          if-no-files-found: error
       - name: Check deployment configuration
         if: github.event_name != 'pull_request' && github.ref_type == 'branch'
         id: deployment
