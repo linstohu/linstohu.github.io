@@ -107,9 +107,10 @@ describe('monthly snapshots and collection search', () => {
       await project.page('writing/conversation'),
       'details',
     ).filter((el) => attr(el, 'class') === 'reply-section');
-    assert.equal(sections.length, 2);
-    assert.ok(sections.every((section) => attr(section, 'open') === undefined));
-    assert.match(textOf(sections[1]), /leafmargin/);
+    assert.equal(sections.length, 1);
+    assert.equal(attr(sections[0], 'open'), undefined);
+    assert.match(textOf(sections[0]), /leafmargin/);
+    assert.doesNotMatch(textOf(sections[0]), /sharedorchard/);
     const { index, fragments } = await openSearch(t, project.output);
     await index.filters();
     const cases = [

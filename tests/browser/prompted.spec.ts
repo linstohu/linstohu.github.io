@@ -109,10 +109,7 @@ test('dialogue separates speakers and keeps rich answers readable across themes 
   page,
 }) => {
   await page.goto('/writing/a-question/');
-  await page
-    .getByRole('button', { name: '展开本条回答的全部小节' })
-    .first()
-    .click();
+  await page.getByRole('button', { name: '通读回答' }).first().click();
   for (const width of [320, 375, 760, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     for (const theme of ['light', 'dark']) {
@@ -234,21 +231,35 @@ test('readers can skim an answer, open a subsection by keyboard and follow its h
   await expect(
     answer.getByText('先把发生的事写下来，再看当时自己能决定什么。'),
   ).toBeVisible();
+  await expect(answer.getByText(/^比如，同事给你的数据/)).toBeVisible();
+  await expect(
+    answer.getByText('对话还可以继续，不必急着写出结论。'),
+  ).toBeVisible();
+  await expect(answer.locator('pre')).toBeHidden();
   const second = sections.nth(1);
   await second.locator(':scope > summary').press('Enter');
   await expect(second).toHaveAttribute('open', '');
   await expect(sections.first()).not.toHaveAttribute('open', '');
   const child = sections.nth(2);
-  const childHeading = child.locator('summary h3');
+  const childHeading = second.getByRole('heading', { name: '先从哪里观察？' });
   const fragment =
     '#' + encodeURIComponent((await childHeading.getAttribute('id'))!);
+  await expect(childHeading).toBeVisible();
+  await expect(
+    second.getByText('留意下一次想要责怪别人的时刻。'),
+  ).toBeVisible();
   await child.locator('summary').press('Space');
-  await expect(child.getByText('留意下一次想要责怪别人的时刻。')).toBeVisible();
+  await expect(
+    child.getByText('先把听到的原话和自己的推测分开。'),
+  ).toBeVisible();
 
-  await answer.getByRole('button', { name: '展开本条回答的全部小节' }).click();
+  await answer.getByRole('button', { name: '通读回答' }).click();
   await expect(answer.locator('details[open]')).toHaveCount(3);
-  await answer.getByRole('button', { name: '收起本条回答的全部小节' }).click();
+  await expect(answer.locator('summary:visible')).toHaveCount(0);
+  await expect(answer.locator('pre')).toBeVisible();
+  await answer.getByRole('button', { name: '收起细节' }).click();
   await expect(answer.locator('details[open]')).toHaveCount(0);
+  await expect(answer.getByText(/^比如，同事给你的数据/)).toBeVisible();
   await page.goto('/writing/a-question/' + fragment);
   await expect(second).toHaveAttribute('open', '');
   await expect(child).toHaveAttribute('open', '');
@@ -274,7 +285,7 @@ test('the open reply outline advances with reading and stays still with reduced 
   const answer = page.locator('[data-speaker="assistant"]').first();
   await expect(answer.locator('.reply-trace')).toBeHidden();
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await answer.getByRole('button', { name: '展开本条回答的全部小节' }).click();
+  await answer.getByRole('button', { name: '通读回答' }).click();
   const path = answer.locator('.reply-trace path');
   await expect(path).toHaveAttribute('d', /^M /);
   async function scrollToProgress(progress: number) {
@@ -393,6 +404,8 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('.dialogue-turn')).toHaveCount(8);
     const firstReply = page.locator('[data-speaker="assistant"]').first();
     await expect(firstReply.locator('.reply-toggle')).toBeHidden();
+    await expect(firstReply.getByText(/^比如，同事给你的数据/)).toBeVisible();
+    await expect(firstReply.locator('table')).toBeHidden();
     await firstReply
       .locator('details.reply-section summary')
       .first()
@@ -411,7 +424,7 @@ test.describe('without JavaScript', () => {
       '这是对话后的笔记。',
     );
     await expect(
-      firstReply.locator('summary').getByText('还想继续追问', { exact: true }),
+      firstReply.getByRole('heading', { name: '还想继续追问' }),
     ).toBeVisible();
     await expect(
       page

@@ -4,6 +4,7 @@ const proseContainers = new Set([
   'dialogue-round',
   'dialogue-turn',
   'dialogue-content',
+  'reply-chapter',
   'reply-section',
   'snapshot-note',
   'snapshot-note-body',
@@ -18,6 +19,11 @@ function textOf(node: DefaultTreeAdapterTypes.Node): string {
 export function articleExcerpt(html: string, description: string): string {
   const prose: DefaultTreeAdapterTypes.Node[] = [];
   function collect(node: DefaultTreeAdapterTypes.Node) {
+    if (
+      'attrs' in node &&
+      node.attrs.some((attr) => attr.name === 'data-pagefind-ignore')
+    )
+      return;
     if (node.nodeName === 'p' || (!description && node.nodeName === 'li'))
       prose.push(node);
     else if (

@@ -77,20 +77,62 @@ function materialLabel(node) {
   }
 }
 
+function disclosure(blocks, label, heading) {
+  const summary = label
+    ? [label]
+    : [
+        element('span', { className: ['reply-when-closed'] }, ['继续阅读']),
+        element('span', { className: ['reply-when-open'] }, ['收起本节']),
+      ];
+  if (heading)
+    summary.push(
+      element('span', { className: ['sr-only'] }, [
+        '，' + readableText(heading),
+      ]),
+    );
+  return element('details', { className: ['reply-section'] }, [
+    element('summary', { dataPagefindIgnore: true }, summary),
+    ...blocks,
+  ]);
+}
+
+const sentences = new Intl.Segmenter('zh-CN', { granularity: 'sentence' });
+
+// Keep exceptionally long opening paragraphs intact for full reading, including inline Markdown.
+// Only the closed view needs a shorter, unindexed quotation.
+function paragraphPreview(block) {
+  if (block?.tagName !== 'p' || !isLong([block])) return;
+  const first = sentences
+    .segment(readableText(block).trim())
+    .containing(0)
+    .segment.trim();
+  const characters = Array.from(first);
+  const sample =
+    characters.length > 90
+      ? characters.slice(0, 89).join('').trimEnd() + '…'
+      : first;
+  return element(
+    'p',
+    { className: ['reply-preview'], dataPagefindIgnore: true },
+    [sample],
+  );
+}
+
 function foldUnheaded(body) {
   const nodes = [];
   let count = 0;
   function addFold(label, blocks) {
-    nodes.push(
-      element('details', { className: ['reply-section'] }, [
-        element('summary', { dataPagefindIgnore: true }, [label]),
-        ...blocks,
-      ]),
-    );
+    nodes.push(disclosure(blocks, label));
     count++;
   }
   function addProse(blocks) {
     const lead = blocks.findIndex(hasContent);
+    const preview = paragraphPreview(blocks[lead]);
+    if (preview) {
+      nodes.push(preview);
+      addFold('后续回答', blocks);
+      return;
+    }
     const rest = blocks.slice(lead + 1);
     if (lead < 0 || !rest.some(hasContent) || !isLong(blocks)) {
       nodes.push(...blocks);
@@ -122,7 +164,10 @@ function foldReply(body) {
     !sections.some(materialLabel)
   )
     return {
-      nodes: [...introduction.nodes, ...sections],
+      nodes: [
+        ...introduction.nodes,
+        element('div', { className: ['reply-chapter'] }, sections),
+      ],
       count: introduction.count,
     };
 
@@ -142,21 +187,36 @@ function foldReply(body) {
   }
 
   let count = introduction.count;
-  function renderSections(children) {
-    return children.flatMap((node) => {
-      if (!node.heading) return [node];
-      const content = renderSections(node.children);
-      if (!content.some(hasContent)) return [node.heading, ...content];
+  function renderSection({ heading, children }) {
+    const blocks = children.filter(hasContent);
+    const brief =
+      !blocks.some((block) => block.heading || materialLabel(block)) &&
+      !isLong(blocks) &&
+      (blocks.length <= 2 ||
+        (blocks.length === 3 &&
+          blocks.every((block) => block.tagName === 'p')));
+    if (brief)
+      return element('div', { className: ['reply-chapter'] }, [
+        heading,
+        ...blocks,
+      ]);
+
+    const lead =
+      paragraphPreview(blocks[0]) ??
+      (blocks[0]?.tagName === 'p' ? blocks.shift() : undefined);
+    const content = [heading];
+    if (lead) content.push(lead);
+    const rest = blocks.map((block) =>
+      block.heading ? renderSection(block) : block,
+    );
+    if (rest.length) {
+      const label = rest.length === 1 ? materialLabel(rest[0]) : undefined;
+      content.push(disclosure(rest, label, heading));
       count++;
-      return [
-        element('details', { className: ['reply-section'] }, [
-          element('summary', {}, [node.heading]),
-          ...content,
-        ]),
-      ];
-    });
+    }
+    return element('div', { className: ['reply-chapter'] }, content);
   }
-  const nodes = [...introduction.nodes, ...renderSections(root.children)];
+  const nodes = [...introduction.nodes, ...root.children.map(renderSection)];
   return { nodes, count };
 }
 
@@ -171,7 +231,7 @@ export function message({ role, name, caption }, body, initial) {
       element(
         'button',
         { type: 'button', className: ['reply-toggle'], hidden: true },
-        ['展开全部'],
+        ['通读回答'],
       ),
     );
   const children = [

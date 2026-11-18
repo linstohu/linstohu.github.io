@@ -8,7 +8,13 @@ function revealLinkedSection() {
   }
   const target = document.getElementById(id);
   if (!target) return;
-  let section = target.closest<HTMLDetailsElement>('details.reply-section');
+  // A chapter's heading and opening paragraph sit outside its folded continuation.
+  let section = target.matches('.reply-chapter > :is(h1,h2,h3,h4,h5,h6)')
+    ? target.parentElement!.querySelector<HTMLDetailsElement>(
+        ':scope > details.reply-section',
+      )
+    : null;
+  section ??= target.closest('details.reply-section');
   let opened = false;
   while (section) {
     if (!section.open) {
@@ -28,9 +34,7 @@ function enableReplyControls(reply: HTMLElement) {
   ];
   const allOpen = () => sections.every((section) => section.open);
   const update = () => {
-    const verb = allOpen() ? '收起' : '展开';
-    button.textContent = verb + '全部';
-    button.setAttribute('aria-label', verb + '本条回答的全部小节');
+    button.textContent = allOpen() ? '收起细节' : '通读回答';
   };
   button.hidden = false;
   update();
@@ -38,6 +42,7 @@ function enableReplyControls(reply: HTMLElement) {
   button.addEventListener('click', () => {
     const open = !allOpen();
     for (const section of sections) section.open = open;
+    reply.toggleAttribute('data-full-reply', open);
     update();
   });
 }

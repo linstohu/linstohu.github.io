@@ -407,71 +407,81 @@
   .reply-toggle {
     margin-inline-start: auto;
     min-height: 2rem;
-    padding: 0 0.15rem;
+    padding: 0 0.25rem;
     color: var(--dialogue-cool);
-    font: 500 0.8125rem/1.4 var(--dialogue-sans);
-    text-decoration: underline;
-    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
-    text-underline-offset: 0.3em;
+    font: 400 0.8125rem/1.5 var(--dialogue-sans);
   }
-  .reply-toggle:hover {
-    text-decoration-color: currentColor;
+  .reply-toggle:hover,
+  .markdown-body .reply-section > summary:hover {
+    color: var(--dialogue-ai-ink);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .dialogue-content > .reply-chapter:not(:first-child) {
+    margin-block-start: clamp(1.75rem, 3vw, 2.25rem);
+  }
+  .reply-preview:has(+ .reply-section[open]) {
+    display: none;
+  }
+  .reply-chapter:has(> details:not([open])) + .reply-chapter {
+    margin-block-start: clamp(1.1rem, 2.2vw, 1.5rem);
+  }
+  .markdown-body .reply-chapter > :is(h1, h2, h3, h4, h5, h6) {
+    margin-block: 0 0.45em;
+  }
+  .markdown-body .reply-chapter > p:has(+ .reply-section),
+  .markdown-body .reply-chapter > :last-child {
+    margin-block-end: 0;
+  }
+  .markdown-body [data-full-reply] .reply-section > summary {
+    display: none;
+  }
+  .markdown-body [data-full-reply] .reply-chapter > p:has(+ .reply-section) {
+    margin-block-end: 0.85em;
+  }
+  .reply-section .reply-chapter {
+    margin-block: 1.35em 0.85em;
   }
   .markdown-body .reply-section {
     margin: 0;
     padding: 0;
     border: 0;
-    border-top: 1px solid
-      color-mix(in srgb, var(--dialogue-cool) 23%, transparent);
   }
   .markdown-body .reply-section > summary {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-    min-height: 3.15rem;
+    gap: 0.45rem;
+    width: fit-content;
+    max-width: 100%;
+    min-height: var(--tap-size);
     margin: 0;
-    padding: 0.6rem 0.2rem 0.6rem 0;
-    color: var(--dialogue-ai-ink);
+    padding: 0.25rem 0.65rem 0.25rem 0;
+    color: var(--dialogue-cool);
+    font: 500 0.8125rem/1.5 var(--dialogue-sans);
     list-style: none;
     text-decoration: none;
   }
-  .reply-section > summary::-webkit-details-marker {
+  .reply-section > summary::-webkit-details-marker,
+  .reply-section:not([open]) > summary > .reply-when-open,
+  .reply-section[open] > summary > .reply-when-closed {
     display: none;
   }
   .reply-section > summary::after {
     content: '';
     flex: none;
-    width: 0.46rem;
-    height: 0.46rem;
-    margin-inline-end: 0.22rem;
-    border: solid var(--dialogue-cool);
-    border-width: 0 1.5px 1.5px 0;
-    transform: rotate(-45deg);
-  }
-  .reply-section[open] > summary::after {
+    width: 0.4rem;
+    height: 0.4rem;
+    margin-block-end: 0.18rem;
+    border: solid currentColor;
+    border-width: 0 1px 1px 0;
     transform: rotate(45deg);
   }
-  .markdown-body .reply-section > summary > :is(h1, h2, h3, h4, h5, h6) {
-    margin: 0;
-    font: 600 1.08em/1.55 var(--dialogue-sans);
-    text-wrap: wrap;
-  }
-  .markdown-body .reply-section .reply-section {
-    margin-inline-start: 0.65rem;
-  }
-  .markdown-body
-    .reply-section
-    .reply-section
-    > summary
-    > :is(h1, h2, h3, h4, h5, h6) {
-    font-size: 1em;
+  .reply-section[open] > summary::after {
+    margin-block: 0.18rem 0;
+    transform: rotate(225deg);
   }
   .markdown-body .reply-section[open] > :last-child:not(summary) {
     margin-block-end: 0.85em;
-  }
-  .markdown-body .reply-section > summary:hover {
-    color: var(--dialogue-cool);
   }
   .markdown-body .reply-section > summary:focus-visible {
     outline-offset: 1px;
@@ -488,12 +498,16 @@
   }
   @media print {
     .reply-toggle,
-    .reply-section > summary::after {
+    .reply-preview,
+    .markdown-body .reply-section > summary {
       display: none;
     }
     .reply-section::details-content {
       display: contents;
       content-visibility: visible;
+    }
+    .markdown-body .reply-chapter > p:has(+ .reply-section) {
+      margin-block-end: 0.85em;
     }
   }
 

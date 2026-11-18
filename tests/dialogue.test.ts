@@ -183,7 +183,7 @@ test('assistant sections preserve the heading hierarchy, rich content, preamble 
       '**AI：**',
       '先说结论。',
       '## 一个角度',
-      '原来的内容。',
+      '保留[首段链接](/about/)和**重点**。',
       '### 再具体一些',
       '> 保留这个引用。',
       '#### 一个例子',
@@ -195,23 +195,78 @@ test('assistant sections preserve the heading hierarchy, rich content, preamble 
   );
   const [user, answer] = elements(code, 'section');
   assert.equal(elements(user, 'details').length, 0);
-  const sections = elements(answer, 'details');
+  const chapters = elements(answer, 'div').filter(
+    (node) => attr(node, 'class') === 'reply-chapter',
+  );
   assert.deepEqual(
-    sections.map((section) => textOf(elements(section, 'summary')[0])),
+    chapters.map((chapter) => textOf(chapter.childNodes[0])),
     ['一个角度', '再具体一些', '一个例子', '另一个角度'],
   );
+  const [first, nested, example, last] = chapters;
+  const [firstFold, nestedFold] = elements(first, 'details');
   assert.deepEqual(
-    sections.map((section) => elements(section, 'details').length),
+    chapters.map((chapter) => elements(chapter, 'details').length),
     [2, 1, 0, 0],
   );
-  assert.ok(sections.every((section) => attr(section, 'open') === undefined));
-  assert.ok(
-    elements(answer, 'h3').some((node) => attr(node, 'id') === '再具体一些'),
-  );
-  assert.equal(elements(sections[1], 'blockquote').length, 1);
-  assert.equal(textOf(elements(sections[2], 'li')[0]), '保留这份清单');
-  assert.match(code, /<p>先说结论。<\/p>\s*<details/);
+  assert.equal(attr(firstFold, 'open'), undefined);
+  assert.equal(attr(nestedFold, 'open'), undefined);
+  const link = elements(first, 'a')[0];
+  assert.equal(attr(link, 'href'), '/about/');
+  assert.equal(elements(firstFold, 'a').length, 0);
+  assert.equal(elements(first, 'strong').length, 1);
+  assert.equal(attr(elements(nested, 'h3')[0], 'id'), '再具体一些');
+  assert.equal(elements(nestedFold, 'blockquote').length, 1);
+  assert.equal(textOf(elements(example, 'li')[0]), '保留这份清单');
+  assert.equal(textOf(elements(last, 'p')[0]), '后面的内容。');
+  assert.equal(articleExcerpt(code, '我想先听结论。'), '先说结论。');
 });
+
+test('short prose sections can be read and excerpted without opening anything', async () => {
+  const { code } = await processor.render(
+    [
+      '**AI：**',
+      '## 先想一想',
+      '留意第一反应。',
+      '说出自己的想法。',
+      '再听对方怎么说。',
+      '## 再行动',
+      '试着记录一次。',
+    ].join('\n\n'),
+    { frontmatter },
+  );
+  assert.equal(elements(code, 'details').length, 0);
+  assert.equal(elements(code, 'button').length, 0);
+  assert.equal(articleExcerpt(code, '留意第一反应。'), '说出自己的想法。');
+});
+
+test('an unusually long opening paragraph has a bounded preview and retains its complete rich text', async () => {
+  const rest = '这是后续的原文。'.repeat(60);
+  const first = '从一个例子开始。';
+  for (const heading of ['', '## 具体例子']) {
+    for (const opening of [first, '长'.repeat(110)]) {
+      const { code } = await processor.render(
+        ['**AI：**', heading, opening + '[原文](/about/)' + rest].join('\n\n'),
+        { frontmatter },
+      );
+      const [preview, original] = elements(code, 'p');
+      assert.equal(attr(preview, 'data-pagefind-ignore'), '');
+      assert.equal(
+        textOf(preview),
+        opening === first ? first : '长'.repeat(89) + '…',
+      );
+      const [fold] = elements(code, 'details');
+      assert.equal(attr(fold, 'open'), undefined);
+      assert.equal(textOf(elements(fold, 'p')[0]), textOf(original));
+      assert.equal(textOf(original), opening + '原文' + rest);
+      assert.equal(attr(elements(original, 'a')[0], 'href'), '/about/');
+      assert.equal(
+        articleExcerpt(code, ''),
+        articleExcerpt('<p>' + textOf(original) + '</p>', ''),
+      );
+    }
+  }
+});
+
 test('a long unheaded reply keeps the opening paragraph and short replies read uninterrupted', async () => {
   const lead = '从一句话开始。';
   const rest = '把当时发生的事情写清楚。'.repeat(35);
@@ -291,5 +346,6 @@ test('long lists, tables and code fold intact with useful labels between the ori
     '以上是这些材料的用途。',
   ]);
   assert.equal(elements(short, 'details').length, 0);
-  assert.deepEqual(elements(headed, 'summary').map(textOf), ['完整代码']);
+  assert.equal(textOf(elements(headed, 'h2')[0]), '完整代码');
+  assert.match(textOf(elements(headed, 'summary')[0]), /代码（12 行）/);
 });

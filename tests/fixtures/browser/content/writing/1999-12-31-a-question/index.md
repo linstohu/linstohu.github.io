@@ -47,6 +47,10 @@ long-code-long-code-long-code-long-code-long-code-long-code-long-code-long-code-
 
 留意下一次想要责怪别人的时刻。
 
+写下对方具体说了什么，以及自己当时怎么回应。
+
+> 先把听到的原话和自己的推测分开。
+
 **我：**
 
 如果确实是对方先做错了呢？
