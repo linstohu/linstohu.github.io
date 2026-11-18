@@ -1,11 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL = 'http://127.0.0.1:4331';
+
 export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: true,
   workers: 2,
   forbidOnly: !!process.env.CI,
-  use: { baseURL: 'http://127.0.0.1:4331', trace: 'retain-on-failure' },
+  use: { baseURL, trace: 'retain-on-failure' },
   projects: [
     { name: 'desktop', use: { viewport: { width: 1440, height: 1000 } } },
     {
@@ -23,8 +25,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node tests/browser/serve.mjs',
-    url: 'http://127.0.0.1:4331',
+    command: 'node tests/browser/serve.mjs ' + baseURL,
+    url: baseURL,
     timeout: 90000,
     reuseExistingServer: false,
     gracefulShutdown: { signal: 'SIGTERM', timeout: 5000 },

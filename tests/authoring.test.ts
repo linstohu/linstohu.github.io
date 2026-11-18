@@ -1,6 +1,5 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import { createTestProject } from './helpers/project.mjs';
 import {
   mkdtemp,
@@ -78,6 +77,30 @@ test('invalid metadata cannot change a file into a published state', async () =>
     await assert.rejects(publishDocument(file, 'writing'));
     assert.equal(await readFile(file, 'utf8'), before);
   }));
+
+test('an empty monthly template stays a draft when publication is rejected', async (t) => {
+  const project = await createTestProject();
+  t.after(project.dispose);
+  project.cli(
+    'content',
+    'new',
+    'now',
+    '--period',
+    '2025-11',
+    '--title',
+    '本月',
+  );
+  const relative = 'now/2025-11.md';
+  const file = project.content(relative);
+  const draft = await readDocument(file);
+  assert.equal(draft.data.draft, true);
+  assert.equal(draft.body.trim(), '');
+  assert.throws(() => project.cli('content', 'publish', relative), {
+    status: 1,
+    stderr: /Markdown 正文或 notes/,
+  });
+  assert.equal(await readFile(file, 'utf8'), draft.raw);
+});
 
 test('draft creation uses the Shanghai date and rejects a reused slug across dates', async () =>
   fixture(async (file) => {
@@ -251,73 +274,75 @@ test('audio and monthly publications lock each entry through its update', async 
   }
 });
 
-test('both audio CLIs reject a slug used by an imported entry before uploading; invalid series never reach disk', async (t) => {
+test('both audio CLIs reject a slug used by an imported entry before uploading', async (t) => {
   const project = await createTestProject();
   t.after(project.dispose);
-  const existing = path.join(
-    project.directory,
-    'content/audio/imported/episode/index.md',
-  );
+  const existing = project.content('audio/imported/episode/index.md');
   await createDocument(
     existing,
     {
       ...data,
       kind: 'podcast',
       uid: 'episode',
-      series: 'thirty-plus',
+      series: 'field-notes',
       slug: 'occupied',
     },
     '',
   );
-  const run = (script: string, args: string[]) =>
-    spawnSync(process.execPath, ['scripts/' + script + '.mjs', ...args], {
-      cwd: project.directory,
-      encoding: 'utf8',
-    });
   const standard = ['--title', '节目', '--description', '简介'];
-  const external = run('content', [
-    'new',
-    'audio',
-    'occupied',
-    ...standard,
-    '--series',
-    'thirty-plus',
-    '--platform',
-    '站点',
-    '--listen-url',
-    'https://example.org/episode',
-  ]);
-  const upload = run('audio', [
-    '--slug',
-    'occupied',
-    ...standard,
-    '--file',
-    'not-needed.webm',
-  ]);
-  for (const result of [external, upload]) {
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /声音 slug 已存在：occupied/);
-  }
-  await assert.rejects(
-    stat(path.join(project.directory, 'content/audio/occupied/index.md')),
-    { code: 'ENOENT' },
+  const conflict = { status: 1, stderr: /声音 slug 已存在：occupied/ };
+  assert.throws(
+    () =>
+      project.cli(
+        'content',
+        'new',
+        'audio',
+        'occupied',
+        ...standard,
+        '--series',
+        'field-notes',
+        '--platform',
+        '站点',
+        '--listen-url',
+        'https://example.org/episode',
+      ),
+    conflict,
   );
-  const series = run('content', [
-    'new',
-    'series',
-    'new-show',
-    '--title',
-    '节目',
-    '--description',
-    '   ',
-  ]);
-  assert.equal(series.status, 1);
-  const json = path.join(project.directory, 'content/series/new-show.json');
+  assert.throws(
+    () =>
+      project.cli(
+        'audio',
+        '--slug',
+        'occupied',
+        ...standard,
+        '--file',
+        'not-needed.webm',
+      ),
+    conflict,
+  );
+  await assert.rejects(stat(project.content('audio/occupied/index.md')), {
+    code: 'ENOENT',
+  });
+});
+
+test('series creation validates metadata before writing its JSON file', async (t) => {
+  const project = await createTestProject();
+  t.after(project.dispose);
+  const createSeries = (description: string) =>
+    project.cli(
+      'content',
+      'new',
+      'series',
+      'new-show',
+      '--title',
+      '节目',
+      '--description',
+      description,
+    );
+  const json = project.content('series/new-show.json');
+  assert.throws(() => createSeries('   '), { status: 1 });
   await assert.rejects(stat(json), { code: 'ENOENT' });
-  assert.equal(
-    run('content', ['new', 'series', 'new-show', ...standard]).status,
-    0,
-  );
+  createSeries('简介');
   assert.equal(JSON.parse(await readFile(json, 'utf8')).description, '简介');
 });
 

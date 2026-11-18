@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectNoHorizontalOverflow } from '../helpers/viewport.ts';
 
 test('Chinese paragraphs use the reading column without shortened lines', async ({
   page,
@@ -16,8 +17,13 @@ test('Chinese paragraphs use the reading column without shortened lines', async 
       const metrics = await paragraph.evaluate((element) => {
         const range = document.createRange();
         range.selectNodeContents(element);
-        const column = element.getBoundingClientRect();
+        const paragraph = element.getBoundingClientRect();
+        const column = element
+          .closest('.article-body')!
+          .getBoundingClientRect();
         return {
+          leftInset: paragraph.left - column.left,
+          rightInset: column.right - paragraph.right,
           fontSize: parseFloat(getComputedStyle(element).fontSize),
           lines: [...range.getClientRects()]
             .filter((line) => line.width > 0)
@@ -27,17 +33,18 @@ test('Chinese paragraphs use the reading column without shortened lines', async 
             })),
         };
       });
+      for (const inset of [metrics.leftInset, metrics.rightInset])
+        expect(
+          Math.abs(inset),
+          width + 'px ' + theme + ': paragraph edges match the reading column',
+        ).toBeLessThanOrEqual(1);
       expect(metrics.lines.length).toBeGreaterThan(1);
       for (const line of metrics.lines.slice(0, -1))
         expect(
           line.gap,
           `${width}px ${theme}: non-final Chinese line should fill the column`,
         ).toBeLessThanOrEqual(metrics.fontSize * 2 + 1);
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-      ).toBe(true);
+      await expectNoHorizontalOverflow(page);
     }
   }
 });
@@ -95,7 +102,7 @@ test('Markdown links remain recognizable and keyboard operable in both themes', 
       if (url === '/writing/first/') {
         await expect(link).toHaveAttribute(
           'href',
-          'https://music.163.com/#/user/home?id=1995560350',
+          'https://example.org/profile',
         );
         await expect(page.locator('.article-path a')).toHaveCSS(
           'text-decoration-line',
@@ -126,11 +133,7 @@ test('Markdown blocks fit narrow screens and disclosures support the keyboard', 
   for (const width of [320, 844]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/writing/first/');
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
+    await expectNoHorizontalOverflow(page);
     const body = page.locator('.article-body');
     const column = await body.boundingBox();
     for (const selector of ['blockquote', 'table', 'pre', 'details']) {

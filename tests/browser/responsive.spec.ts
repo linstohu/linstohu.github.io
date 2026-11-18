@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectNoHorizontalOverflow } from '../helpers/viewport.ts';
 
 test('phone homepage keeps artwork full-width and recent entries stacked', async ({
   page,
@@ -6,9 +7,13 @@ test('phone homepage keeps artwork full-width and recent entries stacked', async
   for (const width of [320, 360, 390, 430, 760]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
-    const artwork = await page.locator('.mountains').boundingBox();
-    expect(artwork!.width).toBeCloseTo(width, 0);
-    expect(artwork!.height).toBeLessThan(width);
+    const artwork = (await page.locator('.mountains').boundingBox())!;
+    const layoutWidth = await page.evaluate(
+      () => document.documentElement.clientWidth,
+    );
+    expect(artwork.x).toBeCloseTo(0, 0);
+    expect(artwork.x + artwork.width).toBeCloseTo(layoutWidth, 0);
+    expect(artwork.height).toBeLessThan(layoutWidth);
     const frame = await page.locator('.composition').boundingBox();
     for (const tile of await page.locator('.composition .tile').all()) {
       const box = await tile.boundingBox();
@@ -27,11 +32,7 @@ test('phone homepage keeps artwork full-width and recent entries stacked', async
       expect(box!.y).toBeGreaterThanOrEqual(bottom);
       bottom = box!.y + box!.height;
     }
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
+    await expectNoHorizontalOverflow(page);
   }
 });
 
@@ -57,9 +58,5 @@ test('phone writing page uses mobile navigation and a single featured column', a
   const copy = await page.locator('.feature-copy').boundingBox();
   const fragment = await page.locator('.feature-fragment').boundingBox();
   expect(fragment!.y).toBeGreaterThanOrEqual(copy!.y + copy!.height - 1);
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+  await expectNoHorizontalOverflow(page);
 });

@@ -1,0 +1,5 @@
+{
+  "title": "溪边电台",
+  "description": "一档测试节目。",
+  "listen": [{ "platform": "订阅", "url": "https://example.org/show" }]
+}

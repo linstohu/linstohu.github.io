@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectNoHorizontalOverflow } from '../helpers/viewport.ts';
 
 test('navigation and excerpt follow the viewport and preserve keyboard focus', async ({
   page,
@@ -64,17 +65,10 @@ test('image viewer supports closing, focus return and repeated opening', async (
   await expect(dialog).toBeHidden();
 });
 
-test('navigation and excerpt remain readable without JavaScript', async ({
-  browser,
-  baseURL,
-}) => {
-  const context = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { width: 360, height: 800 },
-    baseURL,
-  });
-  try {
-    const page = await context.newPage();
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+  test('navigation and excerpt remain readable', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
     await page.goto('/writing/');
     await expect(
       page.getByRole('navigation', { name: '主导航' }),
@@ -82,7 +76,53 @@ test('navigation and excerpt remain readable without JavaScript', async ({
     await expect(page.locator('#fragment-copy')).toBeVisible();
     await expect(page.locator('.mobile-menu')).toBeHidden();
     await expect(page.locator('.fragment-toggle')).toBeHidden();
-  } finally {
-    await context.close();
+  });
+});
+
+test('mobile navigation and the excerpt stay usable if only the disclosure bundle fails', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  let blocked = false;
+  await page.route('**/_astro/Disclosure.*.js', async (route) => {
+    blocked = true;
+    await route.abort();
+  });
+  await page.goto('/writing/');
+  expect(blocked).toBe(true);
+  const nav = page.getByRole('navigation', { name: '主导航' });
+  await expect(nav).toBeVisible();
+  await expect(page.locator('.mobile-menu')).toBeHidden();
+  await expect(page.locator('#fragment-copy')).toBeVisible();
+  await nav.getByRole('link', { name: '声音' }).click();
+  await expect(page).toHaveURL(/\/audio\/$/);
+});
+
+test('linked Markdown images and about-page figures fit the mobile reading column', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  for (const [url, alt] of [
+    ['/writing/first/', '链接里的宽图'],
+    ['/about/', '关于页里的宽图'],
+  ]) {
+    await page.goto(url);
+    const image = page.getByRole('img', { name: alt });
+    await expect(image).toBeVisible();
+    await image.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => image.evaluate((el: HTMLImageElement) => el.naturalWidth))
+      .toBeGreaterThan(0);
+    const edges = await image.evaluate((el) => {
+      const image = el.getBoundingClientRect();
+      const column = el.closest('.markdown-body')!.getBoundingClientRect();
+      return {
+        left: image.left - column.left,
+        right: column.right - image.right,
+      };
+    });
+    expect(edges.left).toBeGreaterThanOrEqual(-1);
+    expect(edges.right).toBeGreaterThanOrEqual(-1);
+    await expectNoHorizontalOverflow(page);
   }
 });

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { expectNoHorizontalOverflow } from '../helpers/viewport.ts';
 
 test('prompted filtering, full-text search and return navigation stay connected', async ({
   page,
@@ -33,7 +34,7 @@ test('prompted filtering, full-text search and return navigation stay connected'
   await expect(page.locator('.dialogue-avatar')).toHaveCount(4);
   await expect(
     page.locator('[data-speaker="user"] > .dialogue-avatar').first(),
-  ).toHaveText('L');
+  ).toHaveText('R');
   await expect(
     page.locator('[data-speaker="assistant"] > .dialogue-avatar svg').first(),
   ).toBeVisible();
@@ -50,22 +51,55 @@ test('prompted filtering, full-text search and return navigation stay connected'
   await expect(page.locator('[data-category-note="prompted"]')).toBeHidden();
 });
 
-test('the publication date shares the author’s text baseline', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/writing/a-question/');
-  const [author, date] = await page
-    .locator('.byline > span:first-child, .byline time')
-    .evaluateAll((items) =>
-      items.map((item) => {
-        const range = document.createRange();
-        range.selectNodeContents(item);
-        return range.getBoundingClientRect().bottom;
-      }),
-    );
-  expect(date).toBeCloseTo(author, 0);
-});
+for (const width of [1280, 320]) {
+  test(
+    'author, assistant and date align within each byline row at ' +
+      width +
+      'px',
+    async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto('/writing/a-question/');
+      const byline = page.locator('.byline');
+      const bounds = (await byline.boundingBox())!;
+      const parts = await byline
+        .locator(':scope > span:first-child, .article-source, time')
+        .evaluateAll((items) =>
+          items.map((item) => {
+            // A zero-height inline box sits on the text baseline even when Chinese and Latin glyphs use different fonts.
+            const marker = document.createElement('i');
+            marker.style.cssText =
+              'display:inline-block;width:0;height:0;vertical-align:baseline;padding:0;margin:0;border:0';
+            item.append(marker);
+            const baseline = marker.getBoundingClientRect().top;
+            marker.remove();
+            const { left, right, top, bottom } = item.getBoundingClientRect();
+            return { left, right, top, bottom, baseline };
+          }),
+        );
+      expect(parts).toHaveLength(3);
+      for (const part of parts) {
+        expect(part.left).toBeGreaterThanOrEqual(bounds.x - 1);
+        expect(part.right).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+      }
+      if (width === 1280) {
+        for (const part of parts)
+          expect(
+            Math.abs(part.baseline - parts[0].baseline),
+          ).toBeLessThanOrEqual(1);
+      } else {
+        expect(parts[2].baseline).toBeGreaterThan(parts[0].baseline + 1);
+        for (const [i, current] of parts.slice(1).entries()) {
+          const previous = parts[i];
+          if (current.left >= previous.right - 1)
+            expect(
+              Math.abs(current.baseline - previous.baseline),
+            ).toBeLessThanOrEqual(1);
+          else expect(current.top).toBeGreaterThanOrEqual(previous.bottom - 1);
+        }
+      }
+    },
+  );
+}
 
 test('dialogue separates speakers and keeps rich answers readable across themes and widths', async ({
   page,
@@ -178,26 +212,17 @@ test('dialogue separates speakers and keeps rich answers readable across themes 
         parseFloat(getComputedStyle(node).fontSize),
       );
       expect(headingSize).toBeGreaterThan(bodySize);
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-      ).toBe(true);
+      await expectNoHorizontalOverflow(page);
     }
   }
 });
 
-test('conversation content and category navigation work without JavaScript', async ({
-  browser,
-  baseURL,
-}) => {
-  const context = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { width: 375, height: 900 },
-    baseURL,
-  });
-  try {
-    const page = await context.newPage();
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+  test('readers can return to the writing list and reopen a conversation', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 900 });
     await page.goto('/writing/a-question/');
     await expect(page.locator('[data-speaker="user"]').first()).toContainText(
       'promptedneedles',
@@ -215,7 +240,22 @@ test('conversation content and category navigation work without JavaScript', asy
         .locator('.article-path')
         .getByRole('link', { name: 'prompted', exact: true }),
     ).toHaveAttribute('href', '/writing/?tag=prompted');
-    await page.goto('/writing/open-note/');
+    await page.getByRole('link', { name: '← 返回 prompted' }).click();
+    await expect(page).toHaveURL('/writing/?tag=prompted');
+    await expect(
+      page.getByRole('heading', { level: 1, name: '文字' }),
+    ).toBeVisible();
+    await page
+      .locator('#rows')
+      .getByRole('link', { name: /与 AI 的对话/ })
+      .click();
+    await expect(page).toHaveURL('/writing/a-question/');
+    await page.getByRole('link', { name: '← 返回 prompted' }).click();
+    await page
+      .locator('#rows')
+      .getByRole('link', { name: /随手记下一句话/ })
+      .click();
+    await expect(page).toHaveURL('/writing/open-note/');
     await expect(page.locator('.article-body')).toHaveText(
       '今天只记下一句话。',
     );
@@ -223,7 +263,5 @@ test('conversation content and category navigation work without JavaScript', asy
     await expect(page.locator('.article-body h2')).toHaveCount(0);
     await expect(page.locator('.dialogue-turn')).toHaveCount(0);
     await expect(page.locator('.dialogue-orbits')).toBeHidden();
-  } finally {
-    await context.close();
-  }
+  });
 });

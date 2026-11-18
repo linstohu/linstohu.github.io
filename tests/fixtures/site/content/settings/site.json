@@ -1,0 +1,10 @@
+{
+  "url": "https://example.org",
+  "title": "溪边手记",
+  "name": "Rowan",
+  "author": "Rowan Field",
+  "greeting": "Hi,",
+  "description": "测试用的个人站点。",
+  "homeImage": "/images/landscape.png",
+  "footerCredit": "溪边手记"
+}

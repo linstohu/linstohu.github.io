@@ -9,7 +9,7 @@ import { buffer } from 'node:stream/consumers';
 import type { Readable } from 'node:stream';
 import { S3Client, type PutObjectCommand } from '@aws-sdk/client-s3';
 import { withMediaSnapshot, uploadMedia } from '../scripts/media.mjs';
-import { audioSchema } from '../src/lib/schemas.ts';
+import { createTestProject } from './helpers/project.mjs';
 
 const media = fileURLToPath(new URL('./fixtures/media/', import.meta.url));
 const env = {
@@ -81,34 +81,52 @@ test('public URL credentials are rejected before sending any bytes and snapshots
   assert.equal(send.mock.callCount(), 0);
 });
 
-test('both upload commands classify WebM by its tracks and agree on the key', async () => {
-  for (const [name, mime] of [
-    ['audio', 'audio/webm'],
-    ['mixed', 'video/webm'],
-    ['video', 'video/webm'],
-  ]) {
-    const file = path.join(media, name + '.webm');
-    let expectedKey = '';
-    await withMediaSnapshot(file, (info) => {
-      assert.equal(info.mime, mime);
-      assert.ok(info.key.startsWith(mime.split('/')[0] + '/'));
-      expectedKey = info.key;
-    });
-    const inspect = () =>
-      withMediaSnapshot(
-        file,
-        (info) => {
-          assert.equal(info.mime, mime);
-          assert.equal(info.key, expectedKey);
-          assert.ok(typeof info.duration === 'number' && info.duration > 0);
-          assert.equal(
-            audioSchema.shape.mime.safeParse(info.mime).success,
-            true,
-          );
-        },
-        { forAudio: true },
+test('media and audio CLI dry-runs classify the same WebM through their public entry points', async (t) => {
+  const project = await createTestProject();
+  t.after(project.dispose);
+  for (const [name, mime, duration] of [
+    ['audio', 'audio/webm', 0.128],
+    ['mixed', 'video/webm', 0.148],
+    ['video', 'video/webm', undefined],
+  ] as const) {
+    await t.test(name, async () => {
+      const file = path.join(media, name + '.webm');
+      const bytes = await readFile(file);
+      const key =
+        mime.split('/')[0] +
+        '/' +
+        createHash('sha256').update(bytes).digest('hex') +
+        '.webm';
+      const args = ['--dry-run', '--file', file];
+      assert.deepEqual(JSON.parse(project.cli('media', ...args)), {
+        key,
+        bytes: bytes.length,
+        mime,
+      });
+      const audio = () =>
+        project.cli(
+          'audio',
+          ...args,
+          '--slug',
+          name,
+          '--title',
+          '试听',
+          '--description',
+          '音轨测试',
+        );
+      if (duration === undefined) {
+        assert.throws(audio, { status: 1, stderr: /音轨/ });
+      } else {
+        const result = JSON.parse(audio());
+        assert.equal(result.key, key);
+        assert.equal(result.bytes, bytes.length);
+        assert.equal(result.mime, mime);
+        assert.equal(result.duration, duration);
+      }
+      await assert.rejects(
+        stat(project.content('audio/' + name + '/index.md')),
+        { code: 'ENOENT' },
       );
-    if (name === 'video') await assert.rejects(inspect(), /音轨/);
-    else await inspect();
+    });
   }
 });
