@@ -1,43 +1,50 @@
 # linsto.org 架构
 
-本站是单作者维护的 Astro 静态网站。Git 保存内容与发布状态，Astro 在构建时生成 HTML、订阅和站点地图，Pagefind 从生成的页面建立全文索引。Cloudflare Pages 提供站点文件，R2 提供音频和大媒体。线上请求无需数据库或 Node.js 服务。
+linsto.org 是单作者维护的 Astro 静态站点。Git 保存正文、元数据和发布状态。Node.js 运行作者工具和构建任务，Cloudflare Pages 向读者提供构建产物。
 
-日常写作、上传媒体和部署的操作步骤见[维护手册](maintenance.md)。
+```mermaid
+flowchart TD
+  repo["Git 中的内容与代码"] --> astro["Astro 静态构建"]
+  astro -->|页面、订阅与资源| dist["dist/"]
+  astro -->|详情页 HTML| search["Pagefind"]
+  search -->|全文索引| dist
+  dist -->|校验后部署| pages["Cloudflare Pages"]
+  pages --> reader["读者浏览器"]
+  r2["Cloudflare R2"] -->|音频与附件| reader
+```
 
-## 内容与发布
+## 内容模型与地址
 
-`src/content.config.ts` 将文字、声音、月份快照、节目资料和关于页面映射为 Astro 内容集合。站点资料和经典摘句从各自的 JSON 文件读取。`src/lib/schemas.ts` 定义数据格式，作者工具与构建过程共用这些校验规则。
+Astro 从 `content/` 加载五个集合。文字、声音和「此刻」按条目发布，`series` 保存节目资料，`pages` 保存「关于」页。站点设置和经典摘句直接读取 JSON。作者工具和构建共用 Zod 字段定义。[集合定义](../src/content.config.ts) · [字段定义](../src/lib/schemas.ts)
 
-| 内容 | 标识与关系                                                                                                          | 页面如何使用                                                                                                                                                                                                                                                                 |
-| ---- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 文字 | `slug` 决定文章地址，目录为 `YYYY-MM-DD-slug`，日期由 `publishedAt` 按北京时间生成。`category` 和 `tags` 由作者填写 | 列表从可见文章生成筛选项。`description` 用于首页、列表、页面元数据和文字 RSS，文章详情从 Markdown 正文开始。最新文章的「文中一段」优先使用 `featuredExcerpt`，缺省时由 `src/lib/excerpt.ts` 从正文选取。                                                                     |
-| 声音 | `slug` 决定详情地址，`uid` 标识 RSS 条目。播客通过 `series` 引用节目，例如「老大不小」对应 `thirty-plus`            | 节目资料保存名称、简介和封面字样。声音页从可见音频生成筛选项，首期公开后节目才出现在生产站。未关联节目的录音归入「声音手记」，由站内播放器播放。栏目单集可通过 `listen` 列表指向外部平台，每个平台保存名称和单集地址。外部单集可省略音频文件和时长，详情页提供平台收听入口。 |
-| 此刻 | `period` 与月份文件名一致                                                                                           | `/now/` 展示最新可见月份，各月快照保有独立地址，按月归档。                                                                                                                                                                                                                   |
+| 集合           | 公开地址           | 标识规则                                                                       |
+| -------------- | ------------------ | ------------------------------------------------------------------------------ |
+| 文字 `writing` | `/writing/<slug>/` | 目录名为 `YYYY-MM-DD-<slug>`，日期取自 `publishedAt`（`Asia/Shanghai` 时区）。 |
+| 声音 `audio`   | `/audio/<slug>/`   | `uid` 在声音集合内唯一，用作 RSS 的 `<guid>`。                                 |
+| 此刻 `now`     | `/now/YYYY/MM/`    | `period` 为 `YYYY-MM`，文件名为 `<period>.md`。`/now/` 展示最新可见月份。      |
 
-`src/lib/publication.ts` 校验标识唯一性、节目引用和声音关联的文字。`src/lib/content.ts` 统一查询与排序。文字、声音和快照默认是草稿，生产构建仅公开 `draft: false` 且发布时间已到的条目。详情页、列表、订阅和站点地图据此生成，搜索索引取自同一次构建。开发预览也展示草稿和未来内容。定时内容在到期后的下一次构建公开。
+文字和声音的集合内 ID 取自 `index.md` 所在的相对目录，公开地址使用各自集合内唯一的 `slug`。声音通过 `relatedWriting` 引用文章 `slug`。播客单集（`podcast`）必须填写 `series`，对应 `content/series/<series>.json`。独立录音（`recording`）须省略该字段。
 
-作者工具先校验元数据，再原子写回文件。文章首次发布或显式修正日期时，工具同步移动整个日期目录，目标冲突会中止操作。文章新建和发布使用集合内的文件锁串行执行，文字与声音集合的内部 ID 使用实际目录名，对外地址与内容关联使用 `slug`。构建校验目录日期及固定标识的唯一性。再次发布默认保留首次发布日期并更新修改时间，正文和 Markdown 空白保留。本地上传的音频以文件内容哈希命名，上传到 R2 后生成本地草稿。声音 RSS 为含完整音频信息的条目生成 enclosure，外部平台单集使用该平台的订阅。删除内容文件时，R2 对象独立保留。
+## 发布规则
+
+`publish:content` 更新本地内容文件。文字的新建和发布共用集合锁，发布日期改到另一天时，作者工具连同配图移动文章目录。[写入逻辑](../scripts/lib.mjs)
+
+- **内容校验**覆盖草稿、未来条目和已发布条目。标识重复、文章目录或快照文件名不符、引用的节目或文章不存在，都会使构建失败。[跨条目校验](../src/lib/publication.ts)
+- **生产可见性**由构建时刻决定。`draft` 默认是 `true`。每次生产构建复用同一份校验后的集合，选取 `draft: false` 且 `publishedAt` 已到的条目，供详情页、列表、RSS 和站点地图使用。定时条目在到期后重新构建并部署时上线。开发模式可以预览草稿和未来条目。[内容查询](../src/lib/content.ts)
+- **声音订阅**只收录 `src`、`bytes`、`mime`、`duration` 齐全的可见条目。仅提供外部 `listen` 链接的单集仍有站内详情页。[声音 RSS](../src/pages/audio/rss.xml.ts)
 
 ## 页面与浏览器
 
-`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 输出共享布局和页面内容。Markdown 按受信任的作者文件渲染。文章目录中的相对图片经 Astro 优化，`src/lib/rehype-figures.mjs` 在 HTML 处理阶段添加图注与放大入口。`public/` 中的资源按原样发布；首页和关于页的配图由 `Artwork.astro` 额外生成多尺寸 AVIF 与 WebP，随 HTML 内联小幅预览。两页按显示宽度选择图片，同一原图复用相同的资源地址。优化图片使用 Astro 生成的内容指纹地址，匹配 `/_astro/*` 的一年不可变缓存策略。
+`src/pages/` 定义路由，`src/layouts/` 和 `src/components/` 把导航、列表和正文写入 HTML。Markdown 在构建时转换。Rehype 插件为独占一段的图片生成放大入口，将图片标题用作图注。在 `prompted` 类文章中，插件根据独立成段的说话者标记，将后续正文按对话轮次分组。[Markdown 配置](../astro.config.mjs)
 
-正文、列表和导航随 HTML 提供。浏览器脚本按页面增强分类筛选、全文搜索、播放和图片查看。列表筛选只更新结果区域，保留精选内容与筛选控件的位置。开发预览搜索标题与摘要，生产搜索使用 Pagefind 正文索引。详情页在索引中标记内容类型，栏目搜索及归档类型筛选在索引层限定范围；浏览器只读取匹配范围的结果。URL 搜索词在输入框出现时同步回填，后续异步脚本保留读者已经输入的内容。
+全站样式集中在 `src/styles/`。Tailwind 提供布局工具类和断点，`tokens.css` 定义颜色、字体与阅读宽度，`markdown.css` 管理正文排版。页面和组件各自导入局部样式。折叠控件和图片弹窗由共享的 Astro 组件封装 Starwind Runtime。[样式入口](../src/styles/site.css) · [交互组件](../src/components/ui/)
 
-## 样式与交互组件
-
-Astro 负责页面、内容和静态 HTML，Tailwind CSS 4 负责通用布局与响应式变体。`src/styles/site.css` 是样式入口，声明 `theme → base → components → utilities` 的级联层；`tokens.css` 定义颜色、字体、阅读宽度和触摸尺寸，`base.css` 定义基础排版，页面与组件的视觉规则保存在对应的 `styles/pages/`、`styles/components/` 中，由使用它们的 Astro 组件导入。Markdown 排版独立维护。基础样式明确控制站点的默认外观，不加载 Tailwind Preflight。
-
-主要断点定义在 Tailwind 的 `@theme` 中：`md` 从 761px 开始，`lg` 从 901px 开始。浏览器交互从同一份 `--breakpoint-md` 读取阈值。页面还可按实际内容在 360px、600px、640px 调整局部尺寸。新增样式放到所属组件，先使用布局工具类和现有设计变量，在同一断点内修改既有规则。
-
-通用交互基于 Starwind Runtime 的无样式组件，封装在 `src/components/ui/`。`Disclosure` 统一导航与正文摘录的折叠状态、ARIA 关联和跨断点行为；导航保留原生 landmark。`ImageDialog` 使用 Dialog 管理弹窗关闭、焦点和滚动锁定，页面只负责填充图片与图注。`PageHeading` 统一栏目标题结构。内容查询、搜索和音频播放保留独立模块。浏览器支持基线跟随 Tailwind 4，交互在桌面 Chromium、Android 尺寸 Chromium 和 iPhone WebKit 中验证。
+Pagefind 索引详情正文、摘要、作者、对话助手与标签。分类和栏目筛选在索引内执行，浏览器通过 `entry_key` 筛选计数匹配列表行，并合并行内元数据的命中。开发模式或索引不可用时按行内元数据搜索。栏目链接使用节目 ID。[列表搜索](../src/scripts/collection.ts)
 
 ## 构建与交付
 
-仓库为单个 pnpm 包。构建集成测试检查生产内容和资源，浏览器测试检查响应式布局、组件交互、键盘焦点及无 JavaScript 时的内容可用性。Node 主版本由 `.nvmrc` 指定，pnpm 版本与任务入口见 `package.json`，CI 按锁文件安装。`pnpm-workspace.yaml` 管理安装策略，包括为 `@astrojs/astro2tsx@0.1.3` 固定兼容的运行时依赖；升级该工具时应复核这项约束。
+`pnpm build` 最后检查站内链接、资源和锚点，并确认搜索索引、订阅等文件齐全。GitHub Actions 保存校验后的 `dist/`，拉取请求的工作流到此结束。部署凭据齐全时，分支构建还会通过 Wrangler 将该目录上传到 Pages。`main` 对应生产环境，其余分支对应预览。[产物校验](../scripts/check-build.mjs) · [部署工作流](../.github/workflows/site.yml)
 
-`.github/workflows/site.yml` 每次通过 `validate:static` 依次检查格式、运行测试、执行 Astro 类型检查和生产构建。仅内容和文档变更跳过浏览器步骤，其余变更、手动运行或缺少比较基准时安装 headless Chromium 与 WebKit 并运行交互测试，全部适用检查通过后才部署。集成测试在临时目录中构建独立内容，覆盖草稿可见性、重复地址、文章图片与摘录、节目从草稿到公开后的展示。Playwright 使用独立的临时内容构建测试站，使用 Chromium 与 iPhone 尺寸的 WebKit，检查真实的搜索索引、输入保留、筛选布局、键盘焦点与正文换行；测试产物与待部署的 `dist/` 分开。生产构建随后检查实际站点的站内链接、图片资源、锚点和订阅文件。
+文章相对引用的本地图片由 Astro 优化，`public/` 下的文件原样发布。自托管音频和附件由作者工具上传 R2，对象键包含文件内容的 SHA-256。页面通过公开 URL 引用媒体，R2 对象独立于 Pages 部署。[媒体上传](../scripts/media.mjs)
 
-GitHub Actions 保存已校验的 `dist/`。部署凭据齐全时，分支构建通过 Wrangler 将同一份产物直接上传至 Pages。`main` 对应生产，其他分支对应预览，拉取请求仅运行校验。R2 媒体上传使用作者本地凭据，Pages 部署使用仓库的 Actions 凭据。
-
-正式地址为 `https://www.linsto.org`。canonical、站点地图和 RSS 的基础地址来自 `content/settings/site.json` 的 `url`，构建时可用 `SITE_URL` 覆盖。根域 `linsto.org` 到 `www` 的 301 跳转由 Cloudflare 规则处理，保留路径及查询参数。DNS、证书和跳转规则在 Cloudflare 管理。
+canonical、RSS 和站点地图中的站内绝对地址使用 `content/settings/site.json` 的 `url`，构建时可用 `SITE_URL` 覆盖。写作命令和部署配置见[维护手册](maintenance.md)。
