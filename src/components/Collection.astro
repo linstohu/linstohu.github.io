@@ -48,6 +48,18 @@ const tagCounts = new Map<string, number>();
 for (const entry of entries)
   for (const tag of new Set(collectionTags(entry, group === 'archive')))
     tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+const writingCategoryOrder = ['随笔', '生活', 'prompted'];
+const filterTags =
+  group === 'writing'
+    ? [
+        ...writingCategoryOrder.filter((tag) => tagCounts.has(tag)),
+        ...Array.from(tagCounts.keys()).filter(
+          (tag) => !writingCategoryOrder.includes(tag),
+        ),
+      ]
+    : group === 'audio'
+      ? []
+      : Array.from(tagCounts.keys());
 ---
 
 <section
@@ -241,7 +253,7 @@ for (const entry of entries)
       </div>
       <div class="index-controls">
         <div class="filters" aria-label="分类筛选">
-          {['', ...(group === 'audio' ? [] : tagCounts.keys())].map((tag) => (
+          {['', ...filterTags].map((tag) => (
             <button
               data-filter={tag}
               aria-pressed={tag === '' ? 'true' : 'false'}
