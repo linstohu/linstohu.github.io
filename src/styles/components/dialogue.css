@@ -463,7 +463,39 @@
   .reply-chapter:has(> details:not([open])) + .reply-chapter {
     margin-block-start: clamp(1.1rem, 2.2vw, 1.5rem);
   }
+  .reply-chapter {
+    &::before {
+      float: inline-start;
+      margin-inline-end: 0.45rem;
+      color: color-mix(in srgb, var(--dialogue-cool) 70%, var(--bg));
+      font:
+        400 0.875rem/1.75rem ui-monospace,
+        monospace;
+      user-select: none;
+    }
+    &:has(> h1)::before {
+      content: '#' / '';
+      line-height: 2.4rem;
+    }
+    &:has(> h2)::before {
+      content: '##' / '';
+    }
+    &:has(> h3)::before {
+      content: '###' / '';
+    }
+    &:has(> h4)::before {
+      content: '####' / '';
+    }
+    &:has(> h5)::before {
+      content: '#####' / '';
+    }
+    &:has(> h6)::before {
+      content: '######' / '';
+    }
+  }
   .markdown-body .reply-chapter > :is(h1, h2, h3, h4, h5, h6) {
+    /* Wrapped title lines share a left edge beside the marker. */
+    display: flow-root;
     margin-block: 0 0.45em;
   }
   .markdown-body .reply-chapter > p:has(+ .reply-section),

@@ -241,10 +241,28 @@ test('readers can skim an answer, open a subsection by keyboard and follow its h
   await expect(second).toHaveAttribute('open', '');
   await expect(sections.first()).not.toHaveAttribute('open', '');
   const child = sections.nth(2);
-  const childHeading = second.getByRole('heading', { name: '先从哪里观察？' });
+  const parentHeading = answer.getByRole('heading', {
+    level: 2,
+    name: '还想继续追问',
+    exact: true,
+  });
+  const childHeading = second.getByRole('heading', {
+    level: 3,
+    name: '先从哪里观察？',
+    exact: true,
+  });
+  for (const [heading, hashes] of [
+    [parentHeading, '##'],
+    [childHeading, '###'],
+  ] as const) {
+    await expect(heading).toBeVisible();
+    const marker = await heading.evaluate(
+      (node) => getComputedStyle(node.parentElement!, '::before').content,
+    );
+    expect(marker).toContain(`"${hashes}"`);
+  }
   const fragment =
     '#' + encodeURIComponent((await childHeading.getAttribute('id'))!);
-  await expect(childHeading).toBeVisible();
   await expect(
     second.getByText('留意下一次想要责怪别人的时刻。'),
   ).toBeVisible();
